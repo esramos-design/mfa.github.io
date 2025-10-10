@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Ship Mining Fracture Analyser Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #1a1a1a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        h1 {
+            border-bottom: 3px solid #666;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        p, li {
+            margin-bottom: 10px;
+        }
+        strong {
+            color: #000;
+        }
+        a {
+            color: #007bff; /* Standard link color */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mining Fracture Analyser</h1>
+        
+        <h2>Introduction</h2>
+        <p>The <strong>Mining Fracture Analyser</strong> is a powerful, real-time calculation tool designed specifically for cooperative mining crews in Star Citizen, such as those using multiple MOLEs, Prospectors, or Golems.</p>
+        <p>This application simplifies complex in-game mechanics by calculating your crew's <strong>Total Combined Effective Laser Power (MW)</strong> and comparing it against a targeted rock's mass, effective resistance, and instability. Use it to pre-determine if your team has enough power to successfully fracture a difficult asteroid or planet-side rock before committing time and resources.</p>
+        
+        <h2>Access the Tool</h2>
+        <p>Find the live, collaborative analyser here: <a href="https://esramos-design.github.io/mfa.github.io">https://esramos-design.github.io/mfa.github.io</a></p>
+
+        <h2>The Collaboration Team</h2>
+        <p>This application was developed by <strong>CHIRONDRAGON</strong> as a community tool for the <strong>THRUSTERS & DUST</strong> organization.</p>
+        <ul>
+            <li><strong>Developer:</strong> CHIRONDRAGON</li>
+            <li><strong>Organization:</strong> THRUSTERS & DUST</li>
+        </ul>
+        
+        <h2>How to Use the App</h2>
+        <p>The analyser is designed for quick input based on your in-game ship loadouts and the rock data displayed on your scanner.</p>
+        
+        <h3>Step 1: Assemble Your Mining Team</h3>
+        <ol>
+            <li>Use the <strong>"1. Assemble Your Mining Team"</strong> dropdown to select a ship (e.g., Argo MOLE or MISC Prospector).</li>
+            <li>Click <strong>Add Ship</strong>. The app will automatically add the corresponding number of laser heads (e.g., 3 heads for a MOLE, 1 for a Prospector) to the configuration area.</li>
+        </ol>
+        
+        <h3>Step 2: Configure Loadouts</h3>
+        <p>For every active <strong>Laser Head</strong> added:</p>
+        <ol>
+            <li><strong>Laser Head (Base Power):</strong> Select the actual mining laser head installed (e.g., Lancet MH2, Helix I).</li>
+            <li><strong>Modules:</strong> Select up to three Power Modules (e.g., Surge, Rieger-C3). Only modules with a power multiplier (<code>&gt;1.0</code>) will increase your effective fracture power.</li>
+        </ol>
+        
+        <h3>Step 3: Apply Gadget</h3>
+        <ol>
+            <li>In the <strong>"2. Select Gadget"</strong> section, choose the resistance-reducing gadget your crew plans to use on the rock (e.g., Sabir). This applies a single, non-stacking resistance reduction to the target rock.</li>
+        </ol>
+        
+        <h3>Step 4: Input Rock Parameters</h3>
+        <ol>
+            <li>Enter the rock's <strong>Base Resistance (%)</strong> and <strong>Rock Instability (%)</strong> values exactly as shown on your ship's mining scanner.</li>
+            <li>Enter the <strong>Target Rock Mass (kg)</strong> for the specific rock you intend to fracture.</li>
+        </ol>
+        
+        <h3>Step 5: Calculate</h3>
+        <ol>
+            <li>Click the <strong>"Calculate Combined Fracture Limit"</strong> button.</li>
+        </ol>
+        
+        <h2>What Do You Get From It?</h2>
+        <p>The results section provides the critical metrics needed for a successful fracture:</p>
+        <ol>
+            <li><strong>Effective Resistance:</strong> The final resistance of the rock after your chosen gadget has been applied.</li>
+            <li><strong>Total Combined Effective Laser Power (MW):</strong> The sum of the raw power from all active laser heads, multiplied by the effects of all chosen modules. This is your crew's true fracture strength.</li>
+            <li><strong>Max Theoretical Breakable Mass Limit (kg):</strong> The largest rock mass your current team configuration can theoretically crack, given the rock's Effective Resistance.</li>
+            <li><strong>VERDICT:</strong> A clear indicator of FRACTURE SUCCESSFUL or FRACTURE FAILED.</li>
+            <li><strong>Upgrade Required (If Failed):</strong> If the fracture fails, the app provides the exact <strong>Required Effective Power (MW)</strong> you need to safely crack the rock and offers recommendations for the maximum-power module loadouts.</li>
+        </ol>
+        
+        <h2>Disclaimer of Accuracy & Safety</h2>
+        <p>This application uses empirical data and established community formulas to provide a useful <strong>estimation</strong> of your fracture capability.</p>
+        <ul>
+            <li><strong>Estimation Tool:</strong> This is not a guarantee of success. In-game variables, ping, server latency, pilot charge control, and minor patch updates can all affect the actual results.</li>
+            <li><strong>Use at Your Own Risk:</strong> The developer is not responsible for any catastrophic failure (rock explosion) that may occur in the game.</li>
+            <li><strong>Data Updates:</strong> Values are based on the latest available data at the time of development. Star Citizen is an alpha, and all ship/laser/module stats are subject to change by Cloud Imperium Games (CIG).</li>
+        </ul>
+        
+        <h2>License</h2>
+        <p>This project is open-source and released under the <strong>GNU General Public License (GPL)</strong></p>
+    </div>
+</body>
+</html>
