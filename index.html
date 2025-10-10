@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mining Fracture Analyser</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define the Inter font family and a space-themed dark background */
+        @import url('https://fonts.fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Deep space blue/black */
+            color: #e5e7eb; /* Light gray text */
+            min-height: 100vh;
+        }
+        /* Custom input and select styling for a sci-fi look */
+        input[type="number"], select {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #ffffff;
+            transition: border-color 0.2s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #60a5fa; /* Blue focus ring */
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+            outline: none;
+        }
+        /* Styling for the dynamically added ship arms */
+        .ship-arm-card {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            transition: border-color 0.2s;
+        }
+        .ship-arm-card:hover {
+            border-color: #60a5fa;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex justify-center items-start">
+
+    <div class="w-full max-w-xl bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Mining Fracture Analyser</h1>
+            <p class="text-sm text-gray-400 mt-2">Calculate the **combined effective fracture power** of your multi-ship mining crew against challenging planetary and asteroid rocks.</p>
+        </header>
+
+        <!-- Dynamic Ship Loadout Management -->
+        <div class="p-4 bg-blue-900/20 rounded-xl mb-6 border border-blue-700/50">
+            <label for="shipSelectToAdd" class="block text-sm font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
+            <div class="flex space-x-2">
+                <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
+                    <!-- Options populated by JS -->
+                </select>
+                <button onclick="addShipLoadout()"
+                        class="p-3 text-sm font-bold rounded-lg transition-all duration-200 
+                               bg-blue-600 hover:bg-blue-700 shadow-md active:scale-95 whitespace-nowrap">
+                    Add Ship
+                </button>
+            </div>
+        </div>
+
+        <!-- Loadout Configuration Container (Dynamically populated) -->
+        <h2 class="text-xl font-semibold text-gray-300 mb-4 mt-6">Active Mining Laser Heads:</h2>
+        <div id="multiShipContainer" class="space-y-4">
+            <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
+                Add ships above to configure their mining laser heads.
+            </p>
+        </div>
+
+        <!-- Gadget Slot (Resistance Reduction) -->
+        <div class="p-4 bg-[#21262d] rounded-xl mt-8">
+            <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">2. Select Gadget (Applies once to Rock)</label>
+            <select id="gadgetSelect" onchange="calculate()"
+                   class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500 bg-[#161b22] border border-[#30363d] text-white">
+                <!-- Options populated by JS -->
+            </select>
+        </div>
+        
+        <!-- Rock Stats Input (Resistance and Instability) -->
+        <h2 class="text-xl font-semibold text-blue-300 mt-8 mb-4">3. Rock Parameters</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-[#21262d] rounded-xl">
+                <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
+                <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
+                       class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+            </div>
+            
+            <div class="p-4 bg-[#21262d] rounded-xl">
+                <label for="instability" class="block text-sm font-medium mb-2 text-gray-300">Rock Instability (%)</label>
+                <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
+                       class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Target Rock Mass Input -->
+        <div class="p-4 bg-[#21262d] rounded-xl mt-6">
+            <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">4. Target Rock Mass (kg) [For Verdict]</label>
+            <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
+                   class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+        </div>
+
+        <button onclick="calculate()"
+                class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 mt-6 
+                       bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
+            Calculate Combined Fracture Limit
+        </button>
+
+        <section id="results" class="mt-8 pt-6 border-t border-gray-700/50">
+            <h2 class="text-xl font-semibold text-center text-blue-300 mb-4">Calculation Results</h2>
+            <p class="text-center text-gray-400 italic">Add ships and enter rock data to begin.</p>
+        </section>
+        
+        <!-- Recommendation output will be inserted here when fracture fails -->
+        <section id="suggestion" class="mt-8 pt-6 border-t border-gray-700/50 hidden">
+        </section>
+    </div>
+
+    <script>
+        // Data Definitions based on the latest single-ship file, adapted for dynamic adding
+        const ships = [
+            // Updated defaultLaser powers based on new laser data
+            { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false }, 
+            { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 3, isFixedLaser: false }, 
+            { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)" } 
+        ];
+
+        // --- UPDATED LASER HEADS DATA ---
+        const allLaserHeads = [
+            // Size 1 Lasers (Max Power in MW)
+            { name: "Arbor MH1 (~1890 MW)", power: 1890, size: 1 }, 
+            { name: "Hofstede-S1 (~2100 MW)", power: 2100, size: 1 },
+            { name: "Impact I (~2100 MW)", power: 2100, size: 1 },
+            { name: "Klein-S1 (~2220 MW)", power: 2220, size: 1 },
+            { name: "Arbor MH2 (~2400 MW)", power: 2400, size: 1 }, // Retaining size 1 to ensure it shows up in S1 ship dropdowns, though officially S2
+            { name: "Lancet MH1 (~2520 MW)", power: 2520, size: 1 },
+            { name: "Pitman (~2700 MW)", power: 2700, size: 1 }, // Bespoke Golem head, slightly higher power
+            { name: "Helix I (~3150 MW)", power: 3150, size: 1 },
+
+            // Size 2 Lasers (Max Power in MW)
+            { name: "Hofstede-S2 (~3360 MW)", power: 3360, size: 2 },
+            { name: "Lancet MH2 (~3600 MW)", power: 3600, size: 2 },
+            { name: "Klein-S2 (~3600 MW)", power: 3600, size: 2 },
+            { name: "Impact II (~4080 MW)", power: 4080, size: 2 }, 
+            { name: "Helix II (~4080 MW)", power: 4080, size: 2 } 
+        ].sort((a, b) => a.power - b.power); 
+
+        // --- UPDATED POWER MODULES DATA ---
+        const powerModules = [
+            { name: "Surge (Active, +50% Power, -15% Resistance)", multiplier: 1.50 },
+            { name: "Brandt (Active, +35% Power, +15% Resistance)", multiplier: 1.35 },
+            { name: "Stampede (Active, +35% Power, -10 Instability)", multiplier: 1.35 },
+            { name: "Rieger-C3 (Passive, +25% Power, -1% Instability)", multiplier: 1.25 },
+            { name: "Rieger-C2 (Passive, +20% Power, -3% Instability)", multiplier: 1.20 },
+            { name: "None", multiplier: 1.00 },
+            { name: "Forel (Active, Stability/Extraction Focus)", multiplier: 1.00 },
+            { name: "Lifeline (Active, Low Instability/High Overcharge)", multiplier: 1.00 },
+            { name: "Torpid (Active, +60% Charge Rate)", multiplier: 1.00 },
+            { name: "Vaux (Passive, -20% Charge Rate)", multiplier: 1.00 },
+            { name: "Vaux-C2 (Passive, -15% Charge Rate)", multiplier: 1.00 },
+            { name: "Vaux-C3 (Passive, -5% Charge Rate)", multiplier: 1.00 },
+            { name: "FLTR (Passive, -20% Inert Materials)", multiplier: 1.00 },
+            { name: "FLTR-L (Passive, -23% Inert Materials)", multiplier: 1.00 },
+            { name: "FLTR-XL (Passive, -24% Inert Materials)", multiplier: 1.00 },
+            { name: "Torrent (Passive, +30% Charge Rate/Instability)", multiplier: 1.00 },
+            { name: "Torrent II (Passive, +35% Charge Rate/Instability)", multiplier: 1.00 },
+            { name: "Torrent III (Passive, +40% Charge Rate/Instability)", multiplier: 1.00 },
+            { name: "XTR (Passive, +15% Opt. Charge Window/Inert)", multiplier: 1.00 },
+            { name: "XTR-L (Passive, +22% Opt. Charge Window/Inert)", multiplier: 1.00 },
+            { name: "XTR-XL (Passive, +25% Opt. Charge Window/Inert)", multiplier: 1.00 },
+            { name: "Focus III (Passive, -5% Power, +40% Opt. Charge Window)", multiplier: 0.95 },
+            { name: "Focus II (Passive, -10% Power, +37% Opt. Charge Window)", multiplier: 0.90 },
+            { name: "Optimum (Active, -15% Power, -80% Catastrophic Rate)", multiplier: 0.85 },
+            { name: "Rime (Active, -15% Power, -25% Resistance)", multiplier: 0.85 },
+            { name: "Focus (Passive, -15% Power, +30% Opt. Charge Window)", multiplier: 0.85 }
+        ].sort((a, b) => b.multiplier - a.multiplier); 
+
+        const gadgets = [
+            { name: "None", reduction: 0.0 }, 
+            { name: "Sabir (-50% Resistance)", reduction: 50.0 },
+            { name: "OptiMax (-30% Resistance)", reduction: 30.0 },
+            { name: "BoreMax (+10% Resistance)", reduction: -10.0 },
+            { name: "Waveshift (Instability/Charge)", reduction: 0.0 }, 
+            { name: "Stalwart (Instability/Charge)", reduction: 0.0 }, 
+            { name: "Okunis (Charge Rate/Window)", reduction: 0.0 },
+        ].sort((a, b) => b.reduction - a.reduction);
+
+        let armIdCounter = 0; // Unique ID for each added laser head
+
+        /**
+         * Generates the HTML for a single mining laser head's configuration.
+         * @param {number} armIndex - The index of the laser head (1, 2, or 3) for display.
+         * @param {object} ship - The ship data object (MOLE, Prospector, Golem).
+         * @returns {string} The HTML for the laser head configuration.
+         */
+        function createArmConfigHtml(armIndex, ship) {
+            armIdCounter++; // Ensure unique ID for this laser head
+            const armUniqueId = `arm-${ship.id}-${armIdCounter}`;
+            // Golem is a special case: only the first arm is fixed laser, but since it only has 1 arm, this simplifies to always true for Golem.
+            const isFixedLaser = ship.isFixedLaser; 
+
+            // 1. Laser Head Options (Filtered by ship's maxLaserSize)
+            let laserOptionsHtml = allLaserHeads
+                .filter(head => head.size <= ship.maxLaserSize)
+                .map(head => {
+                    // Check if this head is the default one for the ship type
+                    const isSelected = head.power === ship.defaultLaser;
+                    return `<option value="${head.power}" ${isSelected ? 'selected' : ''}>${head.name}</option>`;
+                }).join('');
+
+            // Apply fixed laser restrictions for Golem
+            let laserSelectAttributes = '';
+            let laserSelectDisabled = '';
+            if (isFixedLaser) {
+                laserSelectDisabled = 'disabled';
+                laserOptionsHtml = `<option value="${ship.defaultLaser}" selected>${ship.fixedLaserName} (Fixed)</option>`;
+            } else {
+                laserSelectAttributes = `onchange="calculate()"`;
+            }
+            
+            // 2. Module Slot Options (All modules available, 'None' is default)
+            const moduleOptionsHtml = powerModules.map(mod => 
+                `<option value="${mod.multiplier}" ${mod.name.startsWith('None') ? 'selected' : ''}>${mod.name}</option>`
+            ).join('');
+
+            // 3. Module Slots (Enable/Disable 3rd slot based on moduleSlots)
+            let moduleSlotsHtml = '';
+            for (let i = 1; i <= 3; i++) {
+                const isDisabled = i > ship.moduleSlots;
+                const slotText = isDisabled ? `--- SLOT DISABLED (${ship.moduleSlots} Slots Max) ---` : `Module Slot ${i}`;
+                const initialValue = '1.00'; // Multiplier for "None"
+                const disabledClass = isDisabled ? 'opacity-50' : '';
+                
+                moduleSlotsHtml += `
+                    <select id="${armUniqueId}-mod${i}" class="arm-module-select w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white mb-3 ${disabledClass}" 
+                            onchange="calculate()" value="${initialValue}" ${isDisabled ? 'disabled' : ''}>
+                        ${isDisabled ? `<option value="1.00">${slotText}</option>` : moduleOptionsHtml}
+                    </select>
+                `;
+            }
+
+            // --- Full Laser Head Structure ---
+            return `
+                <div id="${armUniqueId}" class="p-4 rounded-xl shadow-lg ship-arm-card space-y-3" data-ship-id="${ship.id}" data-max-modules="${ship.moduleSlots}">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-lg font-bold ${ship.id === 'mole' ? 'text-indigo-400' : ship.id === 'prospector' ? 'text-green-400' : 'text-amber-400'}">
+                            ${ship.name} - Laser Head ${armIndex}
+                        </h4>
+                        <button onclick="removeArmConfig('${armUniqueId}')" title="Remove Laser Head" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-full transition-all duration-150 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <label class="block text-sm font-medium text-gray-400">Laser Head (Base Power)</label>
+                    <select id="${armUniqueId}-laser" class="arm-laser-select w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white"
+                            data-max-size="${ship.maxLaserSize}" ${laserSelectAttributes} ${laserSelectDisabled}>
+                        ${laserOptionsHtml}
+                    </select>
+
+                    <label class="block text-sm font-medium text-gray-400">Modules (Max ${ship.moduleSlots} Slots)</label>
+                    ${moduleSlotsHtml}
+                </div>
+            `;
+        }
+
+        /**
+         * Adds a set of loadout arms corresponding to the selected ship.
+         */
+        function addShipLoadout() {
+            const container = document.getElementById('multiShipContainer');
+            const selectElement = document.getElementById('shipSelectToAdd');
+            const selectedShipId = selectElement.value;
+            const shipData = ships.find(s => s.id === selectedShipId);
+
+            if (!shipData) return;
+
+            // Remove initial placeholder message if present
+            const placeholder = container.querySelector('p.text-gray-500');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            // Add all arms for the selected ship
+            for (let i = 1; i <= shipData.arms; i++) {
+                const armHtml = createArmConfigHtml(i, shipData);
+                container.insertAdjacentHTML('beforeend', armHtml);
+            }
+            
+            // Recalculate after adding new ships
+            calculate();
+        }
+
+        /**
+         * Removes an arm configuration from the DOM.
+         * @param {string} armId - The unique ID of the arm element to remove.
+         */
+        function removeArmConfig(armId) {
+            const armElement = document.getElementById(armId);
+            if (armElement) {
+                armElement.remove();
+            }
+            
+            const container = document.getElementById('multiShipContainer');
+            // If all arms are removed, show the placeholder again
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
+                        Add ships above to configure their mining laser heads.
+                    </p>
+                `;
+            }
+            calculate();
+        }
+
+
+        /**
+         * Dynamically populates the ship and gadget select dropdowns on load.
+         */
+        function populateSelects() {
+            // 1. Populate "Add Ship" Select
+            const shipSelectElement = document.getElementById('shipSelectToAdd');
+            if (shipSelectElement) {
+                shipSelectElement.innerHTML = ships.map((ship) => 
+                    `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
+                ).join('');
+                // Default to MOLE for easy initial testing of multi-arm ships
+                shipSelectElement.value = 'mole';
+            }
+            
+            // 2. Populate Gadget Slot
+            const gadgetSelectElement = document.getElementById('gadgetSelect');
+            if (gadgetSelectElement) {
+                const defaultGadget = gadgets.find(g => g.name.startsWith("Sabir"));
+                gadgetSelectElement.innerHTML = gadgets.map(g => 
+                    `<option value="${g.reduction}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
+                ).join('');
+                if (defaultGadget) {
+                    gadgetSelectElement.value = defaultGadget.reduction.toString();
+                }
+            }
+            
+            // Initial call to add a ship (optional, removed to start with a blank slate)
+            // addShipLoadout(); 
+            calculate(); // Run initial calculation (which will show the 'no ships' message)
+        }
+
+        /**
+         * Assesses mining difficulty based on Instability and Resistance.
+         */
+        function assessDifficulty(instability, resistance) {
+            let difficultyScore = resistance * 1.5 + instability;
+            
+            if (difficultyScore >= 100) {
+                return { text: "EXTREME: Very high instability and resistance. Requires exceptional skill and stability modules.", color: "text-red-500" };
+            } else if (difficultyScore >= 60) {
+                return { text: "HARD: High instability/resistance. Requires specialized modules (Forel/Torrent) for safe charging.", color: "text-orange-400" };
+            } else if (difficultyScore >= 30) {
+                return { text: "MODERATE: Average difficulty. Standard play should be fine, but stability modules are helpful.", color: "text-yellow-300" };
+            } else {
+                return { text: "EASY: Low difficulty rock. Minimal risk of overheating or explosion.", color: "text-green-400" };
+            }
+        }
+
+
+        /**
+         * The core JavaScript function to perform the mining calculation and suggestion.
+         */
+        function calculate() {
+            const resultsContainer = document.getElementById('results');
+            const suggestionContainer = document.getElementById('suggestion');
+            const allArms = document.querySelectorAll('.ship-arm-card');
+            
+            // 1. Input Validation and Power Summation
+            if (allArms.length === 0) {
+                displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
+                suggestionContainer.classList.add('hidden');
+                return;
+            }
+
+            let totalEffectiveLaserPower = 0;
+            let validationError = false;
+            let totalArmsCount = allArms.length;
+
+            allArms.forEach(arm => {
+                const armUniqueId = arm.id;
+                const maxModules = parseInt(arm.dataset.maxModules);
+                
+                // Get Laser Power
+                const laserSelect = document.getElementById(`${armUniqueId}-laser`);
+                // Ensure value exists before parsing
+                const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
+                const basePower = parseFloat(basePowerValue);
+                
+                // Get Module Multipliers
+                let totalModuleMultiplier = 1.0;
+                for (let i = 1; i <= 3; i++) {
+                    const moduleSelect = document.getElementById(`${armUniqueId}-mod${i}`);
+                    if (moduleSelect && i <= maxModules) {
+                        const modMultiplier = parseFloat(moduleSelect.value || '1.0');
+                        totalModuleMultiplier *= modMultiplier;
+                    }
+                }
+
+                if (isNaN(basePower) || basePower <= 0) {
+                    validationError = true;
+                } else {
+                    totalEffectiveLaserPower += basePower * totalModuleMultiplier;
+                }
+            });
+
+            // Get Rock & Gadget Stats
+            const baseResistance = parseFloat(document.getElementById('resistance').value);
+            const rockInstability = parseFloat(document.getElementById('instability').value);
+            const gadgetReduction = parseFloat(document.getElementById('gadgetSelect').value);
+            const rockMass = parseFloat(document.getElementById('rockMass').value);
+            
+            // Final Validation (Catches NaN from number inputs if they are cleared by the user)
+            if (validationError || isNaN(baseResistance) || isNaN(rockMass) || isNaN(rockInstability) || totalEffectiveLaserPower <= 0) {
+                displayResult('Error: Ensure all active laser heads have a valid Laser Head selected and all rock parameters contain valid positive numbers.', 'text-yellow-400');
+                suggestionContainer.classList.add('hidden');
+                return;
+            }
+
+            // 2. Calculate effective resistance after gadget application
+            let effectiveResistance = baseResistance - gadgetReduction;
+            if (effectiveResistance < 0) effectiveResistance = 0; 
+            
+            // 3. Perform Fracture Calculation
+            const resistanceDecimal = effectiveResistance / 100.0;
+            
+            let breakableMassLimit;
+            let requiredEffectivePower = 0; 
+
+            if (resistanceDecimal >= 1.0) {
+                breakableMassLimit = 0.0;
+            } else {
+                const denominator = 1.0 - resistanceDecimal;
+                // Formula: (Total Effective Laser Power * 5) / (1 - Effective Resistance)
+                breakableMassLimit = (totalEffectiveLaserPower * 5) / denominator;
+                
+                // Required Power = (Target Mass * (1 - Effective Resistance)) / 5
+                requiredEffectivePower = (rockMass * denominator) / 5; 
+            }
+
+            // 4. Determine Verdict and Format Output
+            const isSuccess = breakableMassLimit >= rockMass;
+
+            const formattedMaxMass = breakableMassLimit.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            const formattedRockMass = rockMass.toLocaleString();
+            const formattedEffectivePower = totalEffectiveLaserPower.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            
+            let verdictClass = isSuccess ? 'bg-green-700/80' : 'bg-red-700/80';
+            let verdictIcon = isSuccess ? '✅' : '❌';
+            let verdictText = isSuccess ? 'FRACTURE SUCCESSFUL!' : 'FRACTURE FAILED. Power short.';
+            
+            let massDifference = isSuccess ? 
+                `${(breakableMassLimit - rockMass).toLocaleString(undefined, { maximumFractionDigits: 2 })} kg over the target mass.` : 
+                `${(rockMass - breakableMassLimit).toLocaleString(undefined, { maximumFractionDigits: 2 })} kg short of the target mass.`;
+
+            // Difficulty Assessment
+            const difficulty = assessDifficulty(rockInstability, effectiveResistance);
+
+
+            const outputHtml = `
+                <div class="space-y-6 text-white text-center">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
+                            <p class="text-sm text-gray-400">Effective Resistance</p>
+                            <p class="text-3xl font-extrabold text-red-400 mt-1">${effectiveResistance.toFixed(1)}%</p>
+                            <p class="text-xs text-gray-500">(Base ${baseResistance}% - Gadget ${gadgetReduction}%)</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
+                            <p class="text-sm text-gray-400">Rock Instability</p>
+                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${rockInstability.toFixed(1)}%</p>
+                            <p class="text-xs ${difficulty.color} mt-1">${difficulty.text.split(':')[0]}: ${difficulty.text.split(':')[1].trim()}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 rounded-xl bg-indigo-900/40 shadow-inner border border-indigo-700">
+                        <p class="text-sm text-gray-400">Total Combined Effective Laser Power (${totalArmsCount} Laser Heads)</p>
+                        <p class="text-4xl font-extrabold text-yellow-300 mt-1">${formattedEffectivePower} MW</p>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
+                        <p class="text-sm text-gray-400">Max Theoretical Breakable Mass Limit</p>
+                        <p class="text-4xl font-extrabold text-indigo-300 mt-1">${formattedMaxMass} kg</p>
+                    </div>
+                    
+                    <div class="p-4 rounded-xl font-semibold text-lg text-white ${verdictClass} shadow-xl mt-6">
+                        <p class="text-2xl">${verdictIcon} ${verdictText}</p>
+                        <p class="text-sm pt-2 text-gray-200 italic">${massDifference}</p>
+                        <p class="text-sm pt-1 text-gray-300">Target Rock Mass: ${formattedRockMass} kg</p>
+                    </div>
+                </div>
+            `;
+
+            resultsContainer.innerHTML = outputHtml;
+            
+            // 5. Suggestion Logic (Simple prompt if failed)
+            if (!isSuccess && requiredEffectivePower > 0) {
+                 suggestionContainer.classList.remove('hidden');
+                 const formattedRequiredPower = requiredEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                 
+                 // Average power needed per arm
+                 const powerPerArmNeeded = requiredEffectivePower / totalArmsCount;
+                 const formattedPowerPerArmNeeded = powerPerArmNeeded.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                 
+                 // Existing Summary HTML
+                 const summaryHtml = `
+                    <h2 class="text-xl font-semibold text-center text-red-400 mb-4">Upgrade Required</h2>
+                    <div class="p-4 bg-red-900/40 rounded-xl border border-red-500/50 text-center mb-6">
+                        <p class="text-lg font-bold text-red-200">
+                            The rock is too tough for your current team.
+                        </p>
+                        <p class="text-sm text-gray-300 mt-2">
+                            To successfully fracture this target, your **Total Combined Effective Laser Power** must reach at least 
+                            <span class="font-extrabold text-yellow-300">${formattedRequiredPower} MW</span>.
+                        </p>
+                        <p class="text-sm text-gray-300 mt-2">
+                            This means each of your ${totalArmsCount} active laser heads needs to output an average of 
+                            <span class="font-extrabold text-yellow-300">${formattedPowerPerArmNeeded} MW</span> after modules are applied.
+                        </p>
+                        <p class="text-xs text-gray-400 mt-4">
+                            To guarantee a fracture, consider the following maximum power loadout recommendations:
+                        </p>
+                    </div>
+                 `;
+
+                // --- NEW RECOMMENDED LOADOUT LOGIC ---
+                // Ideal Loadout Components for Max Power
+                const recommendedGadget = gadgets.find(g => g.name.startsWith("Sabir")); // Sabir (-50% Resistance)
+                
+                // Top 3 power modules for maximum multiplicative boost
+                const recommendedModules = [ 
+                    powerModules.find(m => m.name.startsWith("Surge")),      // +50% (1.50)
+                    powerModules.find(m => m.name.startsWith("Rieger-C3")),  // +25% (1.25)
+                    powerModules.find(m => m.name.startsWith("Rieger-C2")),  // +20% (1.20)
+                ];
+                
+                // Max Lasers based on updated data
+                const recommendedLaserS2 = allLaserHeads.find(h => h.name.startsWith("Helix II")); // 4080 MW (Max S2)
+                const recommendedLaserS1 = allLaserHeads.find(h => h.name.startsWith("Helix I"));  // 3150 MW (Max S1)
+                
+                // Golem Fixed Laser based on updated data
+                const recommendedGolemLaser = allLaserHeads.find(h => h.name.startsWith("Pitman")); // 2700 MW (Fixed S1)
+
+
+                let recommendedLoadoutHtml = '';
+                
+                // Gadget Recommendation
+                recommendedLoadoutHtml += `<div class="p-4 bg-gray-800/50 rounded-lg mb-6 border border-blue-600">
+                    <p class="font-bold text-blue-300">Recommended Gadget (To reduce rock resistance):</p>
+                    <p class="text-lg text-white font-semibold">${recommendedGadget.name}</p>
+                    <p class="text-sm text-gray-400">(Use the highest Resistance reduction gadget available)</p>
+                </div>`;
+
+                recommendedLoadoutHtml += '<h3 class="text-xl font-bold text-center text-yellow-300 mb-4">Recommended Loadout Per Active Laser Head</h3>';
+                recommendedLoadoutHtml += '<div class="space-y-4">';
+
+                // Iterate through active arms to build individual recommendations
+                allArms.forEach((arm, index) => {
+                    const shipId = arm.dataset.shipId;
+                    const shipData = ships.find(s => s.id === shipId);
+                    const maxModules = parseInt(arm.dataset.maxModules);
+                    const armDisplayNumber = arm.querySelector('h4').innerText.split(' - ')[1]; // Get 'Laser Head 1', 'Laser Head 2', etc.
+
+                    let laserName, laserPower, moduleList;
+
+                    if (shipId === 'golem') {
+                        // Golem is fixed laser (Pitman S1) and 2 slots
+                        laserName = recommendedGolemLaser.name;
+                        laserPower = recommendedGolemLaser.power;
+                        moduleList = [
+                            recommendedModules.find(m => m.name.startsWith("Surge")), 
+                            recommendedModules.find(m => m.name.startsWith("Rieger-C3"))
+                        ]; // Top 2 for 2 slots
+                    } else if (shipId === 'mole') {
+                        // MOLE (S2 max, 3 slots)
+                        laserName = recommendedLaserS2.name;
+                        laserPower = recommendedLaserS2.power;
+                        moduleList = recommendedModules.slice(0, 3); // Top 3 for 3 slots
+                    } else { // Prospector (S1 max, 3 slots)
+                        laserName = recommendedLaserS1.name;
+                        laserPower = recommendedLaserS1.power;
+                        moduleList = recommendedModules.slice(0, 3); // Top 3 for 3 slots
+                    }
+                    
+                    // Filter module list to respect ship's max slot count
+                    moduleList = moduleList.slice(0, maxModules);
+
+
+                    const moduleHtml = moduleList.map((mod, i) => 
+                        `<li class="ml-4 list-disc text-green-300">Slot ${i+1}: <span class="font-bold">${mod.name}</span> (x${mod.multiplier.toFixed(2)})</li>`
+                    ).join('');
+                    
+                    // Calculate the max effective power for this recommended arm loadout
+                    const totalModuleMult = moduleList.reduce((acc, mod) => acc * mod.multiplier, 1.0);
+                    const maxEffectivePower = laserPower * totalModuleMult;
+                    
+                    // Determine the title color based on the ship type
+                    const titleColorClass = shipId === 'mole' ? 'text-indigo-400' : shipId === 'prospector' ? 'text-green-400' : 'text-amber-400';
+
+                    recommendedLoadoutHtml += `
+                        <div class="p-4 rounded-xl bg-gray-900 border border-gray-700">
+                            <h4 class="text-lg font-bold ${titleColorClass}">${shipData.name} - ${armDisplayNumber}</h4>
+                            <p class="text-sm text-gray-400 mt-1">
+                                Max Achievable Power: <span class="text-yellow-400 font-bold">${maxEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
+                            </p>
+                            
+                            <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
+                                <p class="font-medium text-blue-400">Laser Head:</p>
+                                <p class="text-base font-bold text-white">${laserName}</p>
+                            </div>
+                                                        
+                            <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
+                                <p class="font-medium text-blue-400">Recommended Modules (${maxModules} Slots):</p>
+                                <ul class="text-sm space-y-1 pt-1">
+                                    ${moduleHtml}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                recommendedLoadoutHtml += '</div>';
+
+                suggestionContainer.innerHTML = summaryHtml + recommendedLoadoutHtml;
+            } else {
+                 suggestionContainer.classList.add('hidden');
+            }
+        }
+
+        // Helper function for error messages
+        function displayResult(message, className) {
+            document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
+        }
+        
+        // Run initial population on load
+        window.onload = () => {
+            populateSelects();
+        };
+    </script>
+</body>
+</html>
