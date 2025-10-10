@@ -15,18 +15,29 @@
             color: #e5e7eb; /* Light gray text */
             min-height: 100vh;
         }
+        
         /* Custom input and select styling for a sci-fi look */
         input[type="number"], select {
             background-color: #161b22;
             border: 1px solid #30363d;
-            color: #ffffff;
-            transition: border-color 0.2s;
+            color: #e5e7eb; /* Softer light gray for input text */
+            transition: border-color 0.2s, box-shadow 0.2s;
+            /* Standardize select appearance across browsers */
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            /* Add padding to account for the default select arrow */
+            padding-right: 2.5rem; 
         }
+
+        /* --- UPDATED EYE-FRIENDLY FOCUS STYLE --- */
         input[type="number"]:focus, select:focus {
-            border-color: #60a5fa; /* Blue focus ring */
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+            border-color: #38bdf8; /* Bright Sky Blue for high visibility */
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Wider, brighter focus ring */
             outline: none;
         }
+        /* --- END UPDATED FOCUS STYLE --- */
+
         /* Styling for the dynamically added ship arms */
         .ship-arm-card {
             background-color: #21262d;
@@ -84,7 +95,7 @@
         <div class="p-4 bg-[#21262d] rounded-xl mt-8">
             <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">2. Select Gadget (Applies once to Rock)</label>
             <select id="gadgetSelect" onchange="calculate()"
-                   class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500 bg-[#161b22] border border-[#30363d] text-white">
+                   class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
                 <!-- Options populated by JS -->
             </select>
         </div>
@@ -95,13 +106,13 @@
             <div class="p-4 bg-[#21262d] rounded-xl">
                 <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
                 <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
-                       class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+                       class="w-full p-3 rounded-lg" oninput="calculate()">
             </div>
             
             <div class="p-4 bg-[#21262d] rounded-xl">
                 <label for="instability" class="block text-sm font-medium mb-2 text-gray-300">Rock Instability (%)</label>
                 <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
-                       class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+                       class="w-full p-3 rounded-lg" oninput="calculate()">
             </div>
         </div>
 
@@ -109,7 +120,7 @@
         <div class="p-4 bg-[#21262d] rounded-xl mt-6">
             <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">4. Target Rock Mass (kg) [For Verdict]</label>
             <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
-                   class="w-full p-3 rounded-lg focus:ring-2 focus:ring-blue-500" oninput="calculate()">
+                   class="w-full p-3 rounded-lg" oninput="calculate()">
         </div>
 
         <button onclick="calculate()"
