@@ -81,6 +81,9 @@
                     Add Ship
                 </button>
             </div>
+            <!-- New instructional text -->
+            <p class="text-xs text-gray-500 mt-2 italic text-right">Click or tap to view options</p>
+            <!-- End new instructional text -->
         </div>
 
         <!-- Loadout Configuration Container (Dynamically populated) -->
@@ -98,6 +101,9 @@
                    class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
                 <!-- Options populated by JS -->
             </select>
+            <!-- New instructional text -->
+            <p class="text-xs text-gray-500 mt-2 italic text-right">Click or tap to view options</p>
+            <!-- End new instructional text -->
         </div>
         
         <!-- Rock Stats Input (Resistance and Instability) -->
@@ -281,6 +287,7 @@
                             data-max-size="${ship.maxLaserSize}" ${laserSelectAttributes} ${laserSelectDisabled}>
                         ${laserOptionsHtml}
                     </select>
+                    <p class="text-xs text-gray-500 italic text-right -mt-2 mb-2">Click or tap to view options</p>
 
                     <label class="block text-sm font-medium text-gray-400">Modules (Max ${ship.moduleSlots} Slots)</label>
                     ${moduleSlotsHtml}
