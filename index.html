@@ -177,7 +177,6 @@
         ];
 
         // --- UPDATED LASER HEADS DATA ---
-        // This is updated to match the latest provided list and is already sorted by power.
         const allLaserHeads = [
             // Size 1 Lasers (Max Power in MW)
             { name: "Arbor MH1 (~1890 MW)", power: 1890, size: 1 }, 
@@ -260,7 +259,7 @@
             { name: "None", reduction: 0.0 }, 
             { name: "Sabir (-50% Resistance)", reduction: 50.0 },
             { name: "OptiMax (-30% Resistance)", reduction: 30.0 },
-            { name: "BoreMax (+10% Resistance)", reduction: -10.0 },
+            { name: "BoreMax (+10% Resistance)", reduction: -10.0 }, // Negative reduction value means a resistance increase (additive)
             { name: "Waveshift (Instability/Charge)", reduction: 0.0 }, 
             { name: "Stalwart (Instability/Charge)", reduction: 0.0 }, 
             { name: "Okunis (Charge Rate/Window)", reduction: 0.0 },
@@ -297,7 +296,6 @@
             }
             
             // 2. Module Slot Options (Sorted and grouped)
-            // VALUE: Now stores the module NAME, which is used to look up the full module object in calculate()
             const moduleOptionsHtml = sortedModules.map(mod => 
                 `<option value="${mod.name}" ${mod.name.startsWith('None') ? 'selected' : ''}>${mod.name}</option>`
             ).join('');
@@ -415,7 +413,7 @@
                 // Find the default gadget (Sabir) by name/reduction
                 const defaultGadget = gadgets.find(g => g.name.startsWith("Sabir"));
                 gadgetSelectElement.innerHTML = gadgets.map(g => 
-                    // VALUE: Still uses reduction for simple math
+                    // VALUE: Uses reduction. If positive (reduction), it's multiplicative. If negative (increase), it's additive.
                     `<option value="${g.reduction}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
                 ).join('');
                 if (defaultGadget) {
@@ -462,9 +460,11 @@
             }
 
             let totalEffectiveLaserPower = 0;
-            // NEW: Initialize resistance and instability modifiers
-            let totalResistanceModifier = 0; 
-            let totalInstabilityModifier = 0; 
+            
+            // NEW MODIFIERS for complex resistance/instability tracking
+            let totalAdditiveResistance = 0; // Tracks positive resistance additions (e.g., Brandt +15)
+            let totalReductionMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
+            let totalInstabilityModifier = 0; // Stays additive
             let validationError = false;
             let totalArmsCount = allArms.length;
 
@@ -477,7 +477,7 @@
                 const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
                 const basePower = parseFloat(basePowerValue);
                 
-                // --- MODULE EFFECT CALCULATION ---
+                // --- MODULE EFFECT CALCULATION (Per Arm) ---
                 let totalModulePowerMultiplier = 1.0;
                 let activeModules = [];
                 let passiveModules = [];
@@ -501,21 +501,37 @@
 
                 // 2. Apply Active Module Rule (only the most powerful one is active)
                 if (activeModules.length > 0) {
-                    // Sort active modules by multiplier (descending)
                     activeModules.sort((a, b) => b.multiplier - a.multiplier);
                     const activeModule = activeModules[0];
                     
-                    // Apply the effect of the single, most powerful active module
+                    // Apply Power Multiplier and Additive Instability to the total calculation
                     totalModulePowerMultiplier *= activeModule.multiplier; 
-                    totalResistanceModifier += activeModule.resistanceEffect;
-                    totalInstabilityModifier += activeModule.instabilityEffect;
+                    totalInstabilityModifier += activeModule.instabilityEffect; 
+
+                    // Apply Resistance Effect
+                    if (activeModule.resistanceEffect < 0) {
+                        // Resistance reduction (Multiplicative Reduction): e.g., Surge -15 -> x 0.85
+                        totalReductionMultiplier *= (1 - (Math.abs(activeModule.resistanceEffect) / 100));
+                    } else if (activeModule.resistanceEffect > 0) {
+                        // Resistance increase (Additive Percentage Point): e.g., Brandt +15 -> +15% points
+                        totalAdditiveResistance += activeModule.resistanceEffect;
+                    }
                 }
 
-                // 3. Apply Passive Module Rule (all stack multiplicatively on power, additively on effects)
+                // 3. Apply Passive Module Rule (all stack)
                 passiveModules.forEach(mod => {
+                    // Apply Power Multiplier and Additive Instability
                     totalModulePowerMultiplier *= mod.multiplier; 
-                    totalResistanceModifier += mod.resistanceEffect;
-                    totalInstabilityModifier += mod.instabilityEffect;
+                    totalInstabilityModifier += mod.instabilityEffect; 
+
+                    // Apply Resistance Effect
+                    if (mod.resistanceEffect < 0) {
+                        // Resistance reduction (Multiplicative Reduction)
+                        totalReductionMultiplier *= (1 - (Math.abs(mod.resistanceEffect) / 100));
+                    } else if (mod.resistanceEffect > 0) {
+                        // Resistance increase (Additive Percentage Point)
+                        totalAdditiveResistance += mod.resistanceEffect;
+                    }
                 });
                 // --- END MODULE EFFECT CALCULATION ---
 
@@ -530,7 +546,7 @@
             // Get Rock & Gadget Stats
             const baseResistance = parseFloat(document.getElementById('resistance').value);
             const initialInstability = parseFloat(document.getElementById('instability').value);
-            const gadgetReduction = parseFloat(document.getElementById('gadgetSelect').value);
+            const gadgetReductionValue = parseFloat(document.getElementById('gadgetSelect').value);
             const rockMass = parseFloat(document.getElementById('rockMass').value);
             
             // Final Validation (Catches NaN from number inputs if they are cleared by the user)
@@ -542,17 +558,35 @@
 
             // 2. Calculate Final Rock Parameters
             
-            // Step 1: Apply all module effects to base resistance and instability (additive)
-            let moduleModifiedResistance = baseResistance + totalResistanceModifier;
-            let moduleModifiedInstability = initialInstability + totalInstabilityModifier;
+            // Step 1: Apply all module ADDITIVE effects (positive resistance)
+            let resistanceAfterAdditiveMods = baseResistance + totalAdditiveResistance;
+            let finalModifiedInstability = initialInstability + totalInstabilityModifier;
 
-            // Step 2: Apply Gadget effect (Resistance only, additive)
-            let finalEffectiveResistance = moduleModifiedResistance - gadgetReduction;
+            // Step 2: Apply Gadget effect
+            const selectedGadget = gadgets.find(g => g.reduction === gadgetReductionValue);
+
+            if (selectedGadget) {
+                if (selectedGadget.reduction > 0) { // e.g., Sabir 50.0 (Reduction)
+                    // Gadget reduction applies multiplicatively with module reductions
+                    totalReductionMultiplier *= (1 - (selectedGadget.reduction / 100));
+                } else if (selectedGadget.reduction < 0) { // e.g., BoreMax -10.0 (Increase)
+                    // Gadget increase applies additively
+                    resistanceAfterAdditiveMods += Math.abs(selectedGadget.reduction);
+                }
+            }
+            
+            // Step 3: Apply the total multiplicative reduction factor
+            let finalEffectiveResistance = resistanceAfterAdditiveMods * totalReductionMultiplier;
+
+            // Apply final clamps
             if (finalEffectiveResistance < 0) finalEffectiveResistance = 0; 
+            if (finalModifiedInstability < -50) finalModifiedInstability = -50; 
             
-            // Cap instability floor
-            if (moduleModifiedInstability < -50) moduleModifiedInstability = -50; 
-            
+            // --- Output Display Formatting ---
+            const totalResistanceReductionPercentage = (1 - totalReductionMultiplier) * 100;
+            const resistanceDisplayBreakdown = `Add: +${totalAdditiveResistance.toFixed(1)}% | Reduct: ${totalResistanceReductionPercentage.toFixed(1)}% Multiplicative`;
+            // ---------------------------------
+
             // 3. Perform Fracture Calculation
             const resistanceDecimal = finalEffectiveResistance / 100.0;
             
@@ -586,7 +620,7 @@
                 `${(rockMass - breakableMassLimit).toLocaleString(undefined, { maximumFractionDigits: 2 })} kg short of the target mass.`;
 
             // Difficulty Assessment uses the final module-modified instability and effective resistance
-            const difficulty = assessDifficulty(moduleModifiedInstability, finalEffectiveResistance);
+            const difficulty = assessDifficulty(finalModifiedInstability, finalEffectiveResistance);
 
 
             const outputHtml = `
@@ -595,11 +629,11 @@
                         <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
                             <p class="text-sm text-gray-400">Final Effective Resistance</p>
                             <p class="text-3xl font-extrabold text-red-400 mt-1">${finalEffectiveResistance.toFixed(1)}%</p>
-                            <p class="text-xs text-gray-500">(Base ${baseResistance.toFixed(1)}% | Mod: ${totalResistanceModifier > 0 ? '+' : ''}${totalResistanceModifier.toFixed(1)}% | Gadget: -${gadgetReduction.toFixed(1)}%)</p>
+                            <p class="text-xs text-gray-500">(Base ${baseResistance.toFixed(1)}% | ${resistanceDisplayBreakdown})</p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
                             <p class="text-sm text-gray-400">Modified Instability</p>
-                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${moduleModifiedInstability.toFixed(1)}%</p>
+                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(1)}%</p>
                             <p class="text-xs text-gray-500">(Base ${initialInstability.toFixed(1)}% | Mod: ${totalInstabilityModifier > 0 ? '+' : ''}${totalInstabilityModifier.toFixed(1)}%)</p>
                         </div>
                     </div>
@@ -691,21 +725,15 @@
                 
                 // Calculate the max effective power for this recommended arm loadout
                 let rec_power_multiplier = 1.0;
-                let rec_resistance_mod = 0;
-                let rec_instability_mod = 0;
                 
                 const rec_active_module = moduleList.find(m => m.activation === 'Active');
                 const rec_passive_modules = moduleList.filter(m => m.activation === 'Passive');
                 
                 if (rec_active_module) {
                     rec_power_multiplier *= rec_active_module.multiplier;
-                    rec_resistance_mod += rec_active_module.resistanceEffect;
-                    rec_instability_mod += rec_active_module.instabilityEffect;
                 }
                 rec_passive_modules.forEach(mod => {
                     rec_power_multiplier *= mod.multiplier;
-                    rec_resistance_mod += mod.resistanceEffect;
-                    rec_instability_mod += mod.instabilityEffect;
                 });
                 
                 const maxEffectivePower = laserPower * rec_power_multiplier;
@@ -765,9 +793,9 @@
             }
             
             // --- C. Generate Stability Warning (CONDITIONAL) ---
-            if (finalEffectiveResistance > 30 || moduleModifiedInstability > 40) {
+            if (finalEffectiveResistance > 30 || finalModifiedInstability > 40) {
                 
-                let instabilityTip = moduleModifiedInstability > 40 ? 'Your **Instability** is critically high. Expect a small optimal window.' : '';
+                let instabilityTip = finalModifiedInstability > 40 ? 'Your **Instability** is critically high. Expect a small optimal window.' : '';
                 let resistanceTip = finalEffectiveResistance > 30 ? 'Your **Resistance** is high, making the rock hard to heat.' : '';
 
                 warningsHtml += `
