@@ -55,7 +55,7 @@
         <header class="text-center mb-8">
             <!-- ORGANIZATION BRANDING - FIXED WITH IMAGE LOGO -->
             <div class="mb-3 flex items-center justify-center space-x-3">
-                <img src="https://cdn.discordapp.com/attachments/1377796906910224384/1377797363003035688/THRUSTERS-Logo.png?ex=68eb9709&is=68ea4589&hm=ca0d0fcd60d510de453c82c278bd460bcad2ec094cc736a78f59fbff67bf00c7&" 
+                <img src="https://cdn.discordapp.com/attachments/1377796906910224384/1377797363003035688/THRUSTERS-Logo.png?ex=68ece889&is=68eb9709&hm=e7ea7f78c8e09ce0eee0a5712c0672dddead62db8507005b090b16ddfbb3e163&" 
                      alt="THRUSTERS & DUST Logo" 
                      class="h-10 w-10 rounded-full object-cover">
                 <p class="text-lg sm:text-xl font-semibold uppercase tracking-widest text-gray-200">
@@ -463,15 +463,18 @@
             // 2. Populate Gadget Slot
             const gadgetSelectElement = document.getElementById('gadgetSelect');
             if (gadgetSelectElement) {
-                // Find the default gadget (Sabir) by name/reduction
-                const defaultGadget = gadgets.find(g => g.name.startsWith("Sabir"));
+                // Find the "None" gadget
+                const defaultGadget = gadgets.find(g => g.name.startsWith("None"));
                 gadgetSelectElement.innerHTML = gadgets.map(g => 
                     // VALUE: Uses reduction. If positive (reduction), it's multiplicative. If negative (increase), it's additive.
                     `<option value="${g.reduction}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
                 ).join('');
+                
+                // --- FIX: SET DEFAULT TO NONE ---
                 if (defaultGadget) {
                     gadgetSelectElement.value = defaultGadget.reduction.toString();
                 }
+                // -----------------------------
             }
             
             // Run initial calculation (which will show the 'no ships' message)
