@@ -193,7 +193,7 @@
             { name: "Helix II (~4080 MW)", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0 },
             { name: "Arbor MH2 (~2400 MW)", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35 },
             // Pitman is fixed on Golem, added separately if the user wants to compare it. MaxPower 2700, 2 slots
-            { name: "Pitman (~2700 MW)", size: 1, power: 2700, moduleSlots: 2, resistanceEffect: 0, instabilityEffect: 0 } 
+            { name: "Pitman (~2700 MW)", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35 } 
         ].sort((a, b) => a.power - b.power); 
         
         // --- UPDATED POWER MODULES DATA (Expanded and Verified) ---
@@ -517,6 +517,7 @@
             // NEW MODIFIERS for complex resistance/instability tracking
             let totalAdditiveResistance = 0; // Tracks positive resistance additions (e.g., Brandt +15)
             let totalReductionMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
+            let totalResistanceMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
             let totalInstabilityModifier = 0; // Stays additive
             let validationError = false;
             let totalArmsCount = allArms.length;
@@ -551,7 +552,6 @@
                         }
                     }
                 }
-
                 // 2. Apply Active Module Rule (only the most powerful one is active)
                 if (activeModules.length > 0) {
                     activeModules.sort((a, b) => b.multiplier - a.multiplier);
@@ -562,13 +562,7 @@
                     totalInstabilityModifier += activeModule.instabilityEffect; 
 
                     // Apply Resistance Effect
-                    if (activeModule.resistanceEffect < 0) {
-                        // Resistance reduction (Multiplicative Reduction): e.g., Surge -15 -> x 0.85
-                        totalReductionMultiplier *= (1 - (Math.abs(activeModule.resistanceEffect) / 100));
-                    } else if (activeModule.resistanceEffect > 0) {
-                        // Resistance increase (Additive Percentage Point): e.g., Brandt +15 -> +15% points
-                        totalAdditiveResistance += activeModule.resistanceEffect;
-                    }
+                    totalResistanceMultiplier *= (1 + (activeModule.resistanceEffect / 100));
                 }
 
                 // 3. Apply Passive Module Rule (all stack)
@@ -576,15 +570,7 @@
                     // Apply Power Multiplier and Additive Instability
                     totalModulePowerMultiplier *= mod.multiplier; 
                     totalInstabilityModifier += mod.instabilityEffect; 
-
-                    // Apply Resistance Effect
-                    if (mod.resistanceEffect < 0) {
-                        // Resistance reduction (Multiplicative Reduction)
-                        totalReductionMultiplier *= (1 - (Math.abs(mod.resistanceEffect) / 100));
-                    } else if (mod.resistanceEffect > 0) {
-                        // Resistance increase (Additive Percentage Point)
-                        totalAdditiveResistance += mod.resistanceEffect;
-                    }
+                    totalResistanceMultiplier *= (1 + (mod.resistanceEffect) / 100);
                 });
                 // --- END MODULE EFFECT CALCULATION ---
 
@@ -619,25 +605,19 @@
             const selectedGadget = gadgets.find(g => g.reduction === gadgetReductionValue);
 
             if (selectedGadget) {
-                if (selectedGadget.reduction > 0) { // e.g., Sabir 50.0 (Reduction - Multiplicative)
-                    // Gadget reduction applies multiplicatively with module reductions
-                    totalReductionMultiplier *= (1 - (selectedGadget.reduction / 100));
-                } else if (selectedGadget.reduction < 0) { // e.g., BoreMax -10.0 (Increase - Additive)
-                    // Gadget increase applies additively
-                    resistanceAfterAdditiveMods += Math.abs(selectedGadget.reduction);
-                }
+                totalResistanceMultiplier *= (1 - (selectedGadget.reduction / 100));
             }
             
             // Step 3: Apply the total multiplicative reduction factor
-            let finalEffectiveResistance = resistanceAfterAdditiveMods * totalReductionMultiplier;
+            let finalEffectiveResistance = baseResistance * totalResistanceMultiplier;
 
             // Apply final clamps
             if (finalEffectiveResistance < 0) finalEffectiveResistance = 0; 
             if (finalModifiedInstability < -50) finalModifiedInstability = -50; 
             
             // --- Output Display Formatting ---
-            const totalResistanceReductionPercentage = (1 - totalReductionMultiplier) * 100;
-            const resistanceDisplayBreakdown = `Add: +${totalAdditiveResistance.toFixed(1)}% | Reduct: ${totalResistanceReductionPercentage.toFixed(1)}% Multiplicative`;
+            const totalResistanceReductionPercentage = (totalResistanceMultiplier);
+            const resistanceDisplayBreakdown = `Resistance modifier: ${totalResistanceReductionPercentage.toFixed(1)}`;
             // ---------------------------------
 
             // 3. Perform Fracture Calculation
