@@ -196,36 +196,32 @@
             { name: "Pitman (~2700 MW)", size: 1, power: 2700, moduleSlots: 2, resistanceEffect: 0, instabilityEffect: 0 } 
         ].sort((a, b) => a.power - b.power); 
         
-        // --- UPDATED POWER MODULES DATA WITH EFFECTS ---
+        // --- UPDATED POWER MODULES DATA (Expanded and Verified) ---
         const powerModules = [
-            // Power Modules (Active)
-            { name: "Surge (Active, +50% Power, -15% Resistance)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 0, activation: 'Active' },
-            { name: "Brandt (Active, +35% Power, +15% Resistance)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0, activation: 'Active' },
-            { name: "Stampede (Active, +35% Power, -10 Instability)", multiplier: 1.35, resistanceEffect: 0, instabilityEffect: -10, activation: 'Active' },
-            { name: "Forel (Active, Stability/Extraction Focus)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' },
-            { name: "Lifeline (Active, Low Instability/High Overcharge)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' },
-            { name: "Torpid (Active, +60% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' },
+            // Active Modules (Only one active module's power multiplier/effects apply per laser head)
+            { name: "Surge (Active, +50% Power, -15% Res)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 0, activation: 'Active' },
+            { name: "Brandt (Active, +35% Power, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0, activation: 'Active' },
+            { name: "Stampede (Active, +35% Power, -10 Inst)", multiplier: 1.35, resistanceEffect: 0, instabilityEffect: -10, activation: 'Active' },
+            { name: "Forel (Active, Charge Window +60%)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
+            { name: "Lifeline (Active, Stability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
+            { name: "Torpid (Active, Charge Rate +60%)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
+            { name: "Rime (Active, -15% Power, -25% Res)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0, activation: 'Active' },
             { name: "Optimum (Active, -15% Power, -80% Catastrophic Rate)", multiplier: 0.85, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' },
-            { name: "Rime (Active, -15% Power, -25% Resistance)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0, activation: 'Active' },
             
-            // Power Modules (Passive)
-            { name: "Rieger-C3 (Passive, +25% Power, -1% Instability)", multiplier: 1.25, resistanceEffect: 0, instabilityEffect: -1, activation: 'Passive' },
-            { name: "Rieger-C2 (Passive, +20% Power, -3% Instability)", multiplier: 1.20, resistanceEffect: 0, instabilityEffect: -3, activation: 'Passive' },
-            { name: "Torrent III (Passive, +40% Charge Rate/Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 40, activation: 'Passive' }, 
-            { name: "Torrent II (Passive, +35% Charge Rate/Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 35, activation: 'Passive' }, 
-            { name: "Torrent (Passive, +30% Charge Rate/Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 30, activation: 'Passive' }, 
-            { name: "Vaux-C3 (Passive, -5% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Vaux-C2 (Passive, -15% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Vaux (Passive, -20% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "FLTR-XL (Passive, -24% Inert Materials)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "FLTR-L (Passive, -23% Inert Materials)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "FLTR (Passive, -20% Inert Materials)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "XTR-XL (Passive, +25% Opt. Charge Window/Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "XTR-L (Passive, +22% Opt. Charge Window/Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "XTR (Passive, +15% Opt. Charge Window/Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Focus III (Passive, -5% Power, +40% Opt. Charge Window)", multiplier: 0.95, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Focus II (Passive, -10% Power, +37% Opt. Charge Window)", multiplier: 0.90, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Focus (Passive, -15% Power, +30% Opt. Charge Window)", multiplier: 0.85, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            // Passive Modules (All passive modules' power multipliers/effects stack per laser head)
+            { name: "Rieger-C3 (Passive, +25% Power, -1% Inst)", multiplier: 1.25, resistanceEffect: 0, instabilityEffect: -1, activation: 'Passive' },
+            { name: "Rieger-C2 (Passive, +20% Power, -3% Inst)", multiplier: 1.20, resistanceEffect: 0, instabilityEffect: -3, activation: 'Passive' },
+            { name: "Focus III (Passive, -5% Power, +40% Opt Window)", multiplier: 0.95, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "Focus II (Passive, -10% Power, +37% Opt Window)", multiplier: 0.90, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "Focus (Passive, -15% Power, +30% Opt Window)", multiplier: 0.85, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "Torrent III (Passive, +40% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 40, activation: 'Passive' }, 
+            { name: "Torrent II (Passive, +35% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 35, activation: 'Passive' }, 
+            { name: "Torrent (Passive, +30% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 30, activation: 'Passive' }, 
+            { name: "XTR-XL (Passive, +25% Opt Window, -24% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "XTR-L (Passive, +22% Opt Window, -23% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "XTR (Passive, +15% Opt Window, -20% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
+            { name: "FLTR-XL (Passive, -24% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' }, // Extraction only, no fracture effect
+            { name: "Vaux-C3 (Passive, -5% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' }, // Charge rate utility
             
             // Default/None
             { name: "None", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Default' },
@@ -254,15 +250,17 @@
         const sortedModules = sortModules([...powerModules]); // Create a copy and sort it
 
 
-        // --- GADGETS DATA ---
+        // --- UPDATED GADGETS DATA (Verified and expanded) ---
         const gadgets = [
-            { name: "None", reduction: 0.0 }, 
-            { name: "Sabir (-50% Resistance)", reduction: 50.0 },
-            { name: "OptiMax (-30% Resistance)", reduction: 30.0 },
-            { name: "BoreMax (+10% Resistance)", reduction: -10.0 }, // Negative reduction value means a resistance increase (additive)
-            { name: "Waveshift (Instability/Charge)", reduction: 0.0 }, 
-            { name: "Stalwart (Instability/Charge)", reduction: 0.0 }, 
-            { name: "Okunis (Charge Rate/Window)", reduction: 0.0 },
+            // Reduction > 0 means Multiplicative Reduction Factor (e.g., 50.0 -> x 0.50)
+            // Reduction < 0 means Additive Resistance Increase (e.g., -10.0 -> +10 points)
+            { name: "Sabir (-50% Resistance Reduction)", reduction: 50.0, type: 'Multiplicative' }, 
+            { name: "OptiMax (-30% Resistance Reduction)", reduction: 30.0, type: 'Multiplicative' },
+            { name: "BoreMax (+10% Resistance Additive)", reduction: -10.0, type: 'Additive' }, 
+            { name: "Waveshift (Stability/Charge Rate)", reduction: 0.0, type: 'Utility' }, 
+            { name: "Stalwart (Instability Reduction)", reduction: 0.0, type: 'Utility' }, 
+            { name: "Okunis (Optimal Window/Charge Rate)", reduction: 0.0, type: 'Utility' },
+            { name: "None", reduction: 0.0, type: 'None' }, 
         ].sort((a, b) => b.reduction - a.reduction);
 
         let armIdCounter = 0; // Unique ID for each added laser head
@@ -621,10 +619,10 @@
             const selectedGadget = gadgets.find(g => g.reduction === gadgetReductionValue);
 
             if (selectedGadget) {
-                if (selectedGadget.reduction > 0) { // e.g., Sabir 50.0 (Reduction)
+                if (selectedGadget.reduction > 0) { // e.g., Sabir 50.0 (Reduction - Multiplicative)
                     // Gadget reduction applies multiplicatively with module reductions
                     totalReductionMultiplier *= (1 - (selectedGadget.reduction / 100));
-                } else if (selectedGadget.reduction < 0) { // e.g., BoreMax -10.0 (Increase)
+                } else if (selectedGadget.reduction < 0) { // e.g., BoreMax -10.0 (Increase - Additive)
                     // Gadget increase applies additively
                     resistanceAfterAdditiveMods += Math.abs(selectedGadget.reduction);
                 }
@@ -840,7 +838,7 @@
                             <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
                                 <li>Upgrade to the **Max Power Loadout** shown below (using only 1 Active Module per head).</li>
                                 <li>Focus on stacking the most powerful single Active Module (**Surge**) with your strongest Passive Modules.</li>
-                                <li>Ensure you are using a resistance-reducing gadget like **Sabir** (-50%).</li>
+                                <li>Ensure you are using a resistance-reducing gadget like **Sabir** (-50% **Reduction**).</li>
                             </ul>
                         </p>
                     </div>
