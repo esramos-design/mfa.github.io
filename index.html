@@ -477,26 +477,47 @@
                 const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
                 const basePower = parseFloat(basePowerValue);
                 
-                // Get Module Multipliers and Effects
+                // --- MODULE EFFECT CALCULATION ---
                 let totalModulePowerMultiplier = 1.0;
-                // Loop through all 3 slots, checking against maxModules for actual use
+                let activeModules = [];
+                let passiveModules = [];
+                
+                // 1. Collect all module selections for this arm
                 for (let i = 1; i <= 3; i++) { 
                     const moduleSelect = document.getElementById(`${armUniqueId}-mod${i}`);
                     if (moduleSelect && i <= maxModules) { 
                         const moduleName = moduleSelect.value;
-                        // Search the master list for the selected module name
                         const selectedModule = powerModules.find(m => m.name === moduleName);
 
-                        if (selectedModule) {
-                            // Accumulate power multiplier (multiplicative)
-                            totalModulePowerMultiplier *= selectedModule.multiplier; 
-                            
-                            // Accumulate Resistance and Instability modifiers (additive)
-                            totalResistanceModifier += selectedModule.resistanceEffect;
-                            totalInstabilityModifier += selectedModule.instabilityEffect;
+                        if (selectedModule && selectedModule.name !== 'None') {
+                            if (selectedModule.activation === 'Active') {
+                                activeModules.push(selectedModule);
+                            } else if (selectedModule.activation === 'Passive') {
+                                passiveModules.push(selectedModule);
+                            }
                         }
                     }
                 }
+
+                // 2. Apply Active Module Rule (only the most powerful one is active)
+                if (activeModules.length > 0) {
+                    // Sort active modules by multiplier (descending)
+                    activeModules.sort((a, b) => b.multiplier - a.multiplier);
+                    const activeModule = activeModules[0];
+                    
+                    // Apply the effect of the single, most powerful active module
+                    totalModulePowerMultiplier *= activeModule.multiplier; 
+                    totalResistanceModifier += activeModule.resistanceEffect;
+                    totalInstabilityModifier += activeModule.instabilityEffect;
+                }
+
+                // 3. Apply Passive Module Rule (all stack multiplicatively on power, additively on effects)
+                passiveModules.forEach(mod => {
+                    totalModulePowerMultiplier *= mod.multiplier; 
+                    totalResistanceModifier += mod.resistanceEffect;
+                    totalInstabilityModifier += mod.instabilityEffect;
+                });
+                // --- END MODULE EFFECT CALCULATION ---
 
                 if (isNaN(basePower) || basePower <= 0) {
                     validationError = true;
@@ -617,8 +638,15 @@
             
             // Ideal Loadout Components for Max Power
             const recommendedGadget = gadgets.find(g => g.name.startsWith("Sabir"));
-            const topPowerModules = powerModules.filter(m => m.multiplier > 1.0).sort((a, b) => b.multiplier - a.multiplier);
-            const recommendedModules = topPowerModules.slice(0, 3); // Surge, Rieger-C3, Rieger-C2
+            const topActiveModule = powerModules.find(m => m.activation === 'Active' && m.name.startsWith("Surge")); // Surge (1.50)
+            const topPassiveModules = powerModules.filter(m => m.activation === 'Passive').sort((a, b) => b.multiplier - a.multiplier);
+            
+            // The two best passive modules (Rieger-C3, Rieger-C2)
+            const recommendedPassiveModules = [ 
+                topPassiveModules.find(m => m.name.startsWith("Rieger-C3")),
+                topPassiveModules.find(m => m.name.startsWith("Rieger-C2")),
+            ].filter(Boolean); // Filter out null/undefined if any are missing
+
             const recommendedLaserS2 = allLaserHeads.find(h => h.name.startsWith("Helix II")); 
             const recommendedLaserS1 = allLaserHeads.find(h => h.name.startsWith("Helix I"));  
             const recommendedGolemLaser = allLaserHeads.find(h => h.name.startsWith("Pitman")); 
@@ -645,25 +673,46 @@
                 if (shipId === 'golem') {
                     laserName = recommendedGolemLaser.name;
                     laserPower = recommendedGolemLaser.power;
-                    moduleList = recommendedModules.slice(0, 2); 
+                    // Golem (2 slots): 1 Active (Surge) + 1 Passive (Rieger-C3)
+                    moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
                 } else if (shipId === 'mole') {
                     laserName = recommendedLaserS2.name;
                     laserPower = recommendedLaserS2.power;
-                    moduleList = recommendedModules.slice(0, 3); 
+                    // MOLE (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
+                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean); 
                 } else { // Prospector
                     laserName = recommendedLaserS1.name;
                     laserPower = recommendedLaserS1.power;
-                    moduleList = recommendedModules.slice(0, 3); 
+                    // Prospector (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
+                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
                 }
                 
                 moduleList = moduleList.slice(0, maxModules);
-
+                
+                // Calculate the max effective power for this recommended arm loadout
+                let rec_power_multiplier = 1.0;
+                let rec_resistance_mod = 0;
+                let rec_instability_mod = 0;
+                
+                const rec_active_module = moduleList.find(m => m.activation === 'Active');
+                const rec_passive_modules = moduleList.filter(m => m.activation === 'Passive');
+                
+                if (rec_active_module) {
+                    rec_power_multiplier *= rec_active_module.multiplier;
+                    rec_resistance_mod += rec_active_module.resistanceEffect;
+                    rec_instability_mod += rec_active_module.instabilityEffect;
+                }
+                rec_passive_modules.forEach(mod => {
+                    rec_power_multiplier *= mod.multiplier;
+                    rec_resistance_mod += mod.resistanceEffect;
+                    rec_instability_mod += mod.instabilityEffect;
+                });
+                
+                const maxEffectivePower = laserPower * rec_power_multiplier;
+                
                 const moduleHtml = moduleList.map((mod, i) => 
                     `<li class="ml-4 list-disc text-green-300">Slot ${i+1}: <span class="font-bold">${mod.name}</span> (x${mod.multiplier.toFixed(2)})</li>`
                 ).join('');
-                
-                const totalModuleMult = moduleList.reduce((acc, mod) => acc * mod.multiplier, 1.0);
-                const maxEffectivePower = laserPower * totalModuleMult;
                 
                 const titleColorClass = shipId === 'mole' ? 'text-indigo-400' : shipId === 'prospector' ? 'text-green-400' : 'text-amber-400';
 
@@ -706,8 +755,8 @@
                         <p class="mt-2 text-sm text-yellow-200">
                             **Action Plan:**
                             <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
-                                <li>Upgrade to the **Max Power Loadout** shown below to guarantee success.</li>
-                                <li>Failing that, focus on adding high-power modules like **Surge** (x1.50) or **Brandt** (x1.35).</li>
+                                <li>Upgrade to the **Max Power Loadout** shown below (using only 1 Active Module per head).</li>
+                                <li>Focus on stacking the most powerful single Active Module (**Surge**) with your strongest Passive Modules.</li>
                                 <li>Ensure you are using a resistance-reducing gadget like **Sabir** (-50%).</li>
                             </ul>
                         </p>
@@ -730,8 +779,8 @@
                         <p class="mt-2 text-sm text-yellow-200">
                             **Module Recommendation:**
                             <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
-                                <li>To reduce **Instability**: Equip **Stampede** or **Rieger-C2/C3**.</li>
-                                <li>To reduce **Resistance**: Equip **Surge** or **Rime**.</li>
+                                <li>To reduce **Instability**: Equip **Stampede** (Active) or **Rieger-C2/C3** (Passive).</li>
+                                <li>To reduce **Resistance**: Equip **Surge** (Active) or **Rime** (Active).</li>
                                 <li>For optimal window control: Use **Focus** series modules.</li>
                             </ul>
                         </p>
