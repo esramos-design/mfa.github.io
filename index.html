@@ -254,13 +254,13 @@
         const gadgets = [
             // Reduction > 0 means Multiplicative Reduction Factor (e.g., 50.0 -> x 0.50)
             // Reduction < 0 means Additive Resistance Increase (e.g., -10.0 -> +10 points)
-            { name: "Sabir (-50% Resistance Reduction)", reduction: 50.0, type: 'Multiplicative' }, 
-            { name: "OptiMax (-30% Resistance Reduction)", reduction: 30.0, type: 'Multiplicative' },
-            { name: "BoreMax (+10% Resistance Additive)", reduction: -10.0, type: 'Additive' }, 
-            { name: "Waveshift (Stability/Charge Rate)", reduction: 0.0, type: 'Utility' }, 
-            { name: "Stalwart (Instability Reduction)", reduction: 0.0, type: 'Utility' }, 
-            { name: "Okunis (Optimal Window/Charge Rate)", reduction: 0.0, type: 'Utility' },
-            { name: "None", reduction: 0.0, type: 'None' }, 
+            { name: "Sabir (-50% Resistance, +15% Instability)",    reduction: -50.0,    instabilityEffect: 15, type: 'Multiplicative' }, 
+            { name: "OptiMax (-30% Resistance )",  reduction: -30.0,    instabilityEffect: 0, type: 'Multiplicative' },
+            { name: "BoreMax (+10% Resistance, -70% Instability )",   reduction: 10.0,   instabilityEffect: -70, type: 'Additive' }, 
+            { name: "Waveshift (Stability/Charge Rate, -35% Instability)",    reduction: 0.0,     instabilityEffect: -35, type: 'Utility' }, 
+            { name: "Stalwart (Instability Reduction, -35% Instability)",     reduction: 0.0,     instabilityEffect: -35, type: 'Utility' }, 
+            { name: "Okunis (Optimal Window/Charge Rate)",  reduction: 0.0,     instabilityEffect: 0, type: 'Utility' },
+            { name: "None",                                 reduction: 0.0,     instabilityEffect: 0, type: 'None' }, 
         ].sort((a, b) => b.reduction - a.reduction);
 
         let armIdCounter = 0; // Unique ID for each added laser head
@@ -518,7 +518,7 @@
             let totalAdditiveResistance = 0; // Tracks positive resistance additions (e.g., Brandt +15)
             let totalReductionMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
             let totalResistanceMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
-            let totalInstabilityModifier = 0; // Stays additive
+            let totalInstabilityModifier = 1.0; // Stays additive
             let validationError = false;
             let totalArmsCount = allArms.length;
 
@@ -535,7 +535,7 @@
                 let totalModulePowerMultiplier = 1.0;
                 let activeModules = [];
                 let passiveModules = [];
-                
+
                 // 1. Collect all module selections for this arm
                 for (let i = 1; i <= 3; i++) { 
                     const moduleSelect = document.getElementById(`${armUniqueId}-mod${i}`);
@@ -559,7 +559,7 @@
                     
                     // Apply Power Multiplier and Additive Instability to the total calculation
                     totalModulePowerMultiplier *= activeModule.multiplier; 
-                    totalInstabilityModifier += activeModule.instabilityEffect; 
+                    totalInstabilityModifier *= (1 + (activeModule.instabilityEffect / 100)); 
 
                     // Apply Resistance Effect
                     totalResistanceMultiplier *= (1 + (activeModule.resistanceEffect / 100));
@@ -569,8 +569,8 @@
                 passiveModules.forEach(mod => {
                     // Apply Power Multiplier and Additive Instability
                     totalModulePowerMultiplier *= mod.multiplier; 
-                    totalInstabilityModifier += mod.instabilityEffect; 
-                    totalResistanceMultiplier *= (1 + (mod.resistanceEffect) / 100);
+                    totalInstabilityModifier *= (1 + (mod.instabilityEffect / 100)); 
+                    totalResistanceMultiplier *= (1 + (mod.resistanceEffect / 100));
                 });
                 // --- END MODULE EFFECT CALCULATION ---
 
@@ -596,28 +596,27 @@
             }
 
             // 2. Calculate Final Rock Parameters
-            
-            // Step 1: Apply all module ADDITIVE effects (positive resistance)
-            let resistanceAfterAdditiveMods = baseResistance + totalAdditiveResistance;
-            let finalModifiedInstability = initialInstability + totalInstabilityModifier;
+
 
             // Step 2: Apply Gadget effect
             const selectedGadget = gadgets.find(g => g.reduction === gadgetReductionValue);
 
             if (selectedGadget) {
-                totalResistanceMultiplier *= (1 - (selectedGadget.reduction / 100));
+                totalResistanceMultiplier *= (1 + (selectedGadget.reduction / 100));
+                totalInstabilityModifier *= (1 + (selectedGadget.instabilityEffect/100))
             }
             
             // Step 3: Apply the total multiplicative reduction factor
             let finalEffectiveResistance = baseResistance * totalResistanceMultiplier;
+            let finalModifiedInstability = initialInstability * totalInstabilityModifier;
 
             // Apply final clamps
             if (finalEffectiveResistance < 0) finalEffectiveResistance = 0; 
-            if (finalModifiedInstability < -50) finalModifiedInstability = -50; 
+            if (finalModifiedInstability < 0) finalModifiedInstability = 0; 
             
             // --- Output Display Formatting ---
             const totalResistanceReductionPercentage = (totalResistanceMultiplier);
-            const resistanceDisplayBreakdown = `Resistance modifier: ${totalResistanceReductionPercentage.toFixed(1)}`;
+            const resistanceDisplayBreakdown = `Resistance modifier: ${totalResistanceReductionPercentage.toFixed(2)}`;
             // ---------------------------------
 
             // 3. Perform Fracture Calculation
@@ -666,8 +665,8 @@
                         </div>
                         <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
                             <p class="text-sm text-gray-400">Modified Instability</p>
-                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(1)}%</p>
-                            <p class="text-xs text-gray-500">(Base ${initialInstability.toFixed(1)}% | Mod: ${totalInstabilityModifier > 0 ? '+' : ''}${totalInstabilityModifier.toFixed(1)}%)</p>
+                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(2)}</p>
+                            <p class="text-xs text-gray-500">(Base ${initialInstability.toFixed(2)} | Instability modifier: ${totalInstabilityModifier > 0 ? '' : ''}${totalInstabilityModifier.toFixed(2)})</p>
                         </div>
                     </div>
                     
