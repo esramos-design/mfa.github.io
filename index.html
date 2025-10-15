@@ -184,47 +184,47 @@
             { name: "Hofstede-S1 (~2100 MW)", size: 1, power: 2100, moduleSlots: 1, resistanceEffect: -30, instabilityEffect: 10 },
             { name: "Klein-S1 (~2220 MW)", size: 1, power: 2220, moduleSlots: 0, resistanceEffect: -45, instabilityEffect: 35 },
             { name: "Impact I (~2100 MW)", size: 1, power: 2100, moduleSlots: 2, resistanceEffect: 10, instabilityEffect: -10 },
-            { name: "Helix I (~3150 MW)", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0 },
+            { name: "Helix I (~3150 MW)", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0.0 },
             { name: "Arbor MH1 (~1890 MW)", size: 1, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35 },
-            { name: "Lancet MH2 (~3600 MW)", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0, instabilityEffect: -10 },
+            { name: "Lancet MH2 (~3600 MW)", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0.0, instabilityEffect: -10 },
             { name: "Hofstede-S2 (~3360 MW)", size: 2, power: 3360, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 10 },
             { name: "Klein-S2 (~3600 MW)", size: 2, power: 3600, moduleSlots: 1, resistanceEffect: -45, instabilityEffect: 35 },
             { name: "Impact II (~3360 MW)", size: 2, power: 3360, moduleSlots: 3, resistanceEffect: 10, instabilityEffect: -10 }, // Note: Impact II power reduced from 4080 to 3360 based on PDF
-            { name: "Helix II (~4080 MW)", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0 },
+            { name: "Helix II (~4080 MW)", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0.0 },
             { name: "Arbor MH2 (~2400 MW)", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35 },
             // Pitman is fixed on Golem, added separately if the user wants to compare it. MaxPower 2700, 2 slots
             { name: "Pitman (~2700 MW)", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35 } 
-        ].sort((a, b) => a.power - b.power); 
+        ].sort((a, b) => a.power - b.power);
         
         // --- UPDATED POWER MODULES DATA (Expanded and Verified) ---
         const powerModules = [
             // Active Modules (Only one active module's power multiplier/effects apply per laser head)
-            { name: "Surge (Active, +50% Power, -15% Res)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 0, activation: 'Active' },
-            { name: "Brandt (Active, +35% Power, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0, activation: 'Active' },
-            { name: "Stampede (Active, +35% Power, -10 Inst)", multiplier: 1.35, resistanceEffect: 0, instabilityEffect: -10, activation: 'Active' },
-            { name: "Forel (Active, Charge Window +60%)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
-            { name: "Lifeline (Active, Stability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
-            { name: "Torpid (Active, Charge Rate +60%)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
-            { name: "Rime (Active, -15% Power, -25% Res)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0, activation: 'Active' },
-            { name: "Optimum (Active, -15% Power, -80% Catastrophic Rate)", multiplier: 0.85, resistanceEffect: 0, instabilityEffect: 0, activation: 'Active' },
+            { name: "Surge (Active, +50% Power, -15% Res)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Brandt (Active, +35% Power, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Stampede (Active, +35% Power, -10 Inst)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active' },
+            { name: "Forel (Active, Charge Window +60%)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active' }, // Utility focus
+            { name: "Lifeline (Active, Stability)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' }, // Utility focus
+            { name: "Torpid (Active, Charge Rate +60%)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' }, // Utility focus
+            { name: "Rime (Active, -15% Power, -25% Res)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Optimum (Active, -15% Power, -80% Catastrophic Rate)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' },
             
             // Passive Modules (All passive modules' power multipliers/effects stack per laser head)
-            { name: "Rieger-C3 (Passive, +25% Power, -1% Inst)", multiplier: 1.25, resistanceEffect: 0, instabilityEffect: -1, activation: 'Passive' },
-            { name: "Rieger-C2 (Passive, +20% Power, -3% Inst)", multiplier: 1.20, resistanceEffect: 0, instabilityEffect: -3, activation: 'Passive' },
-            { name: "Focus III (Passive, -5% Power, +40% Opt Window)", multiplier: 0.95, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Focus II (Passive, -10% Power, +37% Opt Window)", multiplier: 0.90, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Focus (Passive, -15% Power, +30% Opt Window)", multiplier: 0.85, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "Torrent III (Passive, +40% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 40, activation: 'Passive' }, 
-            { name: "Torrent II (Passive, +35% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 35, activation: 'Passive' }, 
-            { name: "Torrent (Passive, +30% Instability)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 30, activation: 'Passive' }, 
-            { name: "XTR-XL (Passive, +25% Opt Window, -24% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "XTR-L (Passive, +22% Opt Window, -23% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "XTR (Passive, +15% Opt Window, -20% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' },
-            { name: "FLTR-XL (Passive, -24% Inert)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' }, // Extraction only, no fracture effect
-            { name: "Vaux-C3 (Passive, -5% Charge Rate)", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Passive' }, // Charge rate utility
+            { name: "Rieger-C3 (Passive, +25% Power, -1% Inst)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive' },
+            { name: "Rieger-C2 (Passive, +20% Power, -3% Inst)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive' },
+            { name: "Focus III (Passive, -5% Power, +40% Opt Window)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "Focus II (Passive, -10% Power, +37% Opt Window)", multiplier: 0.90, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "Focus (Passive, -15% Power, +30% Opt Window)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "Torrent III (Passive, +40% Instability)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 40, activation: 'Passive' }, 
+            { name: "Torrent II (Passive, +35% Instability)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 35, activation: 'Passive' }, 
+            { name: "Torrent (Passive, +30% Instability)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 30, activation: 'Passive' }, 
+            { name: "XTR-XL (Passive, +25% Opt Window, -24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "XTR-L (Passive, +22% Opt Window, -23% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "XTR (Passive, +15% Opt Window, -20% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
+            { name: "FLTR-XL (Passive, -24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' }, // Extraction only, no fracture effect
+            { name: "Vaux-C3 (Passive, -5% Charge Rate)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' }, // Charge rate utility
             
             // Default/None
-            { name: "None", multiplier: 1.00, resistanceEffect: 0, instabilityEffect: 0, activation: 'Default' },
+            { name: "None", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Default' },
         ];
         
         // Custom sort function: Default, Active (by power), Passive (by power)
@@ -255,12 +255,12 @@
             // Reduction > 0 means Multiplicative Reduction Factor (e.g., 50.0 -> x 0.50)
             // Reduction < 0 means Additive Resistance Increase (e.g., -10.0 -> +10 points)
             { name: "Sabir (-50% Resistance, +15% Instability)",    reduction: -50.0,    instabilityEffect: 15, type: 'Multiplicative' }, 
-            { name: "OptiMax (-30% Resistance )",  reduction: -30.0,    instabilityEffect: 0, type: 'Multiplicative' },
+            { name: "OptiMax (-30% Resistance )",  reduction: -30.0,    instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )",   reduction: 10.0,   instabilityEffect: -70, type: 'Additive' }, 
             { name: "Waveshift (Stability/Charge Rate, -35% Instability)",    reduction: 0.0,     instabilityEffect: -35, type: 'Utility' }, 
             { name: "Stalwart (Instability Reduction, -35% Instability)",     reduction: 0.0,     instabilityEffect: -35, type: 'Utility' }, 
-            { name: "Okunis (Optimal Window/Charge Rate)",  reduction: 0.0,     instabilityEffect: 0, type: 'Utility' },
-            { name: "None",                                 reduction: 0.0,     instabilityEffect: 0, type: 'None' }, 
+            { name: "Okunis (Optimal Window/Charge Rate)",  reduction: 0.0,     instabilityEffect: 0.0, type: 'Utility' },
+            { name: "None",                                 reduction: 0.0,     instabilityEffect: 0.0, type: 'None' }, 
         ].sort((a, b) => b.reduction - a.reduction);
 
         let armIdCounter = 0; // Unique ID for each added laser head
@@ -286,7 +286,14 @@
                     else if (ship.id === 'prospector' && head.name.includes('Helix I')) isSelected = true;
                     else if (ship.id === 'golem' && head.name.includes('Pitman')) isSelected = true;
 
-                    return `<option value="${head.power}" data-slots="${head.moduleSlots}" ${isSelected ? 'selected' : ''}>${head.name} (${head.moduleSlots} Slots)</option>`;
+                    return `<option 
+                            value="${head.power}" 
+                            data-slots="${head.moduleSlots}" 
+                            data-resistance="${head.resistanceEffect}" 
+                            data-instability="${head.instabilityEffect}" 
+                            ${isSelected ? 'selected' : ''}>
+                            ${head.name} (${head.moduleSlots} Slots)
+                            </option>`;
                 }).join('');
 
             let laserSelectAttributes = '';
@@ -467,7 +474,7 @@
                 const defaultGadget = gadgets.find(g => g.name.startsWith("Sabir"));
                 gadgetSelectElement.innerHTML = gadgets.map(g => 
                     // VALUE: Uses reduction. If positive (reduction), it's multiplicative. If negative (increase), it's additive.
-                    `<option value="${g.reduction}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
+                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
                 ).join('');
                 if (defaultGadget) {
                     gadgetSelectElement.value = defaultGadget.reduction.toString();
@@ -530,7 +537,17 @@
                 const laserSelect = document.getElementById(`${armUniqueId}-laser`);
                 const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
                 const basePower = parseFloat(basePowerValue);
-                
+
+                const selectedOption = laserSelect.options[laserSelect.selectedIndex];
+
+                // Read the new data attributes
+                const resistanceEffect = parseFloat(selectedOption.getAttribute('data-resistance')) || 0;
+                const instabilityEffect = parseFloat(selectedOption.getAttribute('data-instability')) || 0;
+
+                // Now you can use them however you like
+                console.log(`Laser Resistance: ${resistanceEffect}, Instability: ${instabilityEffect}`);
+                totalResistanceMultiplier *= (1 + (resistanceEffect / 100));
+                totalInstabilityModifier *= (1 + (instabilityEffect / 100));
                 // --- MODULE EFFECT CALCULATION (Per Arm) ---
                 let totalModulePowerMultiplier = 1.0;
                 let activeModules = [];
@@ -599,12 +616,20 @@
 
 
             // Step 2: Apply Gadget effect
-            const selectedGadget = gadgets.find(g => g.reduction === gadgetReductionValue);
+
+            const gadgetSelect = document.getElementById('gadgetSelect');
+            const selectedGadgetName = gadgetSelect.value;
+            const selectedGadget = gadgets.find(g => g.name === selectedGadgetName);
 
             if (selectedGadget) {
                 totalResistanceMultiplier *= (1 + (selectedGadget.reduction / 100));
                 totalInstabilityModifier *= (1 + (selectedGadget.instabilityEffect/100))
             }
+            console.log(
+                        "Selected gadget:", selectedGadget.name,
+                        "InstEffect:", selectedGadget.instabilityEffect,
+                        "Total Instability Modifier:", totalInstabilityModifier
+                        );
             
             // Step 3: Apply the total multiplicative reduction factor
             let finalEffectiveResistance = baseResistance * totalResistanceMultiplier;
