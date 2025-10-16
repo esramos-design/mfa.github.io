@@ -467,22 +467,22 @@
                 shipSelectElement.value = 'mole';
             }
             
-            // 2. Populate Gadget Slot
-            const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement) {
-                // Find the "None" gadget
-                const defaultGadget = gadgets.find(g => g.name.startsWith("None"));
-                gadgetSelectElement.innerHTML = gadgets.map(g => 
-                    // VALUE: Uses reduction. If positive (reduction), it's multiplicative. If negative (increase), it's additive.
-                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
-                ).join('');
-                
-                // --- FIX: SET DEFAULT TO NONE ---
-                if (defaultGadget) {
-                    gadgetSelectElement.value = defaultGadget.reduction.toString();
-                }
-                // -----------------------------
+        // 2. Populate Gadget Slot
+        const gadgetSelectElement = document.getElementById('gadgetSelect');
+        if (gadgetSelectElement) {
+            // Find the "None" gadget to use as default
+            const defaultGadget = gadgets.find(g => g.name === "None");
+
+            // Populate dropdown with names as values (unique identifiers)
+            gadgetSelectElement.innerHTML = gadgets.map(g =>
+                `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
+            ).join('');
+
+            // --- Set default explicitly to "None" ---
+            if (defaultGadget) {
+                gadgetSelectElement.value = defaultGadget.name;
             }
+        }
             
             // Run initial calculation (which will show the 'no ships' message)
             calculate(); 
