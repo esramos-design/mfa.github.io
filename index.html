@@ -252,8 +252,8 @@
 
         // --- UPDATED GADGETS DATA (Verified and expanded) ---
         const gadgets = [
-            // Reduction > 0 means Multiplicative Reduction Factor (e.g., 50.0 -> x 0.50)
-            // Reduction < 0 means Additive Resistance Increase (e.g., -10.0 -> +10 points)
+            // Reduction < 0 means Multiplicative Reduction Factor (e.g., -50.0 -> x 0.50)
+            // Reduction > 0 means Additive Resistance Increase (e.g., 10.0 -> +10 points)
             { name: "Sabir (-50% Resistance, +15% Instability)",    reduction: -50.0,    instabilityEffect: 15, type: 'Multiplicative' }, 
             { name: "OptiMax (-30% Resistance )",  reduction: -30.0,    instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )",   reduction: 10.0,   instabilityEffect: -70, type: 'Additive' }, 
@@ -524,11 +524,9 @@
 
             let totalEffectiveLaserPower = 0;
             
-            // NEW MODIFIERS for complex resistance/instability tracking
-            let totalAdditiveResistance = 0; // Tracks positive resistance additions (e.g., Brandt +15)
-            let totalReductionMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
-            let totalResistanceMultiplier = 1.0; // Tracks multiplicative resistance reduction factor (e.g., Surge 0.85, Sabir 0.5)
-            let totalInstabilityModifier = 1.0; // Stays additive
+            // NEW MODIFIERS: Multiplicative factors starting at 1.0
+            let totalResistanceMultiplier = 1.0; 
+            let totalInstabilityMultiplier = 1.0; 
             let validationError = false;
             let totalArmsCount = allArms.length;
 
@@ -536,21 +534,20 @@
                 const armUniqueId = arm.id;
                 const maxModules = parseInt(arm.dataset.maxModules);
                 
-                // Get Laser Power
+                // Get Laser Power and Attributes
                 const laserSelect = document.getElementById(`${armUniqueId}-laser`);
                 const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
                 const basePower = parseFloat(basePowerValue);
-
                 const selectedOption = laserSelect.options[laserSelect.selectedIndex];
 
-                // Read the new data attributes
-                const resistanceEffect = parseFloat(selectedOption.getAttribute('data-resistance')) || 0;
-                const instabilityEffect = parseFloat(selectedOption.getAttribute('data-instability')) || 0;
+                // --- Apply Laser Head Effects (Multiplicative) ---
+                const laserResistanceEffect = parseFloat(selectedOption.getAttribute('data-resistance')) || 0;
+                const laserInstabilityEffect = parseFloat(selectedOption.getAttribute('data-instability')) || 0;
 
-                // Now you can use them however you like
-                console.log(`Laser Resistance: ${resistanceEffect}, Instability: ${instabilityEffect}`);
-                totalResistanceMultiplier *= (1 + (resistanceEffect / 100));
-                totalInstabilityModifier *= (1 + (instabilityEffect / 100));
+                // Apply laser's inherent modifiers (e.g., Lancet -10% Res -> x 0.90)
+                totalResistanceMultiplier *= (1 + (laserResistanceEffect / 100));
+                totalInstabilityMultiplier *= (1 + (laserInstabilityEffect / 100));
+                
                 // --- MODULE EFFECT CALCULATION (Per Arm) ---
                 let totalModulePowerMultiplier = 1.0;
                 let activeModules = [];
@@ -572,24 +569,27 @@
                         }
                     }
                 }
+                
                 // 2. Apply Active Module Rule (only the most powerful one is active)
                 if (activeModules.length > 0) {
                     activeModules.sort((a, b) => b.multiplier - a.multiplier);
                     const activeModule = activeModules[0];
                     
-                    // Apply Power Multiplier and Additive Instability to the total calculation
+                    // Apply Power Multiplier (Accumulative)
                     totalModulePowerMultiplier *= activeModule.multiplier; 
-                    totalInstabilityModifier *= (1 + (activeModule.instabilityEffect / 100)); 
-
-                    // Apply Resistance Effect
+                    
+                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking)
+                    totalInstabilityMultiplier *= (1 + (activeModule.instabilityEffect / 100)); 
                     totalResistanceMultiplier *= (1 + (activeModule.resistanceEffect / 100));
                 }
 
                 // 3. Apply Passive Module Rule (all stack)
                 passiveModules.forEach(mod => {
-                    // Apply Power Multiplier and Additive Instability
+                    // Apply Power Multiplier (Accumulative)
                     totalModulePowerMultiplier *= mod.multiplier; 
-                    totalInstabilityModifier *= (1 + (mod.instabilityEffect / 100)); 
+                    
+                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking)
+                    totalInstabilityMultiplier *= (1 + (mod.instabilityEffect / 100)); 
                     totalResistanceMultiplier *= (1 + (mod.resistanceEffect / 100));
                 });
                 // --- END MODULE EFFECT CALCULATION ---
@@ -605,7 +605,8 @@
             // Get Rock & Gadget Stats
             const baseResistance = parseFloat(document.getElementById('resistance').value);
             const initialInstability = parseFloat(document.getElementById('instability').value);
-            const gadgetReductionValue = parseFloat(document.getElementById('gadgetSelect').value);
+            const gadgetSelect = document.getElementById('gadgetSelect');
+            const selectedGadgetName = gadgetSelect.value;
             const rockMass = parseFloat(document.getElementById('rockMass').value);
             
             // Final Validation (Catches NaN from number inputs if they are cleared by the user)
@@ -615,36 +616,27 @@
                 return;
             }
 
-            // 2. Calculate Final Rock Parameters
-
-
-            // Step 2: Apply Gadget effect
-
-            const gadgetSelect = document.getElementById('gadgetSelect');
-            const selectedGadgetName = gadgetSelect.value;
+            // 2. Calculate Final Rock Parameters (Gadget applied last)
             const selectedGadget = gadgets.find(g => g.name === selectedGadgetName);
 
             if (selectedGadget) {
+                // Gadget Resistance is applied multiplicatively, regardless of the sign (e.g., -50% reduction means multiplier of 0.5)
+                // Gadget Instability is also applied multiplicatively
                 totalResistanceMultiplier *= (1 + (selectedGadget.reduction / 100));
-                totalInstabilityModifier *= (1 + (selectedGadget.instabilityEffect/100))
+                totalInstabilityMultiplier *= (1 + (selectedGadget.instabilityEffect / 100));
             }
-            console.log(
-                        "Selected gadget:", selectedGadget.name,
-                        "InstEffect:", selectedGadget.instabilityEffect,
-                        "Total Instability Modifier:", totalInstabilityModifier
-                        );
             
-            // Step 3: Apply the total multiplicative reduction factor
+            // Step 3: Apply the total multiplier to the base rock stats
             let finalEffectiveResistance = baseResistance * totalResistanceMultiplier;
-            let finalModifiedInstability = initialInstability * totalInstabilityModifier;
+            let finalModifiedInstability = initialInstability * totalInstabilityMultiplier;
 
             // Apply final clamps
             if (finalEffectiveResistance < 0) finalEffectiveResistance = 0; 
-            if (finalModifiedInstability < 0) finalModifiedInstability = 0; 
+            if (finalModifiedInstability < 0) finalModifiedInstability = 0; // Instability cannot be negative
             
             // --- Output Display Formatting ---
-            const totalResistanceReductionPercentage = (totalResistanceMultiplier);
-            const resistanceDisplayBreakdown = `Resistance modifier: ${totalResistanceReductionPercentage.toFixed(2)}`;
+            const resistanceDisplayBreakdown = `Total Multiplier: x${totalResistanceMultiplier.toFixed(2)}`;
+            const instabilityDisplayBreakdown = `Total Multiplier: x${totalInstabilityMultiplier.toFixed(2)}`;
             // ---------------------------------
 
             // 3. Perform Fracture Calculation
@@ -693,8 +685,8 @@
                         </div>
                         <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
                             <p class="text-sm text-gray-400">Modified Instability</p>
-                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(2)}</p>
-                            <p class="text-xs text-gray-500">(Base ${initialInstability.toFixed(2)} | Instability modifier: ${totalInstabilityModifier > 0 ? '' : ''}${totalInstabilityModifier.toFixed(2)})</p>
+                            <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(2)}%</p>
+                            <p class="text-xs text-gray-500">(Base ${initialInstability.toFixed(2)}% | ${instabilityDisplayBreakdown})</p>
                         </div>
                     </div>
                     
@@ -749,7 +741,7 @@
 
             const recommendedLaserS2 = allLaserHeads.find(h => h.name.startsWith("Helix II")); 
             const recommendedLaserS1 = allLaserHeads.find(h => h.name.startsWith("Helix I"));  
-            const recommendedGolemLaser = allLaserHeads.find(h => h.name.startsWith("Pitman")); 
+            const recommendedGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman")); // Find by name as power changed
             
             // --- NEW ARM REQUIREMENT ANALYSIS BLOCK (Precedes detailed loadout) ---
             const requiredArmsHtml = `
@@ -809,28 +801,27 @@
 
             recommendedLoadoutHtml += '<div class="space-y-4">';
 
-            allArms.forEach((arm) => {
-                const shipId = arm.dataset.shipId;
-                const shipData = ships.find(s => s.id === shipId);
-                const maxModules = parseInt(arm.dataset.maxModules);
-                const armDisplayNumber = arm.querySelector('h4').innerText.split(' - ')[1]; 
+            // We must now iterate through the *required* number of arms, not just the active ones, 
+            // if the current team is insufficient, but we use the existing arms to structure the display.
 
-                let laserName, laserPower, moduleList;
+            // To avoid generating multiple loadouts for each ship type present, we will generate the three standard loadouts (MOLE/S2, Prospector/S1, Golem/Fixed)
 
-                if (shipId === 'golem') {
-                    laserName = recommendedGolemLaser.name;
-                    laserPower = recommendedGolemLaser.power;
+            const loadoutTypes = [
+                { id: 'mole', name: 'MOLE (S2/3 Slots)', laser: recommendedLaserS2, slots: 3 },
+                { id: 'prospector', name: 'Prospector (S1/3 Slots)', laser: recommendedLaserS1, slots: 3 },
+                { id: 'golem', name: 'Golem (Fixed/2 Slots)', laser: recommendedGolemLaser, slots: 2 }
+            ];
+
+            loadoutTypes.forEach(type => {
+                const maxModules = type.slots;
+
+                // Determine module list based on slots
+                let moduleList;
+                if (type.id === 'golem') {
                     // Golem (2 slots): 1 Active (Surge) + 1 Passive (Rieger-C3)
                     moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
-                } else if (shipId === 'mole') {
-                    laserName = recommendedLaserS2.name;
-                    laserPower = recommendedLaserS2.power;
-                    // MOLE (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
-                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean); 
-                } else { // Prospector
-                    laserName = recommendedLaserS1.name;
-                    laserPower = recommendedLaserS1.power;
-                    // Prospector (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
+                } else { 
+                    // MOLE/Prospector (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
                     moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
                 }
                 
@@ -849,24 +840,24 @@
                     rec_power_multiplier *= mod.multiplier;
                 });
                 
-                const maxEffectivePower = laserPower * rec_power_multiplier;
+                const maxEffectivePower = type.laser.power * rec_power_multiplier;
                 
                 const moduleHtml = moduleList.map((mod, i) => 
                     `<li class="ml-4 list-disc text-green-300">Slot ${i+1}: <span class="font-bold">${mod.name}</span> (x${mod.multiplier.toFixed(2)})</li>`
                 ).join('');
                 
-                const titleColorClass = shipId === 'mole' ? 'text-indigo-400' : shipId === 'prospector' ? 'text-green-400' : 'text-amber-400';
+                const titleColorClass = type.id === 'mole' ? 'text-indigo-400' : type.id === 'prospector' ? 'text-green-400' : 'text-amber-400';
 
                 recommendedLoadoutHtml += `
                     <div class="p-4 rounded-xl bg-gray-900 border border-gray-700">
-                        <h4 class="text-lg font-bold ${titleColorClass}">${shipData.name} - ${armDisplayNumber}</h4>
+                        <h4 class="text-lg font-bold ${titleColorClass}">${type.name} - Max Loadout</h4>
                         <p class="text-sm text-gray-400 mt-1">
                             Max Achievable Power: <span class="text-yellow-400 font-bold">${maxEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
                         </p>
                         
                         <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
                             <p class="font-medium text-blue-400">Laser Head:</p>
-                            <p class="text-base font-bold text-white">${laserName}</p>
+                            <p class="text-base font-bold text-white">${type.laser.name}</p>
                         </div>
                                                     
                         <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
@@ -879,14 +870,14 @@
                 `;
             });
 
+
             recommendedLoadoutHtml += '</div>';
+
             // --- B. Generate Failure Warning (CONDITIONAL) ---
             if (!isSuccess && requiredEffectivePower > 0) {
                  
                  const formattedRequiredPower = requiredEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 });
                  const powerNeeded = requiredEffectivePower - totalEffectiveLaserPower;
-                 
-                 const formattedPowerPerArmNeeded = (requiredEffectivePower / totalArmsCount).toLocaleString(undefined, { maximumFractionDigits: 2 });
                  
                  warningsHtml += `
                     <div class="p-4 bg-red-900/40 rounded-xl border border-red-700/50 mb-6">
@@ -895,9 +886,9 @@
                         <p class="mt-2 text-sm text-yellow-200">
                             **Action Plan:**
                             <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
-                                <li>Upgrade to the **Max Power Loadout** shown below (using only 1 Active Module per head).</li>
-                                <li>Focus on stacking the most powerful single Active Module (**Surge**) with your strongest Passive Modules.</li>
-                                <li>Ensure you are using a resistance-reducing gadget like **Sabir** (-50% **Reduction**).</li>
+                                <li>Refer to the **Min. Laser Heads Required** section above to correctly staff your crew.</li>
+                                <li>The recommended loadouts below represent the maximum power you can achieve per ship type.</li>
+                                <li>Ensure your current ships are using these **Max Loadouts** to close the power gap.</li>
                             </ul>
                         </p>
                     </div>
