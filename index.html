@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mining Fracture Analyser</title>
+    <title>Analyser</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -84,15 +84,14 @@
             <div class="left-column-wrapper bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 
                 <header class="text-center">
-                    <div class="mb-3 flex items-center justify-center space-x-3">
-                        <img src="https://robertsspaceindustries.com/media/sc9nu94qwxdypr/logo/THRUSTERS-Logo.png" 
-                             alt="THRUSTERS & DUST Logo" 
-                             class="h-10 w-10 rounded-full object-cover">
-                        <p class="text-lg sm:text-xl font-semibold uppercase tracking-widest text-gray-200">
-                            THRUSTERS & DUST
-                        </p>
+                    <!-- LOGO MAXIMIZED TO COLUMN WIDTH -->
+                    <div class="mb-6 flex items-center justify-center p-2">
+                        <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=68f3748f&is=68f2230f&hm=2d9d6d8fca9315f915aa2cd43a70d695e4839e8588bf056e2b561cc525006b8c&" 
+                             alt="Mining Fractor Analyser Logo" 
+                             class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg">
+                        <!-- Removed redundant org name and H1 title -->
                     </div>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Mining Fracture Analyser</h1>
+                    <!-- Retained only the subtitle -->
                     <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
                 </header>
                 
@@ -159,13 +158,8 @@
                     RUN ANALYTIC SIMULATION
                 </button>
 
-                <!-- FOOTNOTE 1: RSI Profile link -->
-                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-500">
-                        <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
-                            CHIRONDRAGON RSI Profile
-                        </a>
-                    </p>
+                <!-- FOOTNOTE 1: RSI Profile link (REMOVED) -->
+                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs hidden">
                 </footer>
             </div>
         </div>
@@ -185,15 +179,15 @@
                 <section id="suggestion" class="pt-6 border-t border-gray-700/50 hidden">
                 </section>
                 
-                <!-- FOOTNOTE 2: UEX Data Runner & Discord link -->
+                <!-- FOOTNOTE 2: UEX Data Runner & RSI Profile link (COMBINED) -->
                 <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
                     <p class="text-gray-500">
-                        <a href="https://uexcorp.space/@CHIRONDRAGON?tab=datarunner&set_lang=en_US" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
-                            UEX Data Runner
+                        <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
+                            CHIRONDRAGON RSI Profile
                         </a>
                         <span class="text-gray-600">|</span>
-                        <a href="https://discord.gg/ADcUVtx9DU" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">
-                            Thrusters & Dust Discord
+                        <a href="https://uexcorp.space/@CHIRONDRAGON?tab=datarunner&set_lang=en_US" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
+                            UEX Data Runner
                         </a>
                     </p>
                 </footer>
