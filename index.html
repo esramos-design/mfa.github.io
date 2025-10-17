@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mining Fracture Analyser</title>
+    <title>Mining Fracture Analyser - New Layout</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -22,21 +22,18 @@
             border: 1px solid #30363d;
             color: #e5e7eb; /* Softer light gray for input text */
             transition: border-color 0.2s, box-shadow 0.2s;
-            /* Standardize select appearance across browsers */
             -webkit-appearance: none; 
             -moz-appearance: none;
             appearance: none;
-            /* Add padding to account for the default select arrow */
             padding-right: 2.5rem; 
         }
 
-        /* --- UPDATED EYE-FRIENDLY FOCUS STYLE --- */
+        /* --- FOCUS STYLE --- */
         input[type="number"]:focus, select:focus {
             border-color: #38bdf8; /* Bright Sky Blue for high visibility */
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Wider, brighter focus ring */
             outline: none;
         }
-        /* --- END UPDATED FOCUS STYLE --- */
 
         /* Styling for the dynamically added ship arms */
         .ship-arm-card {
@@ -47,126 +44,150 @@
         .ship-arm-card:hover {
             border-color: #60a5fa;
         }
+
+        /* New Layout container: Max width, slightly centered for desktop visibility */
+        .main-container {
+            max-width: 1000px;
+            width: 95%;
+            display: grid; /* Enables stacking by default, and grid-cols-2 at lg */
+            gap: 2rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr; /* Two equal columns for desktop */
+            }
+        }
+        
+        /* CRITICAL CSS FOR INDEPENDENT SCROLLING COLUMNS */
+        @media (min-width: 1024px) {
+            /* Left Column: Fixed position relative to viewport */
+            .left-column-wrapper {
+                position: sticky;
+                top: 1rem; /* Space from the top */
+                /* Calculate height to fit between top margin and bottom of viewport */
+                max-height: calc(100vh - 2rem); 
+                overflow-y: auto; /* Enable scrolling for inputs */
+            }
+            /* Right Column: Scrolls normally within its container (This is handled by the viewport scrolling, no specific styling needed here) */
+        }
+        /* END CRITICAL CSS */
     </style>
 </head>
 <body class="p-4 sm:p-8 flex justify-center items-start">
 
-    <div class="w-full max-w-xl bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30">
-        <header class="text-center mb-8">
-            <!-- ORGANIZATION BRANDING - FIXED WITH IMAGE LOGO -->
-            <div class="mb-3 flex items-center justify-center space-x-3">
-                <img src="https://robertsspaceindustries.com/media/sc9nu94qwxdypr/logo/THRUSTERS-Logo.png" 
-                     alt="THRUSTERS & DUST Logo" 
-                     class="h-10 w-10 rounded-full object-cover">
-                <p class="text-lg sm:text-xl font-semibold uppercase tracking-widest text-gray-200">
-                    THRUSTERS & DUST
-                </p>
-            </div>
-            <!-- END ORGANIZATION BRANDING -->
+    <!-- MAIN GRID CONTAINER -->
+    <div class="main-container">
+        
+        <!-- LEFT COLUMN: INPUTS AND TEAM ASSEMBLY -->
+        <div class="w-full">
+            <div class="left-column-wrapper bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
+                
+                <header class="text-center">
+                    <div class="mb-3 flex items-center justify-center space-x-3">
+                        <img src="https://robertsspaceindustries.com/media/sc9nu94qwxdypr/logo/THRUSTERS-Logo.png" 
+                             alt="THRUSTERS & DUST Logo" 
+                             class="h-10 w-10 rounded-full object-cover">
+                        <p class="text-lg sm:text-xl font-semibold uppercase tracking-widest text-gray-200">
+                            THRUSTERS & DUST
+                        </p>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Fracture Analyser</h1>
+                    <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
+                </header>
 
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Mining Fracture Analyser</h1>
-            <p class="text-sm text-gray-400 mt-2">Calculate the **combined effective fracture power** of your multi-ship mining crew against challenging planetary and asteroid rocks.</p>
-        </header>
+                <!-- 1. Ship Assembly -->
+                <div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
+                    <label for="shipSelectToAdd" class="block text-base font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
+                    <div class="flex space-x-2">
+                        <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
+                            <!-- Options populated by JS -->
+                        </select>
+                        <button onclick="addShipLoadout()"
+                                class="p-3 text-sm font-bold rounded-lg transition-all duration-200 
+                                       bg-blue-600 hover:bg-blue-700 shadow-md active:scale-95 whitespace-nowrap">
+                            Add Ship
+                        </button>
+                    </div>
+                </div>
 
-        <!-- Dynamic Ship Loadout Management -->
-        <div class="p-4 bg-blue-900/20 rounded-xl mb-6 border border-blue-700/50">
-            <label for="shipSelectToAdd" class="block text-sm font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
-            <div class="flex space-x-2">
-                <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
-                    <!-- Options populated by JS -->
-                </select>
-                <button onclick="addShipLoadout()"
-                        class="p-3 text-sm font-bold rounded-lg transition-all duration-200 
-                               bg-blue-600 hover:bg-blue-700 shadow-md active:scale-95 whitespace-nowrap">
-                    Add Ship
+                <!-- Active Loadout Cards -->
+                <h2 class="text-xl font-semibold text-gray-300">Active Laser Heads:</h2>
+                <div id="multiShipContainer" class="space-y-4 min-h-[100px] p-2 border border-gray-700 rounded-xl">
+                    <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
+                        Add ships above to configure their mining laser heads.
+                    </p>
+                </div>
+
+                <!-- 2. Rock Parameters Group -->
+                <h2 class="text-xl font-semibold text-blue-300">2. Rock & Gadget Setup</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Rock Stats Input (Resistance and Instability) -->
+                    <div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
+                        <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
+                        <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
+                               class="w-full p-3 rounded-lg" oninput="calculate()">
+                    </div>
+                    
+                    <div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
+                        <label for="instability" class="block text-sm font-medium mb-2 text-gray-300">Base Instability (%)</label>
+                        <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
+                               class="w-full p-3 rounded-lg" oninput="calculate()">
+                    </div>
+
+                    <!-- Target Rock Mass Input -->
+                    <div class="p-4 bg-[#21262d] rounded-xl col-span-2">
+                        <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">Target Rock Mass (kg)</label>
+                        <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
+                               class="w-full p-3 rounded-lg" oninput="calculate()">
+                    </div>
+                </div>
+                
+                <!-- Gadget Slot -->
+                <div class="p-4 bg-[#21262d] rounded-xl">
+                    <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">3. Select Gadget (Rock Modifiers)</label>
+                    <select id="gadgetSelect" onchange="calculate()"
+                           class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <button onclick="calculate()"
+                        class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 
+                               bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
+                    RUN ANALYTIC SIMULATION
                 </button>
             </div>
-            <!-- New instructional text -->
-            <p class="text-xs text-gray-500 mt-2 italic text-right">Click or tap to view options</p>
-            <!-- End new instructional text -->
         </div>
 
-        <!-- Loadout Configuration Container (Dynamically populated) -->
-        <h2 class="text-xl font-semibold text-gray-300 mb-4 mt-6">Active Mining Laser Heads:</h2>
-        <div id="multiShipContainer" class="space-y-4">
-            <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
-                Add ships above to configure their mining laser heads.
-            </p>
-        </div>
-
-        <!-- Gadget Slot (Resistance Reduction) -->
-        <div class="p-4 bg-[#21262d] rounded-xl mt-8">
-            <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">2. Select Gadget (Applies once to Rock)</label>
-            <select id="gadgetSelect" onchange="calculate()"
-                   class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
-                <!-- Options populated by JS -->
-            </select>
-            <!-- New instructional text -->
-            <p class="text-xs text-gray-500 mt-2 italic text-right">Click or tap to view options</p>
-            <!-- End new instructional text -->
-        </div>
-        
-        <!-- Rock Stats Input (Resistance and Instability) -->
-        <h2 class="text-xl font-semibold text-blue-300 mt-8 mb-4">3. Rock Parameters</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 bg-[#21262d] rounded-xl">
-                <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
-                <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
-                       class="w-full p-3 rounded-lg" oninput="calculate()">
-            </div>
-            
-            <div class="p-4 bg-[#21262d] rounded-xl">
-                <!-- UPDATED LABEL TEXT -->
-                <label for="instability" class="block text-sm font-medium mb-2 text-gray-300">Base Instability (%)</label>
-                <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
-                       class="w-full p-3 rounded-lg" oninput="calculate()">
+        <!-- RIGHT COLUMN: RESULTS AND SUGGESTIONS -->
+        <div class="w-full">
+            <div class="right-column-wrapper bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
+                
+                <h2 class="text-2xl font-extrabold text-blue-400 text-center">ANALYTIC RESULTS</h2>
+                
+                <!-- Calculation Results -->
+                <section id="results" class="pt-2">
+                    <p class="text-center text-gray-400 italic">Configure your loadout and rock parameters to run the simulation.</p>
+                </section>
+                
+                <!-- Recommendation output -->
+                <section id="suggestion" class="pt-6 border-t border-gray-700/50 hidden">
+                </section>
+                
+                <!-- CHIRONDRAGON Branding Footer (Simplified) -->
+                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
+                    <p class="text-gray-500">
+                        Powered by <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="font-bold text-blue-400 hover:text-blue-300 transition-colors duration-150">CHIRONDRAGON</a>
+                        | <a href="https://discord.gg/ADcUVtx9DU" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">Thrusters & Dust Discord</a>
+                    </p>
+                </footer>
             </div>
         </div>
-
-        <!-- Target Rock Mass Input -->
-        <div class="p-4 bg-[#21262d] rounded-xl mt-6">
-            <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">4. Target Rock Mass (kg) [For Verdict]</label>
-            <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
-                   class="w-full p-3 rounded-lg" oninput="calculate()">
-        </div>
-
-        <button onclick="calculate()"
-                class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 mt-6 
-                       bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
-            Calculate Combined Fracture Limit
-        </button>
-
-        <section id="results" class="mt-8 pt-6 border-t border-gray-700/50">
-            <h2 class="text-xl font-semibold text-center text-blue-300 mb-4">Calculation Results</h2>
-            <p class="text-center text-gray-400 italic">Add ships and enter rock data to begin.</p>
-        </section>
-        
-        <!-- Recommendation output will be inserted here when fracture fails -->
-        <section id="suggestion" class="mt-8 pt-6 border-t border-gray-700/50 hidden">
-        </section>
-
-        <!-- CHIRONDRAGON Branding Footer -->
-        <footer class="mt-10 pt-4 border-t border-gray-700/50 text-center text-sm">
-            <!-- Updated text to only say "Powered by" -->
-            <p class="text-gray-500">Powered by <span class="font-bold text-blue-400">CHIRONDRAGON</span></p>
-            <div class="mt-2 space-x-4 text-xs">
-                <!-- RSI Link -->
-                <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">
-                    RSI Profile
-                </a>
-                <span class="text-gray-600">|</span>
-                <!-- UEX Data Runner Link -->
-                <a href="https://uexcorp.space/@CHIRONDRAGON?tab=datarunner&set_lang=en_US" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">
-                    UEX Data Runner
-                </a>
-                <span class="text-gray-600">|</span>
-                <!-- Discord Link - UPDATED HREF -->
-                <a href="https://discord.gg/ADcUVtx9DU" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">
-                    Thrusters & Dust Discord
-                </a>
-            </div>
-        </footer>
     </div>
+    <!-- END MAIN GRID CONTAINER -->
+
 
     <script>
         // Data Definitions based on the latest single-ship file, adapted for dynamic adding
@@ -635,8 +656,8 @@
 
             if (selectedGadget) {
                 // Gadget Resistance and Instability are also applied multiplicatively
-                // For Multiplicative gadgets (Sabir, OptiMax), reduction is negative (e.g., -50)
-                // For Additive gadgets (BoreMax), reduction is positive (e.g., +10) - which is still applied multiplicatively here!
+                // Reduction is negative (e.g., -50) -> Multiplier 0.50
+                // Increase is positive (e.g., 10) -> Multiplier 1.10
                 totalResistanceMultiplier *= (1 + (selectedGadget.reduction / 100));
                 totalInstabilityMultiplier *= (1 + (selectedGadget.instabilityEffect / 100));
             }
@@ -790,7 +811,7 @@
                 <p class="text-sm text-gray-400">(Recommended to reduce target resistance)</p>
             </div>`;
 
-            recommendedLoadoutHtml += '<h3 class="text-lg font-bold text-center text-yellow-300 mb-4">Loadout Per Active Laser Head</h3>';
+            recommendedLoadoutHtml += '<h3 class="text-lg font-bold text-center text-yellow-300 mb-4">Loadout Per Ship Type</h3>';
             
             // --- NEW SHIP REQUIREMENT ANALYSIS ---
             const minMOLEsRequired = Math.ceil(minArmsRequired / 3);
