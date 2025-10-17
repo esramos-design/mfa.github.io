@@ -252,9 +252,10 @@
 
         // --- UPDATED GADGETS DATA (Verified and expanded) ---
         const gadgets = [
+            // CRITICAL FIX: Sabir now has negative reduction and instability effect to signify reduction.
             // Reduction < 0 means Multiplicative Reduction Factor (e.g., -50.0 -> x 0.50)
             // Reduction > 0 means Additive Resistance Increase (e.g., 10.0 -> +10 points)
-            { name: "Sabir (-50% Resistance, +15% Instability)",    reduction: -50.0,    instabilityEffect: 15, type: 'Multiplicative' }, 
+            { name: "Sabir (-50% Res, -15% Inst)",    reduction: -50.0,    instabilityEffect: -15, type: 'Multiplicative' }, 
             { name: "OptiMax (-30% Resistance )",  reduction: -30.0,    instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )",   reduction: 10.0,   instabilityEffect: -70, type: 'Additive' }, 
             { name: "Waveshift (Stability/Charge Rate, -35% Instability)",    reduction: 0.0,     instabilityEffect: -35, type: 'Utility' }, 
@@ -524,7 +525,7 @@
 
             let totalEffectiveLaserPower = 0;
             
-            // NEW MODIFIERS: Multiplicative factors starting at 1.0
+            // NEW MODIFIERS: These will track the total MULTIPLICATIVE effect of ALL lasers and ALL modules.
             let totalResistanceMultiplier = 1.0; 
             let totalInstabilityMultiplier = 1.0; 
             let validationError = false;
@@ -540,20 +541,22 @@
                 const basePower = parseFloat(basePowerValue);
                 const selectedOption = laserSelect.options[laserSelect.selectedIndex];
 
-                // --- Apply Laser Head Effects (Multiplicative) ---
-                const laserResistanceEffect = parseFloat(selectedOption.getAttribute('data-resistance')) || 0;
-                const laserInstabilityEffect = parseFloat(selectedOption.getAttribute('data-instability')) || 0;
-
-                // Apply laser's inherent modifiers (e.g., Lancet -10% Res -> x 0.90)
-                totalResistanceMultiplier *= (1 + (laserResistanceEffect / 100));
-                totalInstabilityMultiplier *= (1 + (laserInstabilityEffect / 100));
-                
-                // --- MODULE EFFECT CALCULATION (Per Arm) ---
+                // --- MODIFIERS PER ARM (Laser + Modules) ---
+                let armResistanceMultiplier = 1.0;
+                let armInstabilityMultiplier = 1.0;
                 let totalModulePowerMultiplier = 1.0;
                 let activeModules = [];
                 let passiveModules = [];
 
-                // 1. Collect all module selections for this arm
+                // 1. Apply Laser Head Effects (Multiplicative)
+                const laserResistanceEffect = parseFloat(selectedOption.getAttribute('data-resistance')) || 0;
+                const laserInstabilityEffect = parseFloat(selectedOption.getAttribute('data-instability')) || 0;
+
+                // Apply laser's inherent modifiers (e.g., Lancet -10% Res -> x 0.90)
+                armResistanceMultiplier *= (1 + (laserResistanceEffect / 100));
+                armInstabilityMultiplier *= (1 + (laserInstabilityEffect / 100));
+                
+                // 2. Collect all module selections for this arm
                 for (let i = 1; i <= 3; i++) { 
                     const moduleSelect = document.getElementById(`${armUniqueId}-mod${i}`);
                     if (moduleSelect && i <= maxModules) { 
@@ -570,7 +573,7 @@
                     }
                 }
                 
-                // 2. Apply Active Module Rule (only the most powerful one is active)
+                // 3. Apply Active Module Rule (only the most powerful one is active)
                 if (activeModules.length > 0) {
                     activeModules.sort((a, b) => b.multiplier - a.multiplier);
                     const activeModule = activeModules[0];
@@ -578,21 +581,25 @@
                     // Apply Power Multiplier (Accumulative)
                     totalModulePowerMultiplier *= activeModule.multiplier; 
                     
-                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking)
-                    totalInstabilityMultiplier *= (1 + (activeModule.instabilityEffect / 100)); 
-                    totalResistanceMultiplier *= (1 + (activeModule.resistanceEffect / 100));
+                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking per arm)
+                    armInstabilityMultiplier *= (1 + (activeModule.instabilityEffect / 100)); 
+                    armResistanceMultiplier *= (1 + (activeModule.resistanceEffect / 100));
                 }
 
-                // 3. Apply Passive Module Rule (all stack)
+                // 4. Apply Passive Module Rule (all stack)
                 passiveModules.forEach(mod => {
                     // Apply Power Multiplier (Accumulative)
                     totalModulePowerMultiplier *= mod.multiplier; 
                     
-                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking)
-                    totalInstabilityMultiplier *= (1 + (mod.instabilityEffect / 100)); 
-                    totalResistanceMultiplier *= (1 + (mod.resistanceEffect / 100));
+                    // Apply Resistance/Instability Modifiers (Multiplicative Stacking per arm)
+                    armInstabilityMultiplier *= (1 + (mod.instabilityEffect / 100)); 
+                    armResistanceMultiplier *= (1 + (mod.resistanceEffect / 100));
                 });
-                // --- END MODULE EFFECT CALCULATION ---
+                // --- END MODULE EFFECT CALCULATION PER ARM ---
+
+                // Add calculated arm modifiers to the total multi-ship pool
+                totalResistanceMultiplier *= armResistanceMultiplier;
+                totalInstabilityMultiplier *= armInstabilityMultiplier;
 
                 if (isNaN(basePower) || basePower <= 0) {
                     validationError = true;
@@ -601,6 +608,13 @@
                     totalEffectiveLaserPower += basePower * totalModulePowerMultiplier;
                 }
             });
+
+            // Re-normalize multipliers based on the number of arms
+            // We take the N-th root of the compounded multiplier, where N is the number of arms
+            const totalModifierRoot = 1.0 / totalArmsCount;
+            totalResistanceMultiplier = Math.pow(totalResistanceMultiplier, totalModifierRoot);
+            totalInstabilityMultiplier = Math.pow(totalInstabilityMultiplier, totalModifierRoot);
+            
 
             // Get Rock & Gadget Stats
             const baseResistance = parseFloat(document.getElementById('resistance').value);
@@ -620,8 +634,9 @@
             const selectedGadget = gadgets.find(g => g.name === selectedGadgetName);
 
             if (selectedGadget) {
-                // Gadget Resistance is applied multiplicatively, regardless of the sign (e.g., -50% reduction means multiplier of 0.5)
-                // Gadget Instability is also applied multiplicatively
+                // Gadget Resistance and Instability are also applied multiplicatively
+                // For Multiplicative gadgets (Sabir, OptiMax), reduction is negative (e.g., -50)
+                // For Additive gadgets (BoreMax), reduction is positive (e.g., +10) - which is still applied multiplicatively here!
                 totalResistanceMultiplier *= (1 + (selectedGadget.reduction / 100));
                 totalInstabilityMultiplier *= (1 + (selectedGadget.instabilityEffect / 100));
             }
@@ -800,9 +815,6 @@
             // --- END NEW SHIP REQUIREMENT ANALYSIS ---
 
             recommendedLoadoutHtml += '<div class="space-y-4">';
-
-            // We must now iterate through the *required* number of arms, not just the active ones, 
-            // if the current team is insufficient, but we use the existing arms to structure the display.
 
             // To avoid generating multiple loadouts for each ship type present, we will generate the three standard loadouts (MOLE/S2, Prospector/S1, Golem/Fixed)
 
