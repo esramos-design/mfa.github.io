@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mining Fracture Analyser - New Layout</title>
+    <title>Mining Fracture Analyser</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -92,22 +92,10 @@
                             THRUSTERS & DUST
                         </p>
                     </div>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Fracture Analyser</h1>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-400">Mining Fracture Analyser</h1>
                     <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
-                    
-                    <!-- MOVED LINKS TO HEADER FOR BETTER VISIBILITY -->
-                    <div class="mt-3 space-x-4 text-xs flex justify-center items-center">
-                        <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
-                            RSI Profile
-                        </a>
-                        <span class="text-gray-600">|</span>
-                        <a href="https://uexcorp.space/@CHIRONDRAGON?tab=datarunner&set_lang=en_US" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
-                            UEX Data Runner
-                        </a>
-                    </div>
-                    <!-- END MOVED LINKS -->
                 </header>
-
+                
                 <!-- 1. Ship Assembly -->
                 <div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
                     <label for="shipSelectToAdd" class="block text-base font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
@@ -170,6 +158,15 @@
                                bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
                     RUN ANALYTIC SIMULATION
                 </button>
+
+                <!-- FOOTNOTE 1: RSI Profile link -->
+                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
+                    <p class="text-gray-500">
+                        <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
+                            CHIRONDRAGON RSI Profile
+                        </a>
+                    </p>
+                </footer>
             </div>
         </div>
 
@@ -188,11 +185,16 @@
                 <section id="suggestion" class="pt-6 border-t border-gray-700/50 hidden">
                 </section>
                 
-                <!-- CHIRONDRAGON Branding Footer (Simplified) -->
+                <!-- FOOTNOTE 2: UEX Data Runner & Discord link -->
                 <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
                     <p class="text-gray-500">
-                        Powered by <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="font-bold text-blue-400 hover:text-blue-300 transition-colors duration-150">CHIRONDRAGON</a>
-                        | <a href="https://discord.gg/ADcUVtx9DU" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">Thrusters & Dust Discord</a>
+                        <a href="https://uexcorp.space/@CHIRONDRAGON?tab=datarunner&set_lang=en_US" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
+                            UEX Data Runner
+                        </a>
+                        <span class="text-gray-600">|</span>
+                        <a href="https://discord.gg/ADcUVtx9DU" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150">
+                            Thrusters & Dust Discord
+                        </a>
                     </p>
                 </footer>
             </div>
