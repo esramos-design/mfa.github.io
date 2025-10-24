@@ -853,19 +853,25 @@
             const minMOLEsRequired = Math.ceil(minArmsRequired / 3);
             const minProspectorsRequired = minArmsRequired; // Assuming one arm per Prospector
             
+            // NEW BLOCK: Summary of ships required
             recommendedLoadoutHtml += `
                 <div class="p-4 bg-gray-800/50 rounded-lg mb-6 border border-indigo-600">
-                    <h4 class="font-bold text-indigo-300">To Meet the ${minArmsRequired} Arm Requirement:</h4>
+                    <h4 class="font-bold text-indigo-300">Minimum Crew Requirement:</h4>
                     <p class="text-sm text-gray-300 mt-2">
-                        You would need at least:
+                        To meet the required ${minArmsRequired} optimal laser heads, you would need:
                     </p>
                     <div class="flex justify-around mt-3 text-lg font-extrabold">
-                        <span class="text-indigo-400">${minMOLEsRequired} MOLE${minMOLEsRequired > 1 ? 's' : ''}</span>
-                        <span class="text-gray-600">OR</span>
-                        <span class="text-green-400">${minProspectorsRequired} Prospector${minProspectorsRequired > 1 ? 's' : ''}</span>
+                        <div class="text-center">
+                            <span class="text-indigo-400">${minMOLEsRequired}</span>
+                            <p class="text-sm text-gray-400">Argo MOLEs</p>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-green-400">${minProspectorsRequired}</span>
+                            <p class="text-sm text-gray-400">MISC Prospectors</p>
+                        </div>
                     </div>
                     <p class="text-xs text-gray-400 mt-3">
-                        (Assumes all required ships are configured with the optimal loadout shown below.)
+                        (The MOLE option is usually the most efficient way to staff multiple arms.)
                     </p>
                 </div>
             `;
@@ -876,9 +882,9 @@
             // To avoid generating multiple loadouts for each ship type present, we will generate the three standard loadouts (MOLE/S2, Prospector/S1, Golem/Fixed)
 
             const loadoutTypes = [
-                { id: 'mole', name: 'MOLE (S2/3 Slots)', laser: recommendedLaserS2, slots: 3 },
-                { id: 'prospector', name: 'Prospector (S1/2 Slots)', laser: recommendedLaserS1, slots: 2 }, // Prospector set to 2 slots
-                { id: 'golem', name: 'Golem (Fixed/2 Slots)', laser: recommendedGolemLaser, slots: 2 }
+                { id: 'mole', name: 'MOLE (S2/3 Slots - 3 LASERS)', arms: 3, laser: recommendedLaserS2, slots: 3 }, // Added arms property for MOLE
+                { id: 'prospector', name: 'Prospector (S1/2 Slots - 1 LASER)', arms: 1, laser: recommendedLaserS1, slots: 2 }, // Added arms property
+                { id: 'golem', name: 'Golem (Fixed/2 Slots - 1 LASER)', arms: 1, laser: recommendedGolemLaser, slots: 2 } // Added arms property
             ];
 
             loadoutTypes.forEach(type => {
@@ -886,7 +892,7 @@
 
                 // Determine module list based on slots
                 let moduleList;
-                if (type.id === 'golem' || type.id === 'prospector') { // Golem and Prospector are now 2 slots max
+                if (type.id === 'golem' || type.id === 'prospector') { // Golem and Prospector are 2 slots max
                     // 1 Active (Surge) + 1 Passive (Rieger-C3)
                     moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
                 } else { 
@@ -910,7 +916,8 @@
                 });
                 
                 const maxEffectivePower = type.laser.power * rec_power_multiplier;
-                
+                const totalMaxOutput = maxEffectivePower * type.arms; // Total potential output for the ship
+
                 const moduleHtml = moduleList.map((mod, i) => 
                     `<li class="ml-4 list-disc text-green-300">Slot ${i+1}: <span class="font-bold">${mod.name}</span> (x${mod.multiplier.toFixed(2)})</li>`
                 ).join('');
@@ -921,7 +928,10 @@
                     <div class="p-4 rounded-xl bg-gray-900 border border-gray-700">
                         <h4 class="text-lg font-bold ${titleColorClass}">${type.name} - Max Loadout</h4>
                         <p class="text-sm text-gray-400 mt-1">
-                            Max Achievable Power: <span class="text-yellow-400 font-bold">${maxEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
+                            Max Power Per Laser: <span class="text-yellow-400 font-bold">${maxEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
+                        </p>
+                        <p class="text-sm text-gray-400 mt-1">
+                            **Total Ship Output:** <span class="text-yellow-400 font-bold">${totalMaxOutput.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
                         </p>
                         
                         <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
@@ -930,7 +940,7 @@
                         </div>
                                                     
                         <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
-                            <p class="font-medium text-blue-400">Recommended Modules (${maxModules} Slots):</p>
+                            <p class="font-medium text-blue-400">Recommended Modules (${maxModules} Slots) *per laser*:</p>
                             <ul class="text-sm space-y-1 pt-1">
                                 ${moduleHtml}
                             </ul>
