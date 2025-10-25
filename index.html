@@ -44,17 +44,17 @@
             border-color: #60a5fa;
         }
 
-        /* New Layout container: Max width, slightly centered for desktop visibility */
+        /* New Layout container: Wider for 3 columns, slightly centered for desktop visibility */
         .main-container {
-            max-width: 1000px;
+            max-width: 1400px; /* Increased max width for 3 columns */
             width: 95%;
-            display: grid; /* Enables stacking by default, and grid-cols-2 at lg */
+            display: grid; /* Enables stacking by default, and grid-cols-3 at lg */
             gap: 2rem;
         }
         
         @media (min-width: 1024px) {
             .main-container {
-                grid-template-columns: 1fr 1fr; /* Two equal columns for desktop */
+                grid-template-columns: 1fr 1fr 1fr; /* Three equal columns for desktop */
             }
         }
         
@@ -80,9 +80,8 @@
                 margin-bottom: 2rem; /* Add spacing back after the header */
             }
 
-            /* Right Column: Ensure it scrolls relative to the body */
-            .right-column-scroll-content {
-                /* Make content scrollable if it exceeds the card height */
+            /* Middle and Right Column: Apply sticky scrolling behavior to both */
+            .sticky-scroll-content {
                 overflow-y: auto;
                 max-height: calc(100vh - 2rem); /* Match the height calculation of the left column */
                 position: sticky;
@@ -97,7 +96,7 @@
 
     <!-- MAIN GRID CONTAINER --><div class="main-container">
         
-        <!-- LEFT COLUMN: INPUTS AND TEAM ASSEMBLY --><div class="w-full">
+        <!-- COLUMN 1: INPUTS AND TEAM ASSEMBLY --><div class="w-full">
             <div class="left-column-wrapper bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30">
                 
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
@@ -172,16 +171,13 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: RESULTS AND SUGGESTIONS --><div class="w-full">
-            <div class="right-column-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
+        <!-- COLUMN 2: ANALYTIC RESULTS --><div class="w-full">
+            <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 
                 <h2 class="text-2xl font-extrabold text-blue-400 text-center">ANALYTIC RESULTS</h2>
                 
                 <!-- Calculation Results --><section id="results" class="pt-2">
                     <p class="text-center text-gray-400 italic">Configure your loadout and rock parameters to run the simulation.</p>
-                </section>
-                
-                <!-- Recommendation output --><section id="suggestion" class="pt-6 border-t border-gray-700/50 hidden">
                 </section>
                 
                 <!-- FOOTNOTE 2: UEX Data Runner & RSI Profile link (COMBINED) --><footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
@@ -195,6 +191,16 @@
                         </a>
                     </p>
                 </footer>
+            </div>
+        </div>
+
+        <!-- COLUMN 3: LOADOUT GUIDE & SUGGESTIONS --><div class="w-full">
+            <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
+                <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
+                
+                <!-- Recommendation output --><section id="suggestion" class="pt-2">
+                    <p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>
+                </section>
             </div>
         </div>
     </div>
@@ -562,7 +568,7 @@
             // 1. Input Validation and Power/Modifier Summation
             if (allArms.length === 0) {
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
-                suggestionContainer.classList.add('hidden');
+                suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
                 return;
             }
 
@@ -669,7 +675,7 @@
             // Final Validation (Catches NaN from number inputs if they are cleared by the user)
             if (validationError || isNaN(baseResistance) || isNaN(rockMass) || isNaN(initialInstability) || totalEffectiveLaserPower <= 0) {
                 displayResult('Error: Ensure all active laser heads have a valid Laser Head selected and all rock parameters contain valid positive numbers.', 'text-yellow-400');
-                suggestionContainer.classList.add('hidden');
+                suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
                 return;
             }
 
@@ -690,8 +696,7 @@
 
             // Apply final clamps
             if (finalEffectiveResistance < 0) finalEffectiveResistance = 0; 
-            if (finalModifiedInstability < 0) finalEffectiveResistance = 0; // Fix: Should be instability not resistance
-            if (finalModifiedInstability < 0) finalModifiedInstability = 0; // Instability cannot be negative
+            if (finalModifiedInstability < 0) finalModifiedInstability = 0; 
             
             // --- Output Display Formatting ---
             const resistanceDisplayBreakdown = `Total Multiplier: x${totalResistanceMultiplier.toFixed(2)}`;
@@ -988,14 +993,12 @@
             // --- D. Combine and Display ---
             if (warningsHtml.length > 0) {
                 // If there were warnings, prepend them to the loadout recommendation
-                suggestionContainer.innerHTML = `<h2 class="text-xl font-semibold text-center text-red-400 mb-4">Urgent Analysis & Loadout Guide</h2>` + warningsHtml + recommendedLoadoutHtml;
-                suggestionContainer.classList.remove('hidden');
+                suggestionContainer.innerHTML = warningsHtml + recommendedLoadoutHtml;
             } else if (recommendedLoadoutHtml.length > 0) {
                 // If only the loadout recommendation exists (successful, low difficulty rock)
                 suggestionContainer.innerHTML = recommendedLoadoutHtml;
-                suggestionContainer.classList.remove('hidden');
             } else {
-                suggestionContainer.classList.add('hidden');
+                suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">No specific warnings or minimum loadout recommendations at this time.</p>`;
             }
         }
 
@@ -1008,6 +1011,4 @@
         window.onload = () => {
             populateSelects();
         };
-    </script>
-</body>
-</html>
+    </script></body></html>
