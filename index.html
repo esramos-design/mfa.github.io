@@ -103,8 +103,8 @@
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- FIXED LOGO SOURCE with placeholder text matching the aesthetic -->
-                            <img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
+                            <!-- Logo Source Updated -->
+                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351&" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
@@ -311,6 +311,7 @@
         // --- UPDATED GADGETS DATA (Verified and expanded) ---
         const gadgets = [
             // Reduction < 0 means Multiplicative Reduction Factor (e.g., -50.0 -> x 0.50)
+            // Reduction > 0 means Additive Resistance Increase (e.g., 10.0 -> +10 points)
             { name: "Sabir (-50% Res, -15% Inst)", reduction: -50.0, instabilityEffect: -15, type: 'Multiplicative' }, 
             { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive' }, 
@@ -525,19 +526,14 @@
          * Dynamically populates the ship and gadget select dropdowns on load.
          */
         function populateSelects() {
-            console.log("Attempting to populate selects...");
             // 1. Populate "Add Ship" Select
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             if (shipSelectElement) {
-                console.log(`Found ship select element. Processing ${ships.length} ships.`);
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
                 // Default to MOLE for easy initial testing of multi-arm ships
                 shipSelectElement.value = 'mole';
-                console.log("Ship select populated successfully.");
-            } else {
-                 console.error("Could not find shipSelectToAdd element.");
             }
             
         // 2. Populate Gadget Slot
@@ -731,10 +727,6 @@
             if (allArms.length === 0) {
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
-                
-                // Clear charts when no data is present
-                if (powerChart) powerChart.destroy();
-                if (modChart) modChart.destroy();
                 return;
             }
 
