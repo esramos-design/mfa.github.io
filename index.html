@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mining Fracture Analyser - Star Citizen</title>
     <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js for graphs --><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         /* Define the Inter font family and a space-themed dark background */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -204,7 +205,7 @@
             <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
-                 <!-- Chart 2: Resistance / Instability Profile --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
+                 <!-- Chart 2: Risk vs. Stability Profile (Polar Area Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
                     <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Risk vs. Stability Profile</h3>
                     <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
                 </div>
@@ -1045,8 +1046,8 @@
 
             const loadoutTypes = [
                 { id: 'mole', name: 'MOLE (S2/3 Slots - 3 LASERS)', arms: 3, laser: recommendedLaserS2, slots: 3 }, // Added arms property for MOLE
-                { id: 'prospector', name: 'Prospector (S1/2 Slots - 1 LASER)', arms: 1, laser: recommendedLaserS1, slots: 2 }, // Added arms property
-                { id: 'golem', name: 'Golem (Fixed/2 Slots - 1 LASER)', arms: 1, laser: recommendedGolemLaser, slots: 2 } // Added arms property
+                { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
+                { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)" } 
             ];
 
             loadoutTypes.forEach(type => {
@@ -1056,10 +1057,10 @@
                 let moduleList;
                 if (type.id === 'golem' || type.id === 'prospector') { // Golem and Prospector are 2 slots max
                     // 1 Active (Surge) + 1 Passive (Rieger-C3)
-                    moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
+                    moduleList = [powerModules.find(m => m.name.startsWith("Surge")), powerModules.find(m => m.name.startsWith("Rieger-C3"))].filter(Boolean);
                 } else { 
                     // MOLE (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
-                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
+                    moduleList = [powerModules.find(m => m.name.startsWith("Surge")), powerModules.find(m => m.name.startsWith("Rieger-C3")), powerModules.find(m => m.name.startsWith("Rieger-C2"))].filter(Boolean);
                 }
                 
                 moduleList = moduleList.slice(0, maxModules);
@@ -1077,7 +1078,8 @@
                     rec_power_multiplier *= mod.multiplier;
                 });
                 
-                const maxEffectivePower = type.laser.power * rec_power_multiplier;
+                const laserData = allLaserHeads.find(h => h.name === type.laser.name);
+                const maxEffectivePower = (laserData ? laserData.power : type.laser.power) * rec_power_multiplier;
                 const totalMaxOutput = maxEffectivePower * type.arms; // Total potential output for the ship
 
                 const moduleHtml = moduleList.map((mod, i) => 
@@ -1170,6 +1172,9 @@
             } else {
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">No specific warnings or minimum loadout recommendations at this time.</p>`;
             }
+
+            // --- E. Update Charts ---
+            updateCharts(totalEffectiveLaserPower, requiredEffectivePower, finalEffectiveResistance, finalModifiedInstability, rockMass);
         }
 
         // Helper function for error messages
@@ -1177,6 +1182,6 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // Run initial population on load
+        // Run initial population on load using DOMContentLoaded for reliability
         document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
