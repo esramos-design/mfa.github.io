@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mining Fracture Analyser - Star Citizen</title>
     <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js for graphs --><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         /* Define the Inter font family and a space-themed dark background */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -102,9 +103,11 @@
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=68f3748f&is=68f2230f&hm=2d9d6d8fca9315f915aa2cd43a70d695e4839e8588bf056e2b561cc525006b8c&" 
+                            <!-- FIXED LOGO SOURCE with placeholder text matching the aesthetic -->
+                            <img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
                                 alt="Mining Fractor Analyser Logo" 
-                                class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg">
+                                class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg"
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
                         </div>
                         <h1 class="text-3xl font-extrabold text-blue-400">Mining Team Analyser</h1>
                         <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
@@ -171,11 +174,17 @@
             </div>
         </div>
 
-        <!-- COLUMN 2: ANALYTIC RESULTS --><div class="w-full">
+        <!-- COLUMN 2: ANALYTIC RESULTS (Scrollable) --><div class="w-full">
             <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 
                 <h2 class="text-2xl font-extrabold text-blue-400 text-center">ANALYTIC RESULTS</h2>
                 
+                <!-- Chart 1: Power vs Required -->
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
+                    <h3 class="text-lg font-bold text-blue-300 mb-3 text-center">Power & Fracture Margin</h3>
+                    <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
+                </div>
+
                 <!-- Calculation Results --><section id="results" class="pt-2">
                     <p class="text-center text-gray-400 italic">Configure your loadout and rock parameters to run the simulation.</p>
                 </section>
@@ -194,10 +203,16 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: LOADOUT GUIDE & SUGGESTIONS --><div class="w-full">
+        <!-- COLUMN 3: LOADOUT GUIDE & SUGGESTIONS (Scrollable) --><div class="w-full">
             <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
+                 <!-- Chart 2: Resistance / Instability Profile -->
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
+                    <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Modifier Profile</h3>
+                    <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
+                </div>
+
                 <!-- Recommendation output --><section id="suggestion" class="pt-2">
                     <p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>
                 </section>
@@ -205,6 +220,10 @@
         </div>
     </div>
     <!-- END MAIN GRID CONTAINER --><script>
+        // Global chart instances
+        let powerChart = null;
+        let modChart = null;
+
         // Data Definitions based on the latest single-ship file, adapted for dynamic adding
         const ships = [
             // CRITICAL FIX: Prospector moduleSlots changed from 3 to 2.
@@ -556,6 +575,143 @@
             }
         }
 
+        // Global chart instances
+        let powerChart = null;
+        let modChart = null;
+
+        // New Chart initialization logic
+        function updateCharts(effectivePower, requiredPower, finalResistance, finalInstability, rockMass) {
+            // --- Chart 1: Power vs Required ---
+            const powerCtx = document.getElementById('powerChart').getContext('2d');
+            if (powerChart) powerChart.destroy();
+
+            const margin = effectivePower - requiredPower;
+            const success = margin >= 0;
+            const totalMax = Math.max(effectivePower, requiredPower) * 1.1; // 10% buffer
+            
+            // Convert power values to thousands (k) for better display scaling
+            const dataPower = effectivePower / 1000;
+            const dataRequired = requiredPower / 1000;
+            const dataMax = totalMax / 1000;
+
+            powerChart = new Chart(powerCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Team Power (kMW)', 'Required Power (kMW)'],
+                    datasets: [{
+                        label: 'Power',
+                        data: [dataPower, dataRequired],
+                        backgroundColor: [
+                            success ? '#10b981' : '#f87171', // Green or Red (tailwind classes: emerald-500 or red-400)
+                            '#3b82f6', // Blue for required (tailwind class: blue-500)
+                        ],
+                        borderColor: [
+                            success ? '#059669' : '#dc2626', // Darker shades for border
+                            '#2563eb',
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 2, // Wider chart
+                    indexAxis: 'y', // Horizontal bars
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += (context.parsed.x * 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MW';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: dataMax,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + ' kMW';
+                                },
+                                color: '#9ca3af' // gray-400
+                            },
+                            grid: { color: '#374151' } // gray-700
+                        },
+                        y: {
+                            ticks: { color: '#e5e7eb' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // --- Chart 2: Resistance / Instability Profile ---
+            const modCtx = document.getElementById('modChart').getContext('2d');
+            if (modChart) modChart.destroy();
+            
+            // Normalizing Instability (Max 100) and Resistance (Max 100) for a radar chart aesthetic
+            const normalizedRes = finalResistance;
+            const normalizedInstab = finalInstability;
+            const resistanceColor = normalizedRes > 40 ? '#f87171' : '#fbbd0a'; // Red/Yellow
+            const instabilityColor = normalizedInstab > 40 ? '#9333ea' : '#3b82f6'; // Purple/Blue
+
+            modChart = new Chart(modCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Final Resistance (%)', 'Modified Instability (%)'],
+                    datasets: [{
+                        label: 'Rock Parameters',
+                        data: [normalizedRes, normalizedInstab],
+                        backgroundColor: ['rgba(248, 113, 113, 0.4)', 'rgba(147, 51, 234, 0.4)'],
+                        borderColor: [resistanceColor, instabilityColor],
+                        pointBackgroundColor: [resistanceColor, instabilityColor],
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: [resistanceColor, instabilityColor]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 1, // Square radar chart
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e5e7eb' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label}: ${context.raw.toFixed(2)}%`
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: '#4b5563' },
+                            grid: { color: '#4b5563' },
+                            suggestedMin: 0,
+                            suggestedMax: 60, // Set max axis to 60 for better visualization of common values
+                            ticks: {
+                                backdropColor: '#161b22',
+                                color: '#9ca3af',
+                                callback: (value) => value + '%'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
 
         /**
          * The core JavaScript function to perform the mining calculation and suggestion.
@@ -569,6 +725,10 @@
             if (allArms.length === 0) {
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
+                
+                // Clear charts when no data is present
+                if (powerChart) powerChart.destroy();
+                if (modChart) modChart.destroy();
                 return;
             }
 
@@ -676,6 +836,9 @@
             if (validationError || isNaN(baseResistance) || isNaN(rockMass) || isNaN(initialInstability) || totalEffectiveLaserPower <= 0) {
                 displayResult('Error: Ensure all active laser heads have a valid Laser Head selected and all rock parameters contain valid positive numbers.', 'text-yellow-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
+                // Clear charts on validation error
+                if (powerChart) powerChart.destroy();
+                if (modChart) modChart.destroy();
                 return;
             }
 
@@ -1000,6 +1163,9 @@
             } else {
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">No specific warnings or minimum loadout recommendations at this time.</p>`;
             }
+
+            // --- E. Update Charts ---
+            updateCharts(totalEffectiveLaserPower, requiredEffectivePower, finalEffectiveResistance, finalModifiedInstability, rockMass);
         }
 
         // Helper function for error messages
