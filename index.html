@@ -526,14 +526,19 @@
          * Dynamically populates the ship and gadget select dropdowns on load.
          */
         function populateSelects() {
+            console.log("Attempting to populate selects...");
             // 1. Populate "Add Ship" Select
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             if (shipSelectElement) {
+                console.log(`Found ship select element. Processing ${ships.length} ships.`);
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
                 // Default to MOLE for easy initial testing of multi-arm ships
                 shipSelectElement.value = 'mole';
+                console.log("Ship select populated successfully.");
+            } else {
+                 console.error("Could not find shipSelectToAdd element.");
             }
             
         // 2. Populate Gadget Slot
@@ -836,9 +841,6 @@
             if (validationError || isNaN(baseResistance) || isNaN(rockMass) || isNaN(initialInstability) || totalEffectiveLaserPower <= 0) {
                 displayResult('Error: Ensure all active laser heads have a valid Laser Head selected and all rock parameters contain valid positive numbers.', 'text-yellow-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
-                // Clear charts on validation error
-                if (powerChart) powerChart.destroy();
-                if (modChart) modChart.destroy();
                 return;
             }
 
@@ -1173,8 +1175,6 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // Run initial population on load
-        window.onload = () => {
-            populateSelects();
-        };
+        // Run initial population on load using DOMContentLoaded for reliability
+        document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
