@@ -103,11 +103,11 @@
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- UPDATED LOGO SOURCE with onerror fallback -->
-                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351" 
+                            <!-- FIXED LOGO SOURCE with placeholder text matching the aesthetic -->
+                            <img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg"
-                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/38bdf8?text=MINING+ANALYSER+LOGO';">
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
                         </div>
                         <h1 class="text-3xl font-extrabold text-blue-400">Mining Team Analyser</h1>
                         <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
@@ -311,7 +311,6 @@
         // --- UPDATED GADGETS DATA (Verified and expanded) ---
         const gadgets = [
             // Reduction < 0 means Multiplicative Reduction Factor (e.g., -50.0 -> x 0.50)
-            // Reduction > 0 means Additive Resistance Increase (e.g., 10.0 -> +10 points)
             { name: "Sabir (-50% Res, -15% Inst)", reduction: -50.0, instabilityEffect: -15, type: 'Multiplicative' }, 
             { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive' }, 
@@ -526,14 +525,19 @@
          * Dynamically populates the ship and gadget select dropdowns on load.
          */
         function populateSelects() {
+            console.log("Attempting to populate selects...");
             // 1. Populate "Add Ship" Select
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             if (shipSelectElement) {
+                console.log(`Found ship select element. Processing ${ships.length} ships.`);
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
                 // Default to MOLE for easy initial testing of multi-arm ships
                 shipSelectElement.value = 'mole';
+                console.log("Ship select populated successfully.");
+            } else {
+                 console.error("Could not find shipSelectToAdd element.");
             }
             
         // 2. Populate Gadget Slot
@@ -573,6 +577,145 @@
             } else {
                 return { text: "EASY: Low difficulty rock. Minimal risk of overheating or explosion.", color: "text-green-400" };
             }
+        }
+
+        // New Chart initialization logic
+        function updateCharts(effectivePower, requiredPower, finalResistance, finalInstability, rockMass) {
+            // --- Chart 1: Power vs Required ---
+            const powerCanvas = document.getElementById('powerChart');
+            if (!powerCanvas) { console.error("Power chart canvas not found."); return; }
+            const powerCtx = powerCanvas.getContext('2d');
+            
+            if (powerChart) powerChart.destroy();
+
+            const margin = effectivePower - requiredPower;
+            const success = margin >= 0;
+            const totalMax = Math.max(effectivePower, requiredPower) * 1.1; // 10% buffer
+            
+            // Convert power values to thousands (k) for better display scaling
+            const dataPower = effectivePower / 1000;
+            const dataRequired = requiredPower / 1000;
+            const dataMax = totalMax / 1000;
+
+            powerChart = new Chart(powerCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Team Power (kMW)', 'Required Power (kMW)'],
+                    datasets: [{
+                        label: 'Power',
+                        data: [dataPower, dataRequired],
+                        backgroundColor: [
+                            success ? '#10b981' : '#f87171', // Green or Red (tailwind classes: emerald-500 or red-400)
+                            '#3b82f6', // Blue for required (tailwind class: blue-500)
+                        ],
+                        borderColor: [
+                            success ? '#059669' : '#dc2626', // Darker shades for border
+                            '#2563eb',
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 2, // Wider chart
+                    indexAxis: 'y', // Horizontal bars
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += (context.parsed.x * 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MW';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: dataMax,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + ' kMW';
+                                },
+                                color: '#9ca3af' // gray-400
+                            },
+                            grid: { color: '#374151' } // gray-700
+                        },
+                        y: {
+                            ticks: { color: '#e5e7eb' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // --- Chart 2: Resistance / Instability Profile ---
+            const modCanvas = document.getElementById('modChart');
+             if (!modCanvas) { console.error("Modifier chart canvas not found."); return; }
+            const modCtx = modCanvas.getContext('2d');
+
+            if (modChart) modChart.destroy();
+            
+            // Normalizing Instability (Max 100) and Resistance (Max 100) for a radar chart aesthetic
+            const normalizedRes = finalResistance;
+            const normalizedInstab = finalInstability;
+            const resistanceColor = normalizedRes > 40 ? '#f87171' : '#fbbd0a'; // Red/Yellow
+            const instabilityColor = normalizedInstab > 40 ? '#9333ea' : '#3b82f6'; // Purple/Blue
+
+            modChart = new Chart(modCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Final Resistance (%)', 'Modified Instability (%)'],
+                    datasets: [{
+                        label: 'Rock Parameters',
+                        data: [normalizedRes, normalizedInstab],
+                        backgroundColor: ['rgba(248, 113, 113, 0.4)', 'rgba(147, 51, 234, 0.4)'],
+                        borderColor: [resistanceColor, instabilityColor],
+                        pointBackgroundColor: [resistanceColor, instabilityColor],
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: [resistanceColor, instabilityColor]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    aspectRatio: 1, // Square radar chart
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e5e7eb' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label}: ${context.raw.toFixed(2)}%`
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: '#4b5563' },
+                            grid: { color: '#4b5563' },
+                            suggestedMin: 0,
+                            suggestedMax: 60, // Set max axis to 60 for better visualization of common values
+                            ticks: {
+                                backdropColor: '#161b22',
+                                color: '#9ca3af',
+                                callback: (value) => value + '%'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
 
@@ -1034,8 +1177,5 @@
         }
         
         // Run initial population on load using DOMContentLoaded for reliability
-        document.addEventListener('DOMContentLoaded', () => {
-            // Use setTimeout(0) as a slight delay wrapper to ensure full element availability
-            setTimeout(populateSelects, 0); 
-        });
+        document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
