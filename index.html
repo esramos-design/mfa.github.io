@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mining Fracture Analyser - Star Citizen</title>
     <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Chart.js for graphs --><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         /* Define the Inter font family and a space-themed dark background */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -1171,9 +1170,6 @@
             } else {
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">No specific warnings or minimum loadout recommendations at this time.</p>`;
             }
-
-            // --- E. Update Charts ---
-            updateCharts(totalEffectiveLaserPower, requiredEffectivePower, finalEffectiveResistance, finalModifiedInstability, rockMass);
         }
 
         // Helper function for error messages
@@ -1181,6 +1177,6 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // Run initial population on load using DOMContentLoaded for reliability
+        // Run initial population on load
         document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
