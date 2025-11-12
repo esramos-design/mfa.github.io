@@ -205,7 +205,7 @@
             <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
-                 <!-- Chart 2: Risk vs. Stability Profile (Polar Area Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
+                 <!-- Chart 2: Risk vs. Stability Profile (Doughnut Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
                     <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Difficulty Profile</h3>
                     <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
                 </div>
@@ -667,15 +667,13 @@
             const instabValue = finalInstability;
             const maxReference = 60; // Max percentage value for visual reference on a difficult rock
 
-            // We calculate the *relative* remaining "safe" capacity
+            // We use the two key values to show their proportion relative to each other.
             const resistanceRisk = Math.min(resValue, maxReference);
             const instabilityRisk = Math.min(instabValue, maxReference);
-            const remainingDifficulty = Math.max(0, maxReference - resistanceRisk);
-            const remainingDanger = Math.max(0, maxReference - instabilityRisk);
             
-            // We use the two key values to show their proportion relative to each other/max risk
+            // To make a Doughnut/Pie chart, we need a third "spacer" segment if the values are low, 
+            // but for simplicity and clarity on risk profile, we just show the two risks.
             const totalProfileData = [resistanceRisk, instabilityRisk];
-
 
             modChart = new Chart(modCtx, {
                 type: 'doughnut',
@@ -710,7 +708,7 @@
                         },
                         title: {
                             display: true,
-                            text: `Total Rock Difficulty Profile (Max Reference: ${maxReference}%)`,
+                            text: `Rock Difficulty Profile`, // Simplified title
                             color: '#9ca3af',
                             font: { size: 14 }
                         },
@@ -719,13 +717,14 @@
                                 label: (context) => {
                                     const value = context.raw;
                                     const sum = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = (value / sum * 100).toFixed(1);
-                                    return `${context.label}: ${value.toFixed(1)}% (${percentage}%)`;
+                                    const percentage = sum > 0 ? (value / sum * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${value.toFixed(1)}% (Contributes: ${percentage}%)`;
                                 }
                             }
-                        }
+                        },
+                        // Custom element to show the max possible value if we wanted to normalize against a ceiling
                     },
-                    // Center text plugin to show total sum (optional, complex to add directly)
+                    cutout: '60%' // Doughnut styling
                 }
             });
         }
