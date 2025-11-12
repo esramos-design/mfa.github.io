@@ -103,7 +103,7 @@
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- Logo Source Updated and Sized --><img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIyByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFcBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351&" 
+                            <!-- Logo Source Updated to Placeholder for stability --><img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
@@ -206,7 +206,7 @@
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
                  <!-- Chart 2: Risk vs. Stability Profile (Polar Area Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
-                    <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Risk vs. Stability Profile</h3>
+                    <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Difficulty Profile</h3>
                     <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
                 </div>
 
@@ -656,73 +656,76 @@
                 }
             });
 
-            // --- Chart 2: Risk vs. Stability Profile (Polar Area Chart) ---
+            // --- Chart 2: Risk vs. Stability Profile (Doughnut Chart) ---
             const modCanvas = document.getElementById('modChart');
              if (!modCanvas) { console.error("Modifier chart canvas not found."); return; }
             const modCtx = modCanvas.getContext('2d');
 
             if (modChart) modChart.destroy();
             
-            // Data values (Resistance and Instability)
             const resValue = finalResistance;
             const instabValue = finalInstability;
+            const maxReference = 60; // Max percentage value for visual reference on a difficult rock
+
+            // We calculate the *relative* remaining "safe" capacity
+            const resistanceRisk = Math.min(resValue, maxReference);
+            const instabilityRisk = Math.min(instabValue, maxReference);
+            const remainingDifficulty = Math.max(0, maxReference - resistanceRisk);
+            const remainingDanger = Math.max(0, maxReference - instabilityRisk);
             
-            // Define colors and tooltips based on the risk associated with the metric
-            const data = {
-                labels: [
-                    `Resistance (Mining Difficulty: ${resValue.toFixed(1)}%)`, 
-                    `Instability (Charge Danger: ${instabValue.toFixed(2)}%)`
-                ],
-                datasets: [{
-                    label: 'Rock Risk Metrics',
-                    data: [resValue, instabValue],
-                    backgroundColor: [
-                        'rgba(248, 113, 113, 0.7)', // Resistance (Red/Difficulty)
-                        'rgba(147, 51, 234, 0.7)'  // Instability (Purple/Danger)
-                    ],
-                    borderColor: [
-                        '#dc2626',
-                        '#9333ea'
-                    ],
-                    borderWidth: 1
-                }]
-            };
+            // We use the two key values to show their proportion relative to each other/max risk
+            const totalProfileData = [resistanceRisk, instabilityRisk];
+
 
             modChart = new Chart(modCtx, {
-                type: 'polarArea',
-                data: data,
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        `Resistance (${resValue.toFixed(1)}%)`, 
+                        `Instability (${instabValue.toFixed(2)}%)`
+                    ],
+                    datasets: [{
+                        label: 'Risk Contribution',
+                        data: totalProfileData,
+                        backgroundColor: [
+                            'rgba(248, 113, 113, 0.9)', // Red/Resistance
+                            'rgba(147, 51, 234, 0.9)'  // Purple/Instability
+                        ],
+                        borderColor: '#161b22',
+                        borderWidth: 2,
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top',
+                            position: 'bottom',
                             labels: {
                                 color: '#e5e7eb',
                                 font: {
-                                    size: 10
+                                    size: 12
                                 }
                             }
                         },
+                        title: {
+                            display: true,
+                            text: `Total Rock Difficulty Profile (Max Reference: ${maxReference}%)`,
+                            color: '#9ca3af',
+                            font: { size: 14 }
+                        },
                         tooltip: {
                              callbacks: {
-                                label: (context) => context.label // Label now includes the percentage
+                                label: (context) => {
+                                    const value = context.raw;
+                                    const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = (value / sum * 100).toFixed(1);
+                                    return `${context.label}: ${value.toFixed(1)}% (${percentage}%)`;
+                                }
                             }
                         }
                     },
-                    scales: {
-                        r: {
-                            angleLines: { color: '#4b5563' },
-                            grid: { color: '#4b5563' },
-                            suggestedMin: 0,
-                            suggestedMax: 60, // Keep max scale limited for better visual difference
-                            ticks: {
-                                backdropColor: '#161b22',
-                                color: '#9ca3af',
-                                callback: (value) => value + '%'
-                            }
-                        }
-                    }
+                    // Center text plugin to show total sum (optional, complex to add directly)
                 }
             });
         }
@@ -1058,8 +1061,8 @@
 
             const loadoutTypes = [
                 { id: 'mole', name: 'MOLE (S2/3 Slots - 3 LASERS)', arms: 3, laser: recommendedLaserS2, slots: 3 }, // Added arms property for MOLE
-                { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
-                { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)" } 
+                { id: 'prospector', name: 'Prospector (S1/2 Slots - 1 LASER)', arms: 1, laser: recommendedLaserS1, slots: 2 }, // Added arms property
+                { id: 'golem', name: 'Golem (Fixed/2 Slots - 1 LASER)', arms: 1, laser: recommendedGolemLaser, slots: 2 } // Added arms property
             ];
 
             loadoutTypes.forEach(type => {
@@ -1069,10 +1072,10 @@
                 let moduleList;
                 if (type.id === 'golem' || type.id === 'prospector') { // Golem and Prospector are 2 slots max
                     // 1 Active (Surge) + 1 Passive (Rieger-C3)
-                    moduleList = [powerModules.find(m => m.name.startsWith("Surge")), powerModules.find(m => m.name.startsWith("Rieger-C3"))].filter(Boolean);
+                    moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
                 } else { 
                     // MOLE (3 slots): 1 Active (Surge) + 2 Passive (Rieger-C3, Rieger-C2)
-                    moduleList = [powerModules.find(m => m.name.startsWith("Surge")), powerModules.find(m => m.name.startsWith("Rieger-C3")), powerModules.find(m => m.name.startsWith("Rieger-C2"))].filter(Boolean);
+                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
                 }
                 
                 moduleList = moduleList.slice(0, maxModules);
@@ -1090,8 +1093,7 @@
                     rec_power_multiplier *= mod.multiplier;
                 });
                 
-                const laserData = allLaserHeads.find(h => h.name === type.laser.name);
-                const maxEffectivePower = (laserData ? laserData.power : type.laser.power) * rec_power_multiplier;
+                const maxEffectivePower = type.laser.power * rec_power_multiplier;
                 const totalMaxOutput = maxEffectivePower * type.arms; // Total potential output for the ship
 
                 const moduleHtml = moduleList.map((mod, i) => 
@@ -1194,6 +1196,45 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // Run initial population on load using DOMContentLoaded for reliability
-        document.addEventListener('DOMContentLoaded', populateSelects);
+        // **FIXED INITIALIZATION:** Use a dedicated function outside of the main data block to ensure it executes only when the DOM is ready.
+        function initializeApp() {
+            // Re-define ship types based on internal constants to ensure full data integrity
+            const recLaserS2 = allLaserHeads.find(h => h.name.includes("Helix II")); 
+            const recLaserS1 = allLaserHeads.find(h => h.name.includes("Helix I")); 
+            const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman")); 
+
+            const loadoutTypes = [
+                { id: 'mole', name: 'Argo MOLE', arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false, laser: recLaserS2 }, 
+                { id: 'prospector', name: 'MISC Prospector', arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false, laser: recLaserS1 }, 
+                { id: 'golem', name: 'Drake Golem', arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)", laser: recGolemLaser } 
+            ];
+            
+            // Use the standard array 'ships' (already defined) to populate the select.
+            const shipSelectElement = document.getElementById('shipSelectToAdd');
+            if (shipSelectElement) {
+                shipSelectElement.innerHTML = ships.map((ship) => 
+                    `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
+                ).join('');
+                shipSelectElement.value = 'mole';
+            }
+            
+            // Populate Gadget Slot
+            const gadgetSelectElement = document.getElementById('gadgetSelect');
+            if (gadgetSelectElement) {
+                const defaultGadget = gadgets.find(g => g.name === "None");
+                gadgetSelectElement.innerHTML = gadgets.map(g =>
+                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
+                ).join('');
+                if (defaultGadget) {
+                    gadgetSelectElement.value = defaultGadget.name;
+                }
+            }
+
+            // Perform initial calculation to show default messages/charts (empty state)
+            calculate(); 
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // NOTE: The rest of the JS functions (updateLaserConfig, addShipLoadout, etc.) rely on the global 'ships', 'allLaserHeads', 'powerModules', and 'gadgets' arrays defined above.
     </script></body></html>
