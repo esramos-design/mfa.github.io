@@ -523,14 +523,16 @@
          * Dynamically populates the ship and gadget select dropdowns on load.
          */
         function populateSelects() {
-            // 1. Populate "Add Ship" Select
             const shipSelectElement = document.getElementById('shipSelectToAdd');
+            
+            // CRUCIAL DEFENSE: Only proceed if the element is found.
             if (shipSelectElement) {
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
-                // Default to MOLE for easy initial testing of multi-arm ships
                 shipSelectElement.value = 'mole';
+            } else {
+                 console.error("populateSelects: shipSelectToAdd element not found.");
             }
             
         // 2. Populate Gadget Slot
