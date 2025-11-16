@@ -205,7 +205,7 @@
             <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
-                 <!-- Chart 2: Risk vs. Stability Profile (Doughnut Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
+                 <!-- Chart 2: Risk vs. Stability Profile (Polar Area Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
                     <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Difficulty Profile</h3>
                     <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
                 </div>
@@ -322,6 +322,7 @@
 
         /**
          * Generates the HTML for a single mining laser head's configuration.
+         * @param {number} armIndex - The index of the laser head (1, 2, or 3) for display.
          * @param {object} ship - The ship data object (MOLE, Prospector, Golem).
          * @returns {string} The HTML for the laser head configuration.
          */
@@ -337,7 +338,6 @@
                 .map(head => {
                     // Check if this head is the default one for the ship type, based on power and slots
                     let isSelected = false;
-                    // Logic to select default laser
                     if (ship.id === 'mole' && head.name.includes('Helix II')) isSelected = true;
                     else if (ship.id === 'prospector' && head.name.includes('Helix I')) isSelected = true;
                     else if (ship.id === 'golem' && head.name.includes('Pitman')) isSelected = true;
