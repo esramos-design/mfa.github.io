@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mining Fracture Analyser - Star Citizen</title>
-    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Chart.js for graphs --><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         /* Define the Inter font family and a space-themed dark background */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -95,30 +95,30 @@
 </head>
 <body class="p-4 sm:p-8 flex justify-center items-start">
 
-    <!-- MAIN GRID CONTAINER --><div class="main-container">
+    <div class="main-container">
         
-        <!-- COLUMN 1: INPUTS AND TEAM ASSEMBLY --><div class="w-full">
+        <div class="w-full">
             <div class="left-column-wrapper bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30">
                 
-                <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
+                <div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- Logo Source Updated to Placeholder for stability --><img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
+                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351&" 
                                 alt="Mining Fractor Analyser Logo" 
-                                class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
+                                class="w-full h-auto max-w-full rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
                         </div>
                         <h1 class="text-3xl font-extrabold text-blue-400">Mining Team Analyser</h1>
                         <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
                     </div>
                 </div>
-                <!-- END STATIC HEADER PINNED AT TOP --><!-- SCROLLABLE BODY CONTENT --><div class="p-6 sm:p-8 space-y-8">
+                <div class="p-6 sm:p-8 space-y-8">
 
-                    <!-- 1. Ship Assembly --><div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
+                    <div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
                         <label for="shipSelectToAdd" class="block text-base font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
                         <div class="flex space-x-2">
                             <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
-                                <!-- Options populated by JS --></select>
+                                </select>
                             <button onclick="addShipLoadout()"
                                     class="p-3 text-sm font-bold rounded-lg transition-all duration-200 
                                         bg-blue-600 hover:bg-blue-700 shadow-md active:scale-95 whitespace-nowrap">
@@ -127,67 +127,66 @@
                         </div>
                     </div>
 
-                    <!-- Active Loadout Cards --><h2 class="text-xl font-semibold text-gray-300">Active Laser Heads:</h2>
+                    <h2 class="text-xl font-semibold text-gray-300">Active Laser Heads:</h2>
                     <div id="multiShipContainer" class="space-y-4 min-h-[100px] p-2 border border-gray-700 rounded-xl">
                         <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
                             Add ships above to configure their mining laser heads.
                         </p>
                     </div>
 
-                    <!-- 2. Rock Parameters Group --><h2 class="text-xl font-semibold text-blue-300">2. Rock & Gadget Setup</h2>
-                    
+                    </div>
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
+                
+                <div id="rock-gadget-setup" class="space-y-8 p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
+                    <h2 class="text-xl font-semibold text-blue-300">2. Rock & Gadget Setup</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Rock Stats Input (Resistance and Instability) --><div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
+                        <div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
                             <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
                             <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
                                     class="w-full p-3 rounded-lg" oninput="calculate()">
                         </div>
-                        
+
                         <div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
                             <label for="instability" class="block text-sm font-medium mb-2 text-gray-300">Base Instability (%)</label>
                             <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
                                     class="w-full p-3 rounded-lg" oninput="calculate()">
                         </div>
 
-                        <!-- Target Rock Mass Input --><div class="p-4 bg-[#21262d] rounded-xl col-span-2">
+                        <div class="p-4 bg-[#21262d] rounded-xl col-span-2">
                             <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">Target Rock Mass (kg)</label>
                             <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
                                     class="w-full p-3 rounded-lg" oninput="calculate()">
                         </div>
                     </div>
-                    
-                    <!-- Gadget Slot --><div class="p-4 bg-[#21262d] rounded-xl">
+
+                    <div class="p-4 bg-[#21262d] rounded-xl">
                         <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">3. Select Gadget (Rock Modifiers)</label>
                         <select id="gadgetSelect" onchange="calculate()"
-                               class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
-                            <!-- Options populated by JS --></select>
+                                class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white">
+                            </select>
                     </div>
-
-                    <button onclick="calculate()"
-                            class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 
-                                bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
-                        RUN ANALYTIC SIMULATION
-                    </button>
-
                 </div>
-            </div>
-        </div>
-
-        <!-- COLUMN 2: ANALYTIC RESULTS (Scrollable) --><div class="w-full">
-            <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
-                
+                <button onclick="calculate()"
+                        class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 
+                                bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95">
+                    RUN ANALYTIC SIMULATION
+                </button>
                 <h2 class="text-2xl font-extrabold text-blue-400 text-center">ANALYTIC RESULTS</h2>
                 
-                <!-- Chart 1: Power vs Required --><div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
                     <h3 class="text-lg font-bold text-blue-300 mb-3 text-center">Power & Fracture Margin</h3>
                     <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
                 </div>
 
-                <!-- Calculation Results --><section id="results" class="pt-2">
+                <section id="results" class="pt-2">
                     <p class="text-center text-gray-400 italic">Configure your loadout and rock parameters to run the simulation.</p>
                 </section>
                 
-                <!-- FOOTNOTE 2: UEX Data Runner & RSI Profile link (COMBINED) --><footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
+                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
                     <p class="text-gray-500">
                         <a href="https://robertsspaceindustries.com/en/citizens/CHIRONDRAGON" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition-colors duration-150 font-medium">
                             CHIRONDRAGON RSI Profile
@@ -201,22 +200,22 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: LOADOUT GUIDE & SUGGESTIONS (Scrollable) --><div class="w-full">
+        <div class="w-full">
             <div id="suggestions-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-900/30 space-y-8">
                 <h2 class="text-2xl font-extrabold text-yellow-400 text-center">LOADOUT GUIDE & WARNINGS</h2>
                 
-                 <!-- Chart 2: Risk vs. Stability Profile (Doughnut Chart) --><div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
-                    <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Difficulty Profile</h3>
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
+                    <h3 class="text-lg font-bold text-yellow-300 mb-3 text-center">Rock Modifier Profile</h3>
                     <div class="h-64 w-full"><canvas id="modChart"></canvas></div>
                 </div>
 
-                <!-- Recommendation output --><section id="suggestion" class="pt-2">
+                <section id="suggestion" class="pt-2">
                     <p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>
                 </section>
             </div>
         </div>
     </div>
-    <!-- END MAIN GRID CONTAINER --><script>
+    <script>
         // Global chart instances
         let powerChart = null;
         let modChart = null;
@@ -343,13 +342,13 @@
                     else if (ship.id === 'golem' && head.name.includes('Pitman')) isSelected = true;
 
                     return `<option 
-                            value="${head.power}" 
-                            data-slots="${head.moduleSlots}" 
-                            data-resistance="${head.resistanceEffect}" 
-                            data-instability="${head.instabilityEffect}" 
-                            ${isSelected ? 'selected' : ''}>
-                                ${head.name} (${head.moduleSlots} Slots)
-                            </option>`;
+                                value="${head.power}" 
+                                data-slots="${head.moduleSlots}" 
+                                data-resistance="${head.resistanceEffect}" 
+                                data-instability="${head.instabilityEffect}" 
+                                ${isSelected ? 'selected' : ''}>
+                                    ${head.name} (${head.moduleSlots} Slots)
+                                </option>`;
                 }).join('');
 
             let laserSelectAttributes = '';
@@ -361,7 +360,7 @@
                 // Fixed laser (Golem)
                 defaultLaserData = allLaserHeads.find(h => h.name.includes(ship.fixedLaserName.split('(')[0].trim()));
             } else {
-                 // Non-fixed laser (MOLE/Prospector)
+                   // Non-fixed laser (MOLE/Prospector)
                 defaultLaserData = allLaserHeads.find(h => h.power === ship.defaultLaser);
             }
             
@@ -523,16 +522,14 @@
          * Dynamically populates the ship and gadget select dropdowns on load.
          */
         function populateSelects() {
+            // 1. Populate "Add Ship" Select
             const shipSelectElement = document.getElementById('shipSelectToAdd');
-            
-            // CRUCIAL DEFENSE: Only proceed if the element is found.
             if (shipSelectElement) {
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
+                // Default to MOLE for easy initial testing of multi-arm ships
                 shipSelectElement.value = 'mole';
-            } else {
-                 console.error("populateSelects: shipSelectToAdd element not found.");
             }
             
         // 2. Populate Gadget Slot
@@ -573,10 +570,6 @@
                 return { text: "EASY: Low difficulty rock. Minimal risk of overheating or explosion.", color: "text-green-400" };
             }
         }
-
-        // Global chart instances
-        let powerChart = null;
-        let modChart = null;
 
         // New Chart initialization logic
         function updateCharts(effectivePower, requiredPower, finalResistance, finalInstability, rockMass) {
@@ -658,75 +651,61 @@
                 }
             });
 
-            // --- Chart 2: Risk vs. Stability Profile (Doughnut Chart) ---
+            // --- Chart 2: Resistance / Instability Profile ---
             const modCanvas = document.getElementById('modChart');
              if (!modCanvas) { console.error("Modifier chart canvas not found."); return; }
             const modCtx = modCanvas.getContext('2d');
 
             if (modChart) modChart.destroy();
             
-            const resValue = finalResistance;
-            const instabValue = finalInstability;
-            const maxReference = 60; // Max percentage value for visual reference on a difficult rock
-
-            // We use the two key values to show their proportion relative to each other.
-            const resistanceRisk = Math.min(resValue, maxReference);
-            const instabilityRisk = Math.min(instabValue, maxReference);
-            
-            // To make a Doughnut/Pie chart, we need a third "spacer" segment if the values are low, 
-            // but for simplicity and clarity on risk profile, we just show the two risks.
-            const totalProfileData = [resistanceRisk, instabilityRisk];
+            // Normalizing Instability (Max 100) and Resistance (Max 100) for a radar chart aesthetic
+            const normalizedRes = finalResistance;
+            const normalizedInstab = finalInstability;
+            const resistanceColor = normalizedRes > 40 ? '#f87171' : '#fbbd0a'; // Red/Yellow
+            const instabilityColor = normalizedInstab > 40 ? '#9333ea' : '#3b82f6'; // Purple/Blue
 
             modChart = new Chart(modCtx, {
-                type: 'doughnut',
+                type: 'radar',
                 data: {
-                    labels: [
-                        `Resistance (${resValue.toFixed(1)}%)`, 
-                        `Instability (${instabValue.toFixed(2)}%)`
-                    ],
+                    labels: ['Final Resistance (%)', 'Modified Instability (%)'],
                     datasets: [{
-                        label: 'Risk Contribution',
-                        data: totalProfileData,
-                        backgroundColor: [
-                            'rgba(248, 113, 113, 0.9)', // Red/Resistance
-                            'rgba(147, 51, 234, 0.9)'  // Purple/Instability
-                        ],
-                        borderColor: '#161b22',
-                        borderWidth: 2,
+                        label: 'Rock Parameters',
+                        data: [normalizedRes, normalizedInstab],
+                        backgroundColor: ['rgba(248, 113, 113, 0.4)', 'rgba(147, 51, 234, 0.4)'],
+                        borderColor: [resistanceColor, instabilityColor],
+                        pointBackgroundColor: [resistanceColor, instabilityColor],
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: [resistanceColor, instabilityColor]
                     }]
                 },
                 options: {
                     responsive: true,
+                    aspectRatio: 1, // Square radar chart
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#e5e7eb',
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: `Rock Difficulty Profile`, // Simplified title
-                            color: '#9ca3af',
-                            font: { size: 14 }
+                            labels: { color: '#e5e7eb' }
                         },
                         tooltip: {
-                             callbacks: {
-                                label: (context) => {
-                                    const value = context.raw;
-                                    const sum = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = sum > 0 ? (value / sum * 100).toFixed(1) : 0;
-                                    return `${context.label}: ${value.toFixed(1)}% (Contributes: ${percentage}%)`;
-                                }
+                            callbacks: {
+                                label: (context) => `${context.label}: ${context.raw.toFixed(2)}%`
                             }
-                        },
-                        // Custom element to show the max possible value if we wanted to normalize against a ceiling
+                        }
                     },
-                    cutout: '60%' // Doughnut styling
+                    scales: {
+                        r: {
+                            angleLines: { color: '#4b5563' },
+                            grid: { color: '#4b5563' },
+                            suggestedMin: 0,
+                            suggestedMax: 60, // Set max axis to 60 for better visualization of common values
+                            ticks: {
+                                backdropColor: '#161b22',
+                                color: '#9ca3af',
+                                callback: (value) => value + '%'
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -744,20 +723,8 @@
             if (allArms.length === 0) {
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
-                
-                // Clear charts on no data
-                const powerCanvas = document.getElementById('powerChart');
-                const modCanvas = document.getElementById('modChart');
-                if (powerChart) powerChart.destroy();
-                if (modChart) modChart.destroy();
-                powerCanvas.style.display = 'none';
-                modCanvas.style.display = 'none';
                 return;
             }
-
-            // Show canvas elements if they were hidden
-            document.getElementById('powerChart').style.display = 'block';
-            document.getElementById('modChart').style.display = 'block';
 
             let totalEffectiveLaserPower = 0;
             
@@ -971,7 +938,7 @@
             let recommendedLoadoutHtml = '';
             let warningsHtml = ''; 
             
-           // --- CACLULATION FOR MINIMUM ARMS ---
+            // --- CACLULATION FOR MINIMUM ARMS ---
             // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C2 (1.20) = 9180 MW
             const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; // 9180 MW
             const minArmsRequired = Math.ceil(requiredEffectivePower / maxEffectivePowerPerBestArm);
@@ -1117,7 +1084,7 @@
                             <p class="font-medium text-blue-400">Laser Head:</p>
                             <p class="text-base font-bold text-white">${type.laser.name}</p>
                         </div>
-                                                                
+                        
                         <div class="mt-3 p-3 bg-[#161b22] rounded-lg">
                             <p class="font-medium text-blue-400">Recommended Modules (${maxModules} Slots) *per laser*:</p>
                             <ul class="text-sm space-y-1 pt-1">
@@ -1133,24 +1100,24 @@
 
             // --- B. Generate Failure Warning (CONDITIONAL) ---
             if (!isSuccess && requiredEffectivePower > 0) {
-                 
-                   const formattedRequiredPower = requiredEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 });
-                   const powerNeeded = requiredEffectivePower - totalEffectiveLaserPower;
-                   
-                   warningsHtml += `
-                     <div class="p-4 bg-red-900/40 rounded-xl border border-red-700/50 mb-6">
-                         <h3 class="text-xl font-bold text-red-300 mb-2">🚀 Power Shortfall Alert!</h3>
-                         <p class="text-gray-300">The current loadout is **${powerNeeded.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW** short. Your Total Effective Laser Power of **${formattedEffectivePower} MW** must reach at least **${formattedRequiredPower} MW**.</p>
-                         <p class="mt-2 text-sm text-yellow-200">
-                             **Action Plan:**
-                             <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
-                                 <li>Refer to the **Min. Laser Heads Required** section above to correctly staff your crew.</li>
-                                 <li>The recommended loadouts below represent the maximum power you can achieve per ship type.</li>
-                                 <li>Ensure your current ships are using these **Max Loadouts** to close the power gap.</li>
-                             </ul>
-                         </p>
-                     </div>
-                   `;
+                    
+                    const formattedRequiredPower = requiredEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                    const powerNeeded = requiredEffectivePower - totalEffectiveLaserPower;
+                    
+                    warningsHtml += `
+                    <div class="p-4 bg-red-900/40 rounded-xl border border-red-700/50 mb-6">
+                        <h3 class="text-xl font-bold text-red-300 mb-2">🚀 Power Shortfall Alert!</h3>
+                        <p class="text-gray-300">The current loadout is **${powerNeeded.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW** short. Your Total Effective Laser Power of **${formattedEffectivePower} MW** must reach at least **${formattedRequiredPower} MW**.</p>
+                        <p class="mt-2 text-sm text-yellow-200">
+                            **Action Plan:**
+                            <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
+                                <li>Refer to the **Min. Laser Heads Required** section above to correctly staff your crew.</li>
+                                <li>The recommended loadouts below represent the maximum power you can achieve per ship type.</li>
+                                <li>Ensure your current ships are using these **Max Loadouts** to close the power gap.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    `;
             }
             
             // --- C. Generate Stability Warning (CONDITIONAL) ---
@@ -1197,45 +1164,6 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // **FIXED INITIALIZATION:** Use a dedicated function outside of the main data block to ensure it executes only when the DOM is ready.
-        function initializeApp() {
-            // Re-define ship types based on internal constants to ensure full data integrity
-            const recLaserS2 = allLaserHeads.find(h => h.name.includes("Helix II")); 
-            const recLaserS1 = allLaserHeads.find(h => h.name.includes("Helix I")); 
-            const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman")); 
-
-            const loadoutTypes = [
-                { id: 'mole', name: 'Argo MOLE', arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false, laser: recLaserS2 }, 
-                { id: 'prospector', name: 'MISC Prospector', arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false, laser: recLaserS1 }, 
-                { id: 'golem', name: 'Drake Golem', arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)", laser: recGolemLaser } 
-            ];
-            
-            // Use the standard array 'ships' (already defined) to populate the select.
-            const shipSelectElement = document.getElementById('shipSelectToAdd');
-            if (shipSelectElement) {
-                shipSelectElement.innerHTML = ships.map((ship) => 
-                    `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
-                ).join('');
-                shipSelectElement.value = 'mole';
-            }
-            
-            // Populate Gadget Slot
-            const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement) {
-                const defaultGadget = gadgets.find(g => g.name === "None");
-                gadgetSelectElement.innerHTML = gadgets.map(g =>
-                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
-                ).join('');
-                if (defaultGadget) {
-                    gadgetSelectElement.value = defaultGadget.name;
-                }
-            }
-
-            // Perform initial calculation to show default messages/charts (empty state)
-            calculate(); 
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeApp);
-
-        // NOTE: The rest of the JS functions (updateLaserConfig, addShipLoadout, etc.) rely on the global 'ships', 'allLaserHeads', 'powerModules', and 'gadgets' arrays defined above.
+        // Run initial population on load using DOMContentLoaded for reliability
+        document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
