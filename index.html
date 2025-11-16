@@ -103,7 +103,8 @@
                 <!-- STATIC HEADER PINNED AT TOP --><div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- Logo Source Updated to Placeholder for stability --><img src="https://placehold.co/600x150/0d1117/38bdf8?text=MINING+ANALYSER+LOGO" 
+                            <!-- Logo Source Updated with the user's specific URL -->
+                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351&" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=ANALYSER+LOGO+FAILED';">
@@ -369,9 +370,7 @@
 
             if (isFixedLaser) {
                 laserSelectDisabled = 'disabled';
-                // Find the correct Pitman name for Golem display
-                const pitmanLaser = allLaserHeads.find(h => h.name.includes('Pitman'));
-                laserOptionsHtml = `<option value="${pitmanLaser.power}" data-slots="${actualMaxSlots}" data-resistance="${pitmanLaser.resistanceEffect}" data-instability="${pitmanLaser.instabilityEffect}" selected>${ship.fixedLaserName} (Fixed, ${actualMaxSlots} Slots)</option>`;
+                laserOptionsHtml = `<option value="${defaultLaserData.power}" data-slots="${actualMaxSlots}" selected>${ship.fixedLaserName} (Fixed, ${actualMaxSlots} Slots)</option>`;
             } else {
                 // IMPORTANT: We need to trigger recalculate *and* potentially re-render module slots if a laser head changes.
                 laserSelectAttributes = `onchange="updateLaserConfig(this, '${armUniqueId}'); calculate();"`;
@@ -1200,45 +1199,6 @@
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
-        // **FIXED INITIALIZATION:** Use a dedicated function outside of the main data block to ensure it executes only when the DOM is ready.
-        function initializeApp() {
-            // Re-define ship types based on internal constants to ensure full data integrity
-            const recLaserS2 = allLaserHeads.find(h => h.name.includes("Helix II")); 
-            const recLaserS1 = allLaserHeads.find(h => h.name.includes("Helix I")); 
-            const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman")); 
-
-            const loadoutTypes = [
-                { id: 'mole', name: 'Argo MOLE', arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false, laser: recLaserS2 }, 
-                { id: 'prospector', name: 'MISC Prospector', arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false, laser: recLaserS1 }, 
-                { id: 'golem', name: 'Drake Golem', arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)", laser: recGolemLaser } 
-            ];
-            
-            // Use the standard array 'ships' (already defined) to populate the select.
-            const shipSelectElement = document.getElementById('shipSelectToAdd');
-            if (shipSelectElement) {
-                shipSelectElement.innerHTML = ships.map((ship) => 
-                    `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
-                ).join('');
-                shipSelectElement.value = 'mole';
-            }
-            
-            // Populate Gadget Slot
-            const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement) {
-                const defaultGadget = gadgets.find(g => g.name === "None");
-                gadgetSelectElement.innerHTML = gadgets.map(g =>
-                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
-                ).join('');
-                if (defaultGadget) {
-                    gadgetSelectElement.value = defaultGadget.name;
-                }
-            }
-
-            // Perform initial calculation to show default messages/charts (empty state)
-            calculate(); 
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeApp);
-
-        // NOTE: The rest of the JS functions (updateLaserConfig, addShipLoadout, etc.) rely on the global 'ships', 'allLaserHeads', 'powerModules', and 'gadgets' arrays defined above.
+        // Run initial population on load using DOMContentLoaded for reliability
+        document.addEventListener('DOMContentLoaded', populateSelects);
     </script></body></html>
