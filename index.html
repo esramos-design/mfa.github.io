@@ -333,7 +333,7 @@
 
             // 1. Laser Head Options (Filtered by ship's maxLaserSize)
             let laserOptionsHtml = allLaserHeads
-                // Filter by size. Note: S0 items (size 0) are included for S1 and S2 ships to allow flexibility
+                // Filter by size. Note: S0 items (size 0) are included for all ships to allow fixed/small utility lasers
                 .filter(head => head.size <= ship.maxLaserSize || head.size === 0) 
                 .map(head => {
                     // Check if this head is the default one for the ship type, based on power and slots
@@ -357,19 +357,23 @@
             
             // Determine the actual slots for the default/fixed laser head
             let defaultLaserData;
-            if (isFixedLaser) {
-                // Fixed laser (Golem)
+             if (isFixedLaser) {
+                // For Golem, find the specific fixed Pitman laser data
                 defaultLaserData = allLaserHeads.find(h => h.name.includes(ship.fixedLaserName.split('(')[0].trim()));
             } else {
-                 // Non-fixed laser (MOLE/Prospector)
-                defaultLaserData = allLaserHeads.find(h => h.power === ship.defaultLaser);
+                // For MOLE/Prospector, find the default laser data based on power
+                defaultLaserData = allLaserHeads.find(h => h.power === ship.defaultLaser && h.size === ship.maxLaserSize);
+                // Fallback for Prospector/MOLE if default size match is not found (e.g., Helix I is size 1 but defaultLaser is 3150)
+                if (!defaultLaserData) {
+                    defaultLaserData = allLaserHeads.find(h => h.power === ship.defaultLaser);
+                }
             }
-            
+
             const actualMaxSlots = defaultLaserData?.moduleSlots || ship.moduleSlots;
 
-            if (isFixedLaser) {
+            if (isFixedLaser && defaultLaserData) {
                 laserSelectDisabled = 'disabled';
-                laserOptionsHtml = `<option value="${defaultLaserData.power}" data-slots="${actualMaxSlots}" selected>${ship.fixedLaserName} (Fixed, ${actualMaxSlots} Slots)</option>`;
+                laserOptionsHtml = `<option value="${defaultLaserData.power}" data-slots="${actualMaxSlots}" data-resistance="${defaultLaserData.resistanceEffect}" data-instability="${defaultLaserData.instabilityEffect}" selected>${ship.fixedLaserName} (Fixed, ${actualMaxSlots} Slots)</option>`;
             } else {
                 // IMPORTANT: We need to trigger recalculate *and* potentially re-render module slots if a laser head changes.
                 laserSelectAttributes = `onchange="updateLaserConfig(this, '${armUniqueId}'); calculate();"`;
@@ -656,7 +660,7 @@
                 }
             });
 
-            // --- Chart 2: Risk vs. Stability Profile (Doughnut Chart) ---
+            // --- Chart 2: Risk vs. Stability Profile (Polar Area Chart) ---
             const modCanvas = document.getElementById('modChart');
              if (!modCanvas) { console.error("Modifier chart canvas not found."); return; }
             const modCtx = modCanvas.getContext('2d');
