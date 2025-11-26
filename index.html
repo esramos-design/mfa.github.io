@@ -90,7 +90,9 @@
                 position: sticky;
                 top: 1rem;
             }
+
         }
+        /* END CRITICAL CSS */
     </style>
 </head>
 <body class="p-4 sm:p-8 flex justify-center items-start">
@@ -106,17 +108,17 @@
                 <div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- FIXED LOGO: Uses user link with a robust fallback -->
-                            <img src="https://media.discordapp.net/attachments/988651682122584134/1426345013377241169/AJfQ9KSIlByviCr-2cKRFtEIyKBJf0zQGJEvB_4JIpXPrPXNJkB3pVK3y1eD1HyGunZlYx2m0YSC2e3I1Dna5UkbxqP1k6C9Kco272vYe1rOWWj3WFfBu00oKAbDKeDcu0sG0IwBMrVj6H6H5VVm-1JK8Mh-c_7dCJM0WwQ5QeqM5lIfhCms9gs1024-rj.png?ex=69111e4f&is=690fcccf&hm=3f2a7c89d1003cc05f4c86000020954337353670b20795cbdc438f77b6349351&=&format=webp&quality=lossless" 
+                            <!-- UPDATED LOGO: Points to local mpa.jpg file -->
+                            <img src="mpa.jpg" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
-                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=MINING+ANALYSER';">
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=Please+Save+Image+As+mpa.jpg';">
                         </div>
                         <h1 class="text-3xl font-extrabold text-blue-400">Mining Team Analyser</h1>
                         <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
                     </div>
                 </div>
-
+                
                 <!-- SCROLLABLE BODY CONTENT -->
                 <div class="p-6 sm:p-8 space-y-8">
 
@@ -147,7 +149,7 @@
                     <h2 class="text-xl font-semibold text-blue-300">2. Rock & Gadget Setup</h2>
                     
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Rock Stats Input -->
+                        <!-- Rock Stats Input (Resistance and Instability) -->
                         <div class="p-4 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
                             <label for="resistance" class="block text-sm font-medium mb-2 text-gray-300">Base Resistance (%)</label>
                             <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
@@ -160,6 +162,7 @@
                                     class="w-full p-3 rounded-lg" oninput="calculate()">
                         </div>
 
+                        <!-- Target Rock Mass Input -->
                         <div class="p-4 bg-[#21262d] rounded-xl col-span-2">
                             <label for="rockMass" class="block text-sm font-medium mb-2 text-gray-300">Target Rock Mass (kg)</label>
                             <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
@@ -236,13 +239,14 @@
             </div>
         </div>
     </div>
+    <!-- END MAIN GRID CONTAINER -->
 
     <script>
         // Global chart instances
         let powerChart = null;
         let modChart = null;
 
-        // --- DATA DEFINITIONS ---
+        // Data Definitions
         const ships = [
             { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false }, 
             { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
@@ -487,9 +491,9 @@
         }
 
         function populateSelects() {
-            // --- ROBUST SHIP LIST POPULATION ---
             const shipSelectElement = document.getElementById('shipSelectToAdd');
-            if (shipSelectElement && ships.length > 0) {
+            
+            if (shipSelectElement) {
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
@@ -498,9 +502,8 @@
                 console.error("populateSelects error: Element not found or ships array empty.");
             }
             
-            // --- ROBUST GADGET LIST POPULATION ---
             const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement && gadgets.length > 0) {
+            if (gadgetSelectElement) {
                 const defaultGadget = gadgets.find(g => g.name === "None");
                 gadgetSelectElement.innerHTML = gadgets.map(g =>
                     `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
@@ -679,7 +682,6 @@
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">Loadout recommendations and warnings will appear here.</p>`;
                 
-                // Hide charts on no data
                 const powerCanvas = document.getElementById('powerChart');
                 const modCanvas = document.getElementById('modChart');
                 if (powerChart) { powerChart.destroy(); powerChart = null; }
