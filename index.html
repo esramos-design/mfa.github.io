@@ -239,7 +239,6 @@
             </div>
         </div>
     </div>
-    <!-- END MAIN GRID CONTAINER -->
 
     <script>
         // Global chart instances
@@ -491,9 +490,9 @@
         }
 
         function populateSelects() {
+            // --- ROBUST SHIP LIST POPULATION ---
             const shipSelectElement = document.getElementById('shipSelectToAdd');
-            
-            if (shipSelectElement) {
+            if (shipSelectElement && ships.length > 0) {
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
@@ -502,8 +501,9 @@
                 console.error("populateSelects error: Element not found or ships array empty.");
             }
             
+            // --- ROBUST GADGET LIST POPULATION ---
             const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement) {
+            if (gadgetSelectElement && gadgets.length > 0) {
                 const defaultGadget = gadgets.find(g => g.name === "None");
                 gadgetSelectElement.innerHTML = gadgets.map(g =>
                     `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
