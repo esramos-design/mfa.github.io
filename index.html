@@ -845,15 +845,141 @@
 
             resultsContainer.innerHTML = outputHtml;
 
-            // --- Recommendations ---
-            const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; // 9180 MW
+            // --- Recommendations & Warnings Generation ---
+            
+            // 1. Define Ideal Components for Max Power Recommendations
+            const recommendedGadget = gadgets.find(g => g.name.startsWith("Sabir"));
+            const topActiveModule = powerModules.find(m => m.activation === 'Active' && m.name.startsWith("Surge"));
+            const topPassiveModules = powerModules.filter(m => m.activation === 'Passive').sort((a, b) => b.multiplier - a.multiplier);
+            
+            // Top 2 passive modules (Rieger-C3, Rieger-C2 typically)
+            const recommendedPassiveModules = [ 
+                topPassiveModules.find(m => m.name.startsWith("Rieger-C3")),
+                topPassiveModules.find(m => m.name.startsWith("Rieger-C2")),
+            ].filter(Boolean);
+
+            // Recommended Lasers
+            const recLaserS2 = allLaserHeads.find(h => h.name.includes("Helix II")); 
+            const recLaserS1 = allLaserHeads.find(h => h.name.includes("Helix I")); 
+            const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman"));
+
+            // 2. Calculate Minimum Arms Needed
+            // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C2 (1.20) = ~9180 MW
+            const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; 
             const minArmsRequired = requiredEffectivePower > 0 ? Math.ceil(requiredEffectivePower / maxEffectivePowerPerBestArm) : 1;
             const currentArmsSufficient = totalArmsCount >= minArmsRequired;
-            
-            // Recommended Loadout Generation (Using global arrays for consistency)
-            // ... (Existing recommendation logic would go here, simplified for chart focus) ...
 
-            // Update Charts
+            // 3. Build HTML Strings
+            let recommendedLoadoutHtml = '';
+            let warningsHtml = '';
+
+            // --- Block A: Requirement Analysis ---
+            recommendedLoadoutHtml += `
+                <div class="p-4 rounded-xl shadow-lg border ${currentArmsSufficient ? 'border-green-600 bg-green-900/40' : 'border-red-600 bg-red-900/40'} text-center mb-6">
+                    <h3 class="text-xl font-bold ${currentArmsSufficient ? 'text-green-300' : 'text-red-300'}">
+                        Min. Laser Heads Required
+                    </h3>
+                    <p class="text-sm text-gray-300 mt-2">
+                        Required Effective Power: <span class="font-extrabold text-yellow-300">${requiredEffectivePower.toLocaleString(undefined, { maximumFractionDigits: 2 })} MW</span>
+                    </p>
+                    <p class="text-4xl font-extrabold text-white mt-2">
+                        ${minArmsRequired}
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        (Based on max S2 loadout: ${maxEffectivePowerPerBestArm.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW/arm)
+                    </p>
+                    ${!currentArmsSufficient ? 
+                        `<p class="text-sm text-red-200 mt-3 font-bold">WARNING: Your current team (${totalArmsCount} arms) is insufficient.</p>` :
+                        `<p class="text-sm text-green-200 mt-3 font-bold">STATUS: Your current team (${totalArmsCount} arms) is sufficient.</p>`
+                    }
+                </div>
+            `;
+
+            // --- Block B: Max Power Detail Header ---
+            recommendedLoadoutHtml += `<div class="p-4 bg-gray-800/50 rounded-lg mb-6 border border-blue-600">
+                <p class="font-bold text-blue-300">Max Resistance Reduction Gadget:</p>
+                <p class="text-lg text-white font-semibold mt-1">${recommendedGadget ? recommendedGadget.name : 'N/A'}</p>
+                <p class="text-sm text-gray-400">(Recommended to reduce target resistance)</p>
+            </div>`;
+
+            // --- Block C: Ship Configuration Cards ---
+            recommendedLoadoutHtml += '<h3 class="text-lg font-bold text-center text-yellow-300 mb-4">Max Power Configs Per Ship</h3><div class="space-y-4">';
+
+            const displayLoadouts = [
+                { id: 'mole', name: 'MOLE (S2 - 3 Slots)', arms: 3, laser: recLaserS2, slots: 3 }, 
+                { id: 'prospector', name: 'Prospector (S1 - 2 Slots)', arms: 1, laser: recLaserS1, slots: 2 },
+                { id: 'golem', name: 'Golem (Fixed - 2 Slots)', arms: 1, laser: recGolemLaser, slots: 2 } 
+            ];
+
+            displayLoadouts.forEach(type => {
+                if (!type.laser) return;
+                
+                // Determine specific modules for this ship's slot count
+                let moduleList = [];
+                if (type.slots === 2) {
+                    moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
+                } else {
+                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
+                }
+
+                // Calculate Max Power for this specific setup
+                let loadoutMultiplier = 1.0;
+                moduleList.forEach(m => loadoutMultiplier *= m.multiplier);
+                const loadoutPower = type.laser.power * loadoutMultiplier;
+
+                const moduleHtml = moduleList.map((mod, i) => 
+                    `<li class="ml-4 list-disc text-green-300">Slot ${i+1}: <span class="font-bold">${mod.name}</span> (x${mod.multiplier.toFixed(2)})</li>`
+                ).join('');
+
+                const titleColor = type.id === 'mole' ? 'text-indigo-400' : type.id === 'prospector' ? 'text-green-400' : 'text-amber-400';
+
+                recommendedLoadoutHtml += `
+                    <div class="p-4 rounded-xl bg-gray-900 border border-gray-700">
+                        <h4 class="text-lg font-bold ${titleColor}">${type.name}</h4>
+                        <p class="text-sm text-gray-400 mt-1">Max Potential: <span class="text-yellow-400 font-bold">${loadoutPower.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</span></p>
+                        
+                        <div class="mt-2 p-2 bg-[#161b22] rounded border border-gray-800">
+                            <p class="text-xs text-blue-400 font-bold uppercase">Laser Head</p>
+                            <p class="text-sm text-white">${type.laser.name}</p>
+                        </div>
+                        <div class="mt-2 p-2 bg-[#161b22] rounded border border-gray-800">
+                            <p class="text-xs text-blue-400 font-bold uppercase">Modules</p>
+                            <ul class="text-sm space-y-1">${moduleHtml}</ul>
+                        </div>
+                    </div>
+                `;
+            });
+            recommendedLoadoutHtml += '</div>';
+
+            // --- Block D: Warnings ---
+            if (!isSuccess && requiredEffectivePower > 0) {
+                   const powerNeeded = requiredEffectivePower - totalEffectiveLaserPower;
+                   warningsHtml += `
+                     <div class="p-4 bg-red-900/40 rounded-xl border border-red-700/50 mb-6">
+                         <h3 class="text-xl font-bold text-red-300 mb-2">🚀 Power Shortfall Alert!</h3>
+                         <p class="text-gray-300">You are <strong>${powerNeeded.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</strong> short.</p>
+                     </div>
+                   `;
+            }
+            
+            if (finalEffectiveResistance > 30 || finalModifiedInstability > 40) {
+                warningsHtml += `
+                    <div class="p-4 bg-purple-900/40 rounded-xl border border-purple-700/50 mb-6">
+                        <h3 class="text-xl font-bold text-purple-300 mb-2">🛡️ Stability Warning</h3>
+                        <p class="text-sm text-gray-300">High Resistance/Instability detected. Consider <strong>Stampede</strong> (Instability) or <strong>Surge</strong> (Resistance) modules.</p>
+                    </div>
+                `;
+            }
+
+            // 4. Update DOM
+            if (warningsHtml || recommendedLoadoutHtml) {
+                suggestionContainer.innerHTML = warningsHtml + recommendedLoadoutHtml;
+                suggestionContainer.classList.remove('hidden');
+            } else {
+                 suggestionContainer.innerHTML = `<p class="text-center text-gray-400 italic">No specific recommendations.</p>`;
+            }
+
+            // --- E. Update Charts ---
             updateCharts(totalEffectiveLaserPower, requiredEffectivePower, finalEffectiveResistance, finalModifiedInstability, rockMass);
         }
 
