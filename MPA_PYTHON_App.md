@@ -1,20 +1,20 @@
-# ** Mining Fracture Analyser (MFA) - Star Citizen Edition**
+# ** Mining Fracture Analyser (MFA) - PYTHON App Edition**
 
 The **Mining Fracture Analyser (MFA)** is a standalone Windows application designed for Star Citizen mining crews. It calculates whether your crew (MOLEs, Prospectors, etc.) has enough combined laser power to fracture a specific rock based on its Mass, Resistance, and Instability.
 
 Version 2.0 includes an **AI Senior Foreman** powered by Google Gemini, which provides tactical advice and generates roleplay-ready orders for your crew.
 
-**🛠️ Phase 1: Installation & Setup**
+## **🛠️ Phase 1: Installation & Setup**
 
-**1. Install Python**
+### **1. Install Python**
 This app runs on Python. If you don't have it installed:
 • Download Python from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 • **Crucial:** During installation, check the box that says **"Add Python to PATH"**.
 
-**2. Save the Application Files**
+### **2. Save the Application Files**
 Create a new folder on your computer (e.g., `Desktop\MFA_Tool`) and save the two files (`index.html` and `run_app.py`) inside it.
 
-**3. Install the Window Wrapper**
+### **3. Install the Window Wrapper**
 Open your Command Prompt (search for `cmd` in Windows) and run this command:
 
 ```bash
@@ -25,7 +25,7 @@ pip install pywebview
 
 -----
 
-**🔑 Phase 2: Activating the AI Foreman (Gemini API)**
+## **🔑 Phase 2: Activating the AI Foreman (Gemini API)**
 
 To use the "Analyze Strategy" and "Generate Orders" buttons, you need a free API key from Google.
 
@@ -40,7 +40,7 @@ To use the "Analyze Strategy" and "Generate Orders" buttons, you need a free API
 
 -----
 
-**🚀 Phase 3: Running the App**
+## **🚀 Phase 3: Running the App**
 
 1.  Open your folder.
 2.  Double-click `run_app.py`.
@@ -49,7 +49,7 @@ To use the "Analyze Strategy" and "Generate Orders" buttons, you need a free API
 
 -----
 
-**🤖 Phase 4: Working with the AI Senior Foreman**
+## **🤖 Phase 4: Working with the AI Senior Foreman**
 
 Once you have entered your rock parameters and set up your mining team, the **Analytics Column** (Column 3) will unlock the AI features.
 
@@ -68,7 +68,7 @@ Once you have entered your rock parameters and set up your mining team, the **An
 
 -----
 
-**📷 Extra Feature: OCR Scanning**
+## **📷 Extra Feature: OCR Scanning**
 Don't want to type numbers manually?
 
 1.  Take a screenshot of the rock's scan data in Star Citizen.
@@ -77,6 +77,6 @@ Don't want to type numbers manually?
 
 -----
 
-**⚠️ Troubleshooting**
+## **⚠️ Troubleshooting**
 • **"The AI buttons do nothing":** Did you paste your API key into `index.html`?
 • **"ModuleNotFoundError: No module named 'webview'":** You missed Step 3 in Phase 1. Run `pip install pywebview` in your terminal.
