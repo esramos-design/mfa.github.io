@@ -2,7 +2,7 @@
 # ⛏️ Mining Fracture Analyser
 
 **Stop Guessing. Start Fracturing.**
-[🔴 Live Demo](YOUR_LINK_HERE) | [🐛 Report Bug](YOUR_LINK_HERE) | [✨ Request Feature](YOUR_LINK_HERE) | [💬 Join Discord](YOUR_LINK_HERE)
+[🔴 Live Demo]([YOUR_LINK_HERE](https://esramos-design.github.io/mfa.github.io/)) | [🐛 Report Bug](YOUR_LINK_HERE) | [✨ Request Feature](YOUR_LINK_HERE) | [💬 Join Discord](YOUR_LINK_HERE)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 > **📖 Introduction**
