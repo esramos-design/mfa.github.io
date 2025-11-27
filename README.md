@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
-![Game](https://img.shields.io/badge/Star%20Citizen-3.24+-orange)
+![Game](https://img.shields.io/badge/Star%20Citizen-4.4+-orange)
 
 **A real-time cooperative mining calculator for Star Citizen.**
 
