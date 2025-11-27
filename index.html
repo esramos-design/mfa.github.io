@@ -1176,20 +1176,20 @@
             const topActiveModule = powerModules.find(m => m.activation === 'Active' && m.name.startsWith("Surge"));
             const topPassiveModules = powerModules.filter(m => m.activation === 'Passive').sort((a, b) => b.multiplier - a.multiplier);
             
-            // Top 2 passive modules (Rieger-C3, Rieger-C2 typically)
-            const recommendedPassiveModules = [ 
-                topPassiveModules.find(m => m.name.startsWith("Rieger-C3")),
-                topPassiveModules.find(m => m.name.startsWith("Rieger-C2")),
-            ].filter(Boolean);
+            // Fix: Select the single best passive module to duplicate (Meta is stacking best modules)
+            const bestPassiveModule = topPassiveModules.length > 0 ? topPassiveModules[0] : null;
 
-            // Recommended Lasers
-            const recLaserS2 = allLaserHeads.find(h => h.name.includes("Helix II")); 
-            const recLaserS1 = allLaserHeads.find(h => h.name.includes("Helix I")); 
+            // Recommended Lasers - Strict matching to avoid S1/S2 confusion
+            const recLaserS2 = allLaserHeads.find(h => h.name === "Helix II Mining Laser"); 
+            const recLaserS1 = allLaserHeads.find(h => h.name === "Helix I Mining Laser"); 
             const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman"));
 
             // 2. Calculate Minimum Arms Needed
-            // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C2 (1.20) = ~9180 MW
-            const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; 
+            // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C3 (1.25) = ~9562 MW
+            // Note: Updated calculation to assume stacked C3s for max theoretical
+            let maxPassiveMult = bestPassiveModule ? bestPassiveModule.multiplier : 1.0;
+            const maxEffectivePowerPerBestArm = 4080 * 1.50 * maxPassiveMult * maxPassiveMult; 
+            
             const minArmsRequired = requiredEffectivePower > 0 ? Math.ceil(requiredEffectivePower / maxEffectivePowerPerBestArm) : 1;
             const currentArmsSufficient = activeArmsCount >= minArmsRequired;
 
@@ -1258,10 +1258,13 @@
                 if (!type.laser) return;
                 
                 let moduleList = [];
-                if (type.slots === 2) {
-                    moduleList = [topActiveModule, recommendedPassiveModules[0]].filter(Boolean);
-                } else {
-                    moduleList = [topActiveModule, ...recommendedPassiveModules].filter(Boolean);
+                // Slot 1: Active
+                if (topActiveModule) moduleList.push(topActiveModule);
+                // Remaining Slots: Best Passive Duplicated
+                if (bestPassiveModule) {
+                    for(let i = 1; i < type.slots; i++) {
+                         moduleList.push(bestPassiveModule);
+                    }
                 }
 
                 let loadoutMultiplier = 1.0;
