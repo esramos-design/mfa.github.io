@@ -1,7 +1,3 @@
-Here is the text formatted specifically for Discord. You can copy and paste the block below directly into a Discord channel.
-
------
-
 **\# Mining Fracture Analyser (MFA) - Star Citizen Edition**
 
 The **Mining Fracture Analyser (MFA)** is a standalone Windows application designed for Star Citizen mining crews. It calculates whether your crew (MOLEs, Prospectors, etc.) has enough combined laser power to fracture a specific rock based on its Mass, Resistance, and Instability.
