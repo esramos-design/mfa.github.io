@@ -309,19 +309,29 @@
                 <section id="results" class="pt-2">
                     <p class="text-center text-gray-400 italic text-sm">Configure your loadout to see results.</p>
                 </section>
+                
+                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
+                    <p class="text-gray-600">MFA v2.1 + Gemini Integration</p>
+                </footer>
+            </div>
+        </div>
 
-                <!-- AI SECTION -->
-                <div id="ai-section" class="mt-6 border-t border-gray-700/50 pt-4 hidden">
+        <!-- COLUMN 4: REQUIREMENTS & WARNINGS -->
+        <div class="w-full">
+            <div id="warnings-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 rounded-2xl shadow-2xl border border-blue-900/30 space-y-6">
+                
+                <!-- AI SECTION (Moved Here) -->
+                <div id="ai-section" class="hidden">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
                             <span class="text-lg">🤖</span> AI Senior Foreman
                         </h3>
                         <div class="flex gap-2">
                             <button onclick="askAI('briefing')" class="px-3 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors shadow-lg shadow-blue-900/20">
-                                ✨ Generate Orders
+                                ✨ Orders
                             </button>
                             <button onclick="askAI('strategy')" class="px-3 py-1 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded transition-colors shadow-lg shadow-purple-900/20">
-                                ✨ Analyze Strategy
+                                ✨ Strategy
                             </button>
                         </div>
                     </div>
@@ -341,17 +351,9 @@
                          </div>
                     </div>
                 </div>
-                
-                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-600">MFA v2.1 + Gemini Integration</p>
-                </footer>
-            </div>
-        </div>
+                <!-- END AI SECTION -->
 
-        <!-- COLUMN 4: REQUIREMENTS & WARNINGS -->
-        <div class="w-full">
-            <div id="warnings-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 rounded-2xl shadow-2xl border border-blue-900/30 space-y-6">
-                <h2 class="text-xl font-extrabold text-yellow-400 text-center uppercase tracking-wide">Requirements</h2>
+                <h2 class="text-xl font-extrabold text-yellow-400 text-center uppercase tracking-wide border-t border-gray-700/50 pt-6">Requirements</h2>
                 <!-- Warning output -->
                 <section id="warnings" class="pt-2">
                     <p class="text-center text-gray-400 italic text-sm">Warnings and requirements will appear here.</p>
