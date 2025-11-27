@@ -109,7 +109,7 @@
                             <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
                             <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
                                 alt="Mining Fractor Analyser Logo" 
-                                class="w-full h-auto max-w-[80%] rounded-lg object-contain shadow-lg"
+                                class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=Mining+Analyser';">
                         </div>
                         <!-- REMOVED HEADER TEXT -->
@@ -207,8 +207,14 @@
                  
                  <!-- Chart 2: Rock Difficulty Profile -->
                 <div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
-                    <h3 class="text-sm font-bold text-yellow-300 mb-2 text-center">Rock Difficulty Profile</h3>
+                    <h3 class="text-sm font-bold text-yellow-300 mb-2 text-center">Risk Profile (Difficulty Factors)</h3>
                     <div class="h-48 w-full"><canvas id="modChart"></canvas></div>
+                </div>
+
+                 <!-- Chart 3: Power vs Resistance Curve -->
+                 <div class="p-4 bg-gray-900/50 rounded-xl border border-purple-600/50">
+                    <h3 class="text-sm font-bold text-purple-300 mb-2 text-center">Effective Power vs Resistance</h3>
+                    <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
                 </div>
 
                 <!-- Calculation Results -->
@@ -250,6 +256,7 @@
         // Global chart instances
         let powerChart = null;
         let modChart = null;
+        let resistanceChart = null;
 
         // Data Definitions
         // UPDATED SHIP IMAGES TO USE DIRECT GITHUB RAW LINKS
@@ -670,14 +677,17 @@
         function updateCharts(effectivePower, requiredPower, finalResistance, finalInstability, rockMass) {
             const powerCanvas = document.getElementById('powerChart');
             const modCanvas = document.getElementById('modChart');
+            const resistanceCanvas = document.getElementById('resistanceChart');
 
-            if (!powerCanvas || !modCanvas) return;
+            if (!powerCanvas || !modCanvas || !resistanceCanvas) return;
 
             const powerCtx = powerCanvas.getContext('2d');
             const modCtx = modCanvas.getContext('2d');
+            const resistanceCtx = resistanceCanvas.getContext('2d');
             
             if (powerChart) powerChart.destroy();
             if (modChart) modChart.destroy();
+            if (resistanceChart) resistanceChart.destroy();
 
             const margin = effectivePower - requiredPower;
             const success = margin >= 0;
@@ -752,23 +762,29 @@
             const resValue = finalResistance;
             const instabValue = finalInstability;
             
-            const resistanceRisk = Math.min(resValue, 100);
-            const instabilityRisk = Math.min(instabValue, 100);
-            const totalProfileData = [resistanceRisk, instabilityRisk];
+            // Calculate Risk Profile
+            // Base assumes a "Safe Capacity" of 100. 
+            // Any sum of Resistance + Instability reduces the Safe Margin.
+            let safeMargin = 100 - (resValue + instabValue);
+            if (safeMargin < 0) safeMargin = 0; // Prevent negative margin if risks are extreme
+
+            const totalProfileData = [resValue, instabValue, safeMargin];
 
             modChart = new Chart(modCtx, {
                 type: 'doughnut',
                 data: {
                     labels: [
                         `Resistance (${resValue.toFixed(1)}%)`, 
-                        `Instability (${instabValue.toFixed(2)}%)`
+                        `Instability (${instabValue.toFixed(2)}%)`,
+                        `Safe Margin (${safeMargin.toFixed(1)}%)`
                     ],
                     datasets: [{
                         label: 'Risk Contribution',
                         data: totalProfileData,
                         backgroundColor: [
-                            'rgba(248, 113, 113, 0.9)', // Red/Resistance
-                            'rgba(147, 51, 234, 0.9)'  // Purple/Instability
+                            'rgba(239, 68, 68, 0.9)', // Red (Resistance)
+                            'rgba(147, 51, 234, 0.9)', // Purple (Instability)
+                            'rgba(55, 65, 81, 0.5)'    // Dark Grey (Safe Margin)
                         ],
                         borderColor: '#161b22',
                         borderWidth: 2,
@@ -783,15 +799,12 @@
                             labels: {
                                 color: '#e5e7eb',
                                 font: {
-                                    size: 12
+                                    size: 11
                                 }
                             }
                         },
                         title: {
-                            display: true,
-                            text: `Rock Difficulty Profile`,
-                            color: '#9ca3af',
-                            font: { size: 14 }
+                            display: false, // Title handled by HTML header
                         },
                         tooltip: {
                              callbacks: {
@@ -803,6 +816,82 @@
                         }
                     },
                     cutout: '60%' 
+                }
+            });
+
+            // --- Chart 3: Resistance Curve Data Generation ---
+            const resLabels = [];
+            const reqData = [];
+            const myPowerData = [];
+            
+            // Sweep Resistance from 0 to 100%
+            for(let i=0; i<=100; i+=5) {
+                resLabels.push(i + '%');
+                // Calculate required power using tool logic: (mass * (1 - resistanceDecimal)) / 5
+                let decimal = i / 100.0;
+                let req = (rockMass * (1.0 - decimal)) / 5.0;
+                reqData.push(req / 1000); // Convert to kMW
+                myPowerData.push(effectivePower / 1000); // My power is constant relative to Rock Resistance in this model
+            }
+            
+            resistanceChart = new Chart(resistanceCtx, {
+                type: 'line',
+                data: {
+                    labels: resLabels,
+                    datasets: [
+                        {
+                            label: 'Team Power',
+                            data: myPowerData,
+                            borderColor: '#3b82f6', // Blue
+                            backgroundColor: '#3b82f6',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        },
+                        {
+                            label: 'Required Power (Calc)',
+                            data: reqData,
+                            borderColor: '#fbbf24', // Amber/Yellow
+                            backgroundColor: '#fbbf24',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#9ca3af', font: { size: 10 } }
+                        },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' kMW';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                         x: {
+                            ticks: { color: '#9ca3af', maxTicksLimit: 11 },
+                            grid: { color: '#374151' },
+                            title: { display: true, text: 'Resistance %', color: '#6b7280', font: { size: 10 } }
+                        },
+                        y: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' },
+                            title: { display: true, text: 'Power (kMW)', color: '#6b7280', font: { size: 10 } }
+                        }
+                    }
                 }
             });
         }
@@ -823,8 +912,10 @@
                 
                 const powerCanvas = document.getElementById('powerChart');
                 const modCanvas = document.getElementById('modChart');
+                const resCanvas = document.getElementById('resistanceChart');
                 if (powerChart) { powerChart.destroy(); powerChart = null; }
                 if (modChart) { modChart.destroy(); modChart = null; }
+                if (resistanceChart) { resistanceChart.destroy(); resistanceChart = null; }
                 return;
             }
 
