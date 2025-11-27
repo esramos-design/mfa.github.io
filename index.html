@@ -41,10 +41,15 @@
         .ship-arm-card {
             background-color: #21262d;
             border: 1px solid #30363d;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, opacity 0.2s;
         }
         .ship-arm-card:hover {
             border-color: #60a5fa;
+        }
+        /* Disabled state styling */
+        .ship-arm-card.disabled-arm {
+            opacity: 0.5;
+            border-color: #30363d;
         }
 
         /* New Layout container: Wider for 4 columns */
@@ -314,7 +319,13 @@
             { name: "Impact II Mining Laser", size: 2, power: 3360, moduleSlots: 3, resistanceEffect: 10, instabilityEffect: -10 },
             { name: "Klein-S2 Mining Laser", size: 2, power: 3600, moduleSlots: 1, resistanceEffect: -45, instabilityEffect: 35 },
             { name: "Lancet MH2 Mining Laser", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0.0, instabilityEffect: -10 },
-        ].sort((a, b) => b.power - a.power);
+        ].sort((a, b) => {
+            // Sort by Size descending first (2 -> 1 -> 0), then by Power descending
+            if (b.size !== a.size) {
+                return b.size - a.size;
+            }
+            return b.power - a.power;
+        });
 
         const powerModules = [
             { name: "Surge (Active, +50% Power, +10 Inst)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active' },
@@ -489,10 +500,17 @@
 
             return `
                 <div id="${armUniqueId}" class="p-4 rounded-xl shadow-lg ship-arm-card space-y-3" data-ship-id="${ship.id}" data-max-modules="${actualMaxSlots}">
-                    <div class="flex justify-between items-start">
-                        <h4 class="text-lg font-bold ${ship.id === 'mole' ? 'text-indigo-400' : ship.id === 'prospector' ? 'text-green-400' : 'text-amber-400'}">
-                            ${ship.name} - Laser Head ${armIndex}
-                        </h4>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center space-x-2">
+                            <h4 class="text-lg font-bold ${ship.id === 'mole' ? 'text-indigo-400' : ship.id === 'prospector' ? 'text-green-400' : 'text-amber-400'}">
+                                ${ship.name} - Head ${armIndex}
+                            </h4>
+                            <!-- Toggle Switch -->
+                            <label class="relative inline-flex items-center cursor-pointer ml-3">
+                                <input type="checkbox" id="${armUniqueId}-enable" class="sr-only peer" checked onchange="toggleArm('${armUniqueId}'); calculate();">
+                                <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
                         <button onclick="removeArmConfig('${armUniqueId}')" title="Remove Laser Head" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-full transition-all duration-150 active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
@@ -511,6 +529,17 @@
                     ${moduleSlotsHtml}
                 </div>
             `;
+        }
+        
+        function toggleArm(armId) {
+            const container = document.getElementById(armId);
+            const checkbox = document.getElementById(armId + '-enable');
+            
+            if (checkbox.checked) {
+                container.classList.remove('disabled-arm');
+            } else {
+                container.classList.add('disabled-arm');
+            }
         }
         
         function updateLaserConfig(selectElement, armUniqueId) {
@@ -929,10 +958,21 @@
             let totalResistanceMultiplier = 1.0; 
             let totalInstabilityMultiplier = 1.0; 
             let validationError = false;
-            let totalArmsCount = allArms.length;
+            let activeArmsCount = 0;
 
             allArms.forEach(arm => {
                 const armUniqueId = arm.id;
+                // Check if switch is enabled
+                const isEnabledCheck = document.getElementById(`${armUniqueId}-enable`);
+                // Default to true if switch not found (failsafe)
+                const isEnabled = isEnabledCheck ? isEnabledCheck.checked : true;
+
+                if (!isEnabled) {
+                    return; // Skip inactive arms completely
+                }
+                
+                activeArmsCount++;
+
                 const maxModules = parseInt(arm.dataset.maxModules);
                 const laserSelect = document.getElementById(`${armUniqueId}-laser`);
                 const basePowerValue = laserSelect ? (laserSelect.value || '0') : '0';
@@ -985,7 +1025,20 @@
                 }
             });
 
-            const totalModifierRoot = 1.0 / totalArmsCount;
+            if (activeArmsCount === 0) {
+                displayResult('No active mining laser heads. Enable at least one laser head.', 'text-yellow-400');
+                
+                const powerCanvas = document.getElementById('powerChart');
+                const modCanvas = document.getElementById('modChart');
+                const resCanvas = document.getElementById('resistanceChart');
+                if (powerChart) { powerChart.destroy(); powerChart = null; }
+                if (modChart) { modChart.destroy(); modChart = null; }
+                if (resistanceChart) { resistanceChart.destroy(); resistanceChart = null; }
+                return;
+            }
+
+            // Geometric Mean root is based on ACTIVE arms now
+            const totalModifierRoot = 1.0 / activeArmsCount;
             totalResistanceMultiplier = Math.pow(totalResistanceMultiplier, totalModifierRoot);
             totalInstabilityMultiplier = Math.pow(totalInstabilityMultiplier, totalModifierRoot);
 
@@ -1055,7 +1108,7 @@
                     </div>
                     
                     <div class="p-3 rounded-xl bg-indigo-900/40 shadow-inner border border-indigo-700">
-                        <p class="text-sm text-gray-400">Total Combined Effective Laser Power (${totalArmsCount} Laser Heads)</p>
+                        <p class="text-sm text-gray-400">Total Combined Effective Laser Power (${activeArmsCount} Active Heads)</p>
                         <p class="text-4xl font-extrabold text-yellow-300 mt-1">${formattedEffectivePower} MW</p>
                     </div>
 
@@ -1101,7 +1154,7 @@
             // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C2 (1.20) = ~9180 MW
             const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; 
             const minArmsRequired = requiredEffectivePower > 0 ? Math.ceil(requiredEffectivePower / maxEffectivePowerPerBestArm) : 1;
-            const currentArmsSufficient = totalArmsCount >= minArmsRequired;
+            const currentArmsSufficient = activeArmsCount >= minArmsRequired;
 
             // 3. Build HTML Strings
             let requirementHtml = '';
@@ -1124,8 +1177,8 @@
                         (Based on max S2 loadout: ${maxEffectivePowerPerBestArm.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW/arm)
                     </p>
                     ${!currentArmsSufficient ? 
-                        `<p class="text-sm text-red-200 mt-3 font-bold">WARNING: Your current team (${totalArmsCount} arms) is insufficient.</p>` :
-                        `<p class="text-sm text-green-200 mt-3 font-bold">STATUS: Your current team (${totalArmsCount} arms) is sufficient.</p>`
+                        `<p class="text-sm text-red-200 mt-3 font-bold">WARNING: Your current active team (${activeArmsCount} arms) is insufficient.</p>` :
+                        `<p class="text-sm text-green-200 mt-3 font-bold">STATUS: Your current active team (${activeArmsCount} arms) is sufficient.</p>`
                     }
                 </div>
             `;
