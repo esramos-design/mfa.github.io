@@ -4,8 +4,7 @@
 **Stop Guessing. Start Fracturing.**
 [🔴 Live Demo](YOUR_LINK_HERE) | [🐛 Report Bug](YOUR_LINK_HERE) | [✨ Request Feature](YOUR_LINK_HERE) | [💬 Join Discord](YOUR_LINK_HERE)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 > **📖 Introduction**
 > The **Mining Fracture Analyser** is a precision calculation engine designed for serious industrial crews in Star Citizen (MOLEs, Prospectors, Golems).
 >
@@ -14,8 +13,7 @@
 **🤝 The Collaboration Team**
 Developed by **CHIRONDRAGON** for the **THRUSTERS & DUST** organization.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ### ✨ KEY FEATURES
 
 📸 **OCR Auto-Scan (Magic Paste)**
@@ -39,8 +37,7 @@ Don't just see numbers; visualize the fracture:
 💡 **Smart Recommendations**
 Underpowered? The system thinks for you. It automatically suggests the **minimum laser heads required** and optimal **module configurations** to guarantee a break.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ### 📦 HOW TO USE
 
 **1️⃣ Input Target Data**
@@ -56,8 +53,7 @@ Underpowered? The system thinks for you. It automatically suggests the **minimum
 * Click `RUN ANALYTIC SIMULATION`.
 * Review the **Verdict**, **Effective Resistance**, and **Total Power** output.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## Disclaimer of Accuracy & Safety
 **🛠️ Built With:** HTML5, Tailwind CSS (Space-Themed), Chart.js, Tesseract.js
 **⚠️ Disclaimer:** Results are based on empirical community data. Server tick rates and desync may impact in-game results.
