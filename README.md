@@ -41,7 +41,7 @@
 
 ## 📖 About The Project
 
-The **Mining Fracture Analyser** is a specialized web application developed by **CHIRONDRAGON** for the **THRUSTERS & DUST** organization.
+The **Mining Fracture Analyser** is a specialized web application developed by **CHIRONDRAGON**.
 
 Star Citizen mining mechanics involve complex variables: Laser Power, Instability, Resistance, Distance, and Consumables. Guessing these values often results in overheated rocks (explosions) or wasted time on rocks that are mathematically impossible to break.
 
