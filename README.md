@@ -131,4 +131,4 @@ Distributed under the GNU General Public License (GPL). See `LICENSE` for more i
 
 ## 📞 Contact
 **Developer:** CHIRONDRAGON
-**Organization:** THRUSTERS & DUST
+**Organization:** 
