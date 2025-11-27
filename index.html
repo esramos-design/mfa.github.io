@@ -292,23 +292,28 @@
         ];
 
         const allLaserHeads = [
-            { name: "Arbor MH1 (~1890 MW)", size: 1, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35 },
-            { name: "Arbor MH2 (~2400 MW)", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35 },
-            { name: "Arbor MHV (~1890 MW)", size: 0, power: 1890, moduleSlots: 0, resistanceEffect: 25, instabilityEffect: -35 }, 
-            { name: "Helix I (~3150 MW)", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0.0 },
-            { name: "Helix II (~4080 MW)", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0.0 },
-            { name: "Hofstede-S1 (~2100 MW)", size: 1, power: 2100, moduleSlots: 1, resistanceEffect: -30, instabilityEffect: 10 },
-            { name: "Hofstede-S2 (~3360 MW)", size: 2, power: 3360, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 10 },
-            { name: "Impact I (~2100 MW)", size: 1, power: 2100, moduleSlots: 2, resistanceEffect: 10, instabilityEffect: -10 },
-            { name: "Impact II (~3360 MW)", size: 2, power: 3360, moduleSlots: 3, resistanceEffect: 10, instabilityEffect: -10 }, 
-            { name: "Klein-S1 (~2220 MW)", size: 1, power: 2220, moduleSlots: 0, resistanceEffect: -45, instabilityEffect: 35 },
-            { name: "Klein-S2 (~3600 MW)", size: 2, power: 3600, moduleSlots: 1, resistanceEffect: -45, instabilityEffect: 35 },
-            { name: "Lancet MH1 (~2520 MW)", size: 1, power: 2520, moduleSlots: 1, resistanceEffect: -10, instabilityEffect: 40 },
-            { name: "Lancet MH2 (~3600 MW)", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0.0, instabilityEffect: -10 },
-            { name: "Lawson (~1890 MW)", size: 0, power: 1890, moduleSlots: 0, resistanceEffect: 0.0, instabilityEffect: 0.0 },
-            { name: "Pitman (~2700 MW)", size: 0, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35 },
-            { name: "S0 Helix (~1000 MW)", size: 0, power: 1000, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 0.0 }, 
-            { name: "S00 Hofstede (~500 MW)", size: 0, power: 500, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 10 }, 
+            // Size 0
+            { name: "Arbor MHV Mining Laser", size: 0, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35 }, 
+            { name: "S0 Helix Mining Laser", size: 0, power: 1000, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 0 }, 
+            { name: "S00 Hofstede Mining Laser", size: 0, power: 500, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 10 }, 
+            { name: "Lawson Mining Laser", size: 0, power: 1890, moduleSlots: 0, resistanceEffect: 0, instabilityEffect: 0 },
+            { name: "Pitman Mining Laser", size: 0, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35 }, 
+
+            // Size 1
+            { name: "Arbor MH1 Mining Laser", size: 1, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35 },
+            { name: "Helix I Mining Laser", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0.0 },
+            { name: "Hofstede-S1 Mining Laser", size: 1, power: 2100, moduleSlots: 1, resistanceEffect: -30, instabilityEffect: 10 },
+            { name: "Impact I Mining Laser", size: 1, power: 2100, moduleSlots: 2, resistanceEffect: 10, instabilityEffect: -10 },
+            { name: "Klein-S1 Mining Laser", size: 1, power: 2220, moduleSlots: 0, resistanceEffect: -45, instabilityEffect: 35 },
+            { name: "Lancet MH1 Mining Laser", size: 1, power: 2520, moduleSlots: 1, resistanceEffect: -10, instabilityEffect: 40 },
+
+            // Size 2
+            { name: "Arbor MH2 Mining Laser", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35 },
+            { name: "Helix II Mining Laser", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0.0 },
+            { name: "Hofstede-S2 Mining Laser", size: 2, power: 3360, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 10 },
+            { name: "Impact II Mining Laser", size: 2, power: 3360, moduleSlots: 3, resistanceEffect: 10, instabilityEffect: -10 },
+            { name: "Klein-S2 Mining Laser", size: 2, power: 3600, moduleSlots: 1, resistanceEffect: -45, instabilityEffect: 35 },
+            { name: "Lancet MH2 Mining Laser", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0.0, instabilityEffect: -10 },
         ].sort((a, b) => b.power - a.power);
 
         const powerModules = [
