@@ -56,9 +56,14 @@ Underpowered? The system thinks for you. It automatically suggests the **minimum
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## Disclaimer of Accuracy & Safety
 **🛠️ Built With:** HTML5, Tailwind CSS (Space-Themed), Chart.js, Tesseract.js
+
 **⚠️ Disclaimer:** Results are based on empirical community data. Server tick rates and desync may impact in-game results.
+
 **📄 License:** This project is open-source and released under the GNU General Public License (GPL).
+
 **Estimation Tool:** This is not a guarantee of success. In-game variables, ping, server latency, pilot charge control, and minor patch updates can all affect the actual results.  
+
 **Use at Your Own Risk:** The developer is not responsible for any catastrophic failure (rock explosion) that may occur in the game.  
+
 **Data Updates:** Values are based on the latest available data at the time of development. Star Citizen is an alpha, and all ship/laser/module stats are subject to change by Cloud Imperium Games (CIG).
 
