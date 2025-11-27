@@ -107,9 +107,9 @@
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
                             <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
-                            <img src="mpa.jpg" 
+                            <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
                                 alt="Mining Fractor Analyser Logo" 
-                                class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
+                                class="w-full h-auto max-w-[80%] rounded-lg object-contain shadow-lg"
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=Mining+Analyser';">
                         </div>
                         <!-- REMOVED HEADER TEXT -->
@@ -305,14 +305,14 @@
         ].sort((a, b) => b.power - a.power);
 
         const powerModules = [
-            { name: "Surge (Active, +50% Power, -15% Res)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Surge (Active, +50% Power, +10 Inst)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active' },
             { name: "Brandt (Active, +35% Power, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active' },
             { name: "Stampede (Active, +35% Power, -10 Inst)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active' },
             { name: "Forel (Active, Charge Window +60%)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active' },
-            { name: "Lifeline (Active, Stability)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' },
-            { name: "Torpid (Active, Charge Rate +60%)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Lifeline (Active, -15% Res, -20% Inst)", multiplier: 1.00, resistanceEffect: -15, instabilityEffect: -20.0, activation: 'Active' },
+            { name: "Torpid (Active, -40% Power)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' },
             { name: "Rime (Active, -15% Power, -25% Res)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0.0, activation: 'Active' },
-            { name: "Optimum (Active, -15% Power, -80% Catastrophic Rate)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active' },
+            { name: "Optimum (Active, -15% Power, -10% Inst)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active' },
             { name: "Rieger-C3 (Passive, +25% Power, -1% Inst)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive' },
             { name: "Rieger-C2 (Passive, +20% Power, -3% Inst)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive' },
             { name: "Focus III (Passive, -5% Power, +40% Opt Window)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive' },
@@ -344,7 +344,7 @@
         const sortedModules = sortModules([...powerModules]); 
 
         const gadgets = [
-            { name: "Sabir (-50% Res, -15% Inst)", reduction: -50.0, instabilityEffect: -15, type: 'Multiplicative' }, 
+            { name: "Sabir (-50% Res, +15% Inst)", reduction: -50.0, instabilityEffect: 15, type: 'Multiplicative' }, 
             { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative' },
             { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive' }, 
             { name: "Waveshift (Stability/Charge Rate, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility' }, 
@@ -360,50 +360,61 @@
             const armUniqueId = `arm-${ship.id}-${armIdCounter}`;
             const isFixedLaser = ship.isFixedLaser; 
 
-            let laserOptionsHtml = allLaserHeads
-                .filter(head => {
-                    // EXCLUSION LOGIC:
-                    // 1. Exclude S0 lasers (Size 0) from typical ship lists UNLESS specifically Pitman for Golem
-                    // 2. MOLE (S2 Max) gets S1 & S2. Prospector (S1 Max) gets S1.
-                    
-                    // Filter out generic Size 0 lasers for ship dropdowns
-                    if (head.size === 0 && !head.name.includes('Pitman')) return false; 
+            // Filter heads based on ship restrictions
+            const availableHeads = allLaserHeads.filter(head => {
+                // Golem (Fixed)
+                if (ship.id === 'golem') return head.name.includes('Pitman');
+                
+                // General exclusions
+                if (head.name.includes('Pitman')) return false; // Pitman is Golem only
+                if (head.size === 0) return false; // Exclude other Size 0s
+                
+                // Specific Ship Restrictions
+                if (ship.id === 'mole') return head.size === 2; // MOLE: Size 2 ONLY
+                if (ship.id === 'prospector') return head.size === 1; // Prospector: Size 1 ONLY
+                
+                return head.size <= ship.maxLaserSize;
+            });
 
-                    // Filter based on ship max size
-                    if (head.size > ship.maxLaserSize) return false;
+            // Helper to generate option HTML
+            const generateOption = (head) => {
+                let isSelected = false;
+                if (ship.id === 'mole' && head.name.includes('Helix II')) isSelected = true;
+                else if (ship.id === 'prospector' && head.name.includes('Helix I')) isSelected = true;
+                else if (ship.id === 'golem' && head.name.includes('Pitman')) isSelected = true;
 
-                    return true;
-                }) 
-                .map(head => {
-                    // REFINED FILTERING LOGIC per specific request:
-                    
-                    // Golem Logic: Only show Pitman
-                    if (ship.id === 'golem' && !head.name.includes('Pitman')) {
-                        return ''; 
-                    }
-                    // Prospector/MOLE Logic: Exclude Pitman
-                    if (ship.id !== 'golem' && head.name.includes('Pitman')) {
-                         return ''; 
-                    }
-                    // General Size 0 Exclusion for ships (e.g. Hand lasers) unless handled above
-                    if (head.size === 0 && !head.name.includes('Pitman')) {
-                        return '';
-                    }
+                return `<option 
+                        value="${head.power}" 
+                        data-slots="${head.moduleSlots}" 
+                        data-resistance="${head.resistanceEffect}" 
+                        data-instability="${head.instabilityEffect}" 
+                        ${isSelected ? 'selected' : ''}>
+                            ${head.name} (${head.moduleSlots} Slots)
+                        </option>`;
+            };
 
-                    let isSelected = false;
-                    if (ship.id === 'mole' && head.name.includes('Helix II')) isSelected = true;
-                    else if (ship.id === 'prospector' && head.name.includes('Helix I')) isSelected = true;
-                    else if (ship.id === 'golem' && head.name.includes('Pitman')) isSelected = true;
+            // Group by Size for Dropdown
+            const size2Heads = availableHeads.filter(h => h.size === 2);
+            const size1Heads = availableHeads.filter(h => h.size === 1);
+            
+            let laserOptionsHtml = '';
 
-                    return `<option 
-                            value="${head.power}" 
-                            data-slots="${head.moduleSlots}" 
-                            data-resistance="${head.resistanceEffect}" 
-                            data-instability="${head.instabilityEffect}" 
-                            ${isSelected ? 'selected' : ''}>
-                                ${head.name} (${head.moduleSlots} Slots)
-                            </option>`;
-                }).join('');
+            // Generate Optgroups
+            if (size2Heads.length > 0) {
+                laserOptionsHtml += `<optgroup label="Size 2 Laser Heads">`;
+                laserOptionsHtml += size2Heads.map(generateOption).join('');
+                laserOptionsHtml += `</optgroup>`;
+            }
+            if (size1Heads.length > 0) {
+                laserOptionsHtml += `<optgroup label="Size 1 Laser Heads">`;
+                laserOptionsHtml += size1Heads.map(generateOption).join('');
+                laserOptionsHtml += `</optgroup>`;
+            }
+            
+            // Fallback if no groups (e.g. Golem or empty)
+            if (laserOptionsHtml === '' && availableHeads.length > 0) {
+                 laserOptionsHtml = availableHeads.map(generateOption).join('');
+            }
 
             let laserSelectAttributes = '';
             let laserSelectDisabled = '';
