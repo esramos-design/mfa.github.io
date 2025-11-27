@@ -123,8 +123,8 @@
                 scrollbar-width: thin;
             }
             .static-header-pin {
-                position: sticky;
-                top: 0;
+                position: relative;
+                /* top: 0; Removed sticky lock */
                 z-index: 10; /* Ensure it stays above scrolling content */
                 /* Use padding equal to the main wrapper's original top padding (p-6/p-8) to match the border/box visually */
                 padding: 1.5rem 2rem 1.5rem 2rem; 
@@ -1564,20 +1564,33 @@
             // Note: Simple cleanup, complex cases might require specific handling
             
             // Regex Patterns optimized for Star Citizen UI
-            // Looks for label, optional colons/spaces, followed by number (handling commas)
-            const massRegex = /(?:Mass|Mas|M|Rock Mass)[\s:.]*([\d,.]+)/i;
-            const resRegex = /(?:Resistance|Res|Resist)[\s:.]*([\d,.]+)/i;
-            const instRegex = /(?:Instability|Inst|Stablity)[\s:.]*([\d,.]+)/i; // 'Stablity' handles common typos
+            // Modified to capture digits separated by spaces (e.g., "1 6" which Tesseract might output)
+            // Strategy: Skip non-digits after label, then capture a sequence of digits/spaces/commas/dots
+            
+            // Define a capture group that must start with a digit, but can contain spaces, commas, or dots thereafter
+            const numberGroup = "([\\d][\\d\\s,.]*)"; 
+            const separators = "[\\s:.]*"; // Strict separators to prevent jumping to the wrong number on the page
+
+            const massRegex = new RegExp("(?:Mass|Mas|M|Rock Mass)" + separators + numberGroup, "i");
+            const resRegex = new RegExp("(?:Resistance|Res|Resist)" + separators + numberGroup, "i");
+            const instRegex = new RegExp("(?:Instability|Inst|Stablity)" + separators + numberGroup, "i");
 
             const massMatch = text.match(massRegex);
             const resMatch = text.match(resRegex);
             const instMatch = text.match(instRegex);
 
             let updated = false;
+            
+            // Helper to clean captured string (remove spaces/commas, keep digits/dots)
+            const parseValue = (str) => {
+                // Replace everything that isn't a digit or a dot
+                // This handles "1 6" -> "16", "4,500" -> "4500", "16.5" -> "16.5"
+                const cleaned = str.replace(/[^\d.]/g, '');
+                return parseFloat(cleaned);
+            };
 
             if (massMatch && massMatch[1]) {
-                // Remove commas and convert to float
-                const val = parseFloat(massMatch[1].replace(/,/g, ''));
+                const val = parseValue(massMatch[1]);
                 if (!isNaN(val)) {
                     document.getElementById('rockMass').value = val;
                     updated = true;
@@ -1585,9 +1598,7 @@
             }
 
             if (resMatch && resMatch[1]) {
-                const val = parseFloat(resMatch[1].replace(/,/g, ''));
-                // SC Resistance is usually 0-100. If > 1, assume percent. If < 1 (e.g. 0.5), convert to 50? 
-                // Usually SC UI shows "50%".
+                const val = parseValue(resMatch[1]);
                 if (!isNaN(val)) {
                     document.getElementById('resistance').value = val;
                     updated = true;
@@ -1595,7 +1606,7 @@
             }
 
             if (instMatch && instMatch[1]) {
-                const val = parseFloat(instMatch[1].replace(/,/g, ''));
+                const val = parseValue(instMatch[1]);
                 if (!isNaN(val)) {
                     document.getElementById('instability').value = val;
                     updated = true;
