@@ -252,7 +252,7 @@
         let modChart = null;
 
         // Data Definitions
-        // FIXED: Corrected image URLs to use standard GitHub Raw links for reliability
+        // UPDATED SHIP IMAGES TO USE DIRECT GITHUB RAW LINKS
         const ships = [
             { 
                 id: "mole", 
@@ -261,8 +261,7 @@
                 maxLaserSize: 2, 
                 defaultLaser: 4080, 
                 moduleSlots: 3, 
-                isFixedLaser: false, 
-                image: "https://github.com/esramos-design/mfa.github.io/raw/main/mole.jpg" 
+                isFixedLaser: false
             }, 
             { 
                 id: "prospector", 
@@ -271,8 +270,7 @@
                 maxLaserSize: 1, 
                 defaultLaser: 3150, 
                 moduleSlots: 2, 
-                isFixedLaser: false, 
-                image: "https://github.com/esramos-design/mfa.github.io/raw/main/prospector.jpg" 
+                isFixedLaser: false
             }, 
             { 
                 id: "golem", 
@@ -282,8 +280,7 @@
                 defaultLaser: 2700, 
                 moduleSlots: 2, 
                 isFixedLaser: true, 
-                fixedLaserName: "Pitman (~2700 MW)", 
-                image: "https://github.com/esramos-design/mfa.github.io/raw/main/golem.jpg" 
+                fixedLaserName: "Pitman (~2700 MW)"
             } 
         ];
 
@@ -364,8 +361,35 @@
             const isFixedLaser = ship.isFixedLaser; 
 
             let laserOptionsHtml = allLaserHeads
-                .filter(head => head.size <= ship.maxLaserSize || head.size === 0) 
+                .filter(head => {
+                    // EXCLUSION LOGIC:
+                    // 1. Exclude S0 lasers (Size 0) from typical ship lists UNLESS specifically Pitman for Golem
+                    // 2. MOLE (S2 Max) gets S1 & S2. Prospector (S1 Max) gets S1.
+                    
+                    // Filter out generic Size 0 lasers for ship dropdowns
+                    if (head.size === 0 && !head.name.includes('Pitman')) return false; 
+
+                    // Filter based on ship max size
+                    if (head.size > ship.maxLaserSize) return false;
+
+                    return true;
+                }) 
                 .map(head => {
+                    // REFINED FILTERING LOGIC per specific request:
+                    
+                    // Golem Logic: Only show Pitman
+                    if (ship.id === 'golem' && !head.name.includes('Pitman')) {
+                        return ''; 
+                    }
+                    // Prospector/MOLE Logic: Exclude Pitman
+                    if (ship.id !== 'golem' && head.name.includes('Pitman')) {
+                         return ''; 
+                    }
+                    // General Size 0 Exclusion for ships (e.g. Hand lasers) unless handled above
+                    if (head.size === 0 && !head.name.includes('Pitman')) {
+                        return '';
+                    }
+
                     let isSelected = false;
                     if (ship.id === 'mole' && head.name.includes('Helix II')) isSelected = true;
                     else if (ship.id === 'prospector' && head.name.includes('Helix I')) isSelected = true;
@@ -401,7 +425,7 @@
                 laserSelectAttributes = `onchange="updateLaserConfig(this, '${armUniqueId}'); calculate();"`;
             }
             
-            // --- FIXED: Separate Active and Passive Modules ---
+            // --- MODULE DROPDOWN GROUPING ---
             const activeModulesHtml = sortedModules
                 .filter(m => m.activation === 'Active')
                 .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
@@ -414,7 +438,6 @@
 
             const defaultOption = `<option value="None" selected>None</option>`;
             
-            // Combine into OptGroups
             const finalModuleOptions = `
                 ${defaultOption}
                 <optgroup label="Active Modules">
@@ -564,15 +587,24 @@
             calculate();
         }
 
-        // --- NEW: Update the ship image when dropdown changes ---
+        // --- UPDATED: Hardcoded Image URLs for reliability ---
         function updateShipImage() {
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             const selectedShipId = shipSelectElement.value;
-            const shipData = ships.find(s => s.id === selectedShipId);
             const imageElement = document.getElementById('selectedShipImage');
 
-            if (shipData && shipData.image) {
-                imageElement.src = shipData.image;
+            // Hardcoded mapping to ensure correct display without relying on data array
+            let imageUrl = '';
+            if (selectedShipId === 'mole') {
+                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/mole.png?raw=true";
+            } else if (selectedShipId === 'prospector') {
+                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/prospector.png?raw=true";
+            } else if (selectedShipId === 'golem') {
+                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/golem.png?raw=true";
+            }
+
+            if (imageUrl) {
+                imageElement.src = imageUrl;
                 imageElement.classList.remove('hidden');
             } else {
                 imageElement.classList.add('hidden');
@@ -959,6 +991,7 @@
             const recGolemLaser = allLaserHeads.find(h => h.name.includes("Pitman"));
 
             // 2. Calculate Minimum Arms Needed
+            // Max S2 Laser (Helix II: 4080 MW, 3 slots) * Surge (1.50) * Rieger-C3 (1.25) * Rieger-C2 (1.20) = ~9180 MW
             const maxEffectivePowerPerBestArm = 4080 * 1.50 * 1.25 * 1.20; 
             const minArmsRequired = requiredEffectivePower > 0 ? Math.ceil(requiredEffectivePower / maxEffectivePowerPerBestArm) : 1;
             const currentArmsSufficient = totalArmsCount >= minArmsRequired;
