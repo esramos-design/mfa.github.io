@@ -106,14 +106,14 @@
                 <div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                     <div class="text-center">
                         <div class="mb-2 flex items-center justify-center p-2">
-                            <!-- LOGO UPDATE: Using local file 'mpa.jpg' as requested -->
+                            <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
                             <img src="mpa.jpg" 
                                 alt="Mining Fractor Analyser Logo" 
                                 class="w-full h-auto max-w-[70%] rounded-lg object-contain shadow-lg"
-                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=Please+Save+Image+As+mpa.jpg';">
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x150/161b22/e5e7eb?text=Mining+Analyser';">
                         </div>
-                        <h1 class="text-2xl font-extrabold text-blue-400">Mining Fracture Analyser</h1>
-                        <p class="text-xs text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
+                        <!-- REMOVED HEADER TEXT -->
+                        <p class="text-sm text-gray-400 mt-2">Configure your mining team and analyze rock fracture limits.</p>
                     </div>
                 </div>
                 
@@ -124,9 +124,9 @@
                     <div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
                         <label for="shipSelectToAdd" class="block text-sm font-medium mb-2 text-blue-300">1. Assemble Your Mining Team</label>
                         
-                        <!-- Ship Image Container -->
+                        <!-- Dynamic Ship Image Display -->
                         <div class="mb-4 flex justify-center">
-                            <img id="selectedShipImage" src="" alt="Selected Ship" class="rounded-lg shadow-md border border-blue-900/50 max-h-32 object-contain w-full hidden">
+                            <img id="selectedShipImage" src="" alt="Selected Ship" class="rounded-lg shadow-md border border-blue-900/50 max-h-48 object-contain w-full hidden">
                         </div>
 
                         <div class="flex space-x-2">
@@ -252,10 +252,39 @@
         let modChart = null;
 
         // Data Definitions
+        // FIXED: Corrected image URLs to use standard GitHub Raw links for reliability
         const ships = [
-            { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false, image: "https://github.com/esramos-design/mfa.github.io/blob/main/mole.png?raw=true" }, 
-            { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false, image: "https://github.com/esramos-design/mfa.github.io/blob/main/prospector.png?raw=true" }, 
-            { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)", image: "https://github.com/esramos-design/mfa.github.io/blob/main/golem.png?raw=true" } 
+            { 
+                id: "mole", 
+                name: "Argo MOLE", 
+                arms: 3, 
+                maxLaserSize: 2, 
+                defaultLaser: 4080, 
+                moduleSlots: 3, 
+                isFixedLaser: false, 
+                image: "https://github.com/esramos-design/mfa.github.io/raw/main/mole.png" 
+            }, 
+            { 
+                id: "prospector", 
+                name: "MISC Prospector", 
+                arms: 1, 
+                maxLaserSize: 1, 
+                defaultLaser: 3150, 
+                moduleSlots: 2, 
+                isFixedLaser: false, 
+                image: "https://github.com/esramos-design/mfa.github.io/raw/main/Prospector.png" 
+            }, 
+            { 
+                id: "golem", 
+                name: "Drake Golem", 
+                arms: 1, 
+                maxLaserSize: 1, 
+                defaultLaser: 2700, 
+                moduleSlots: 2, 
+                isFixedLaser: true, 
+                fixedLaserName: "Pitman (~2700 MW)", 
+                image: "https://github.com/esramos-design/mfa.github.io/raw/main/Golem.png" 
+            } 
         ];
 
         const allLaserHeads = [
@@ -372,9 +401,29 @@
                 laserSelectAttributes = `onchange="updateLaserConfig(this, '${armUniqueId}'); calculate();"`;
             }
             
-            const moduleOptionsHtml = sortedModules.map(mod => 
-                `<option value="${mod.name}" ${mod.name.startsWith('None') ? 'selected' : ''}>${mod.name}</option>`
-            ).join('');
+            // --- FIXED: Separate Active and Passive Modules ---
+            const activeModulesHtml = sortedModules
+                .filter(m => m.activation === 'Active')
+                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
+                .join('');
+            
+            const passiveModulesHtml = sortedModules
+                .filter(m => m.activation === 'Passive')
+                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
+                .join('');
+
+            const defaultOption = `<option value="None" selected>None</option>`;
+            
+            // Combine into OptGroups
+            const finalModuleOptions = `
+                ${defaultOption}
+                <optgroup label="Active Modules">
+                    ${activeModulesHtml}
+                </optgroup>
+                <optgroup label="Passive Modules">
+                    ${passiveModulesHtml}
+                </optgroup>
+            `;
 
             let moduleSlotsHtml = '<div id="module-slots-container-' + armUniqueId + '">';
             for (let i = 1; i <= 3; i++) {
@@ -386,7 +435,7 @@
                 moduleSlotsHtml += `
                     <select id="${armUniqueId}-mod${i}" class="arm-module-select w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white mb-3 ${disabledClass}" 
                             onchange="calculate()" value="${initialValue}" ${isDisabled ? 'disabled' : ''}>
-                        ${isDisabled ? `<option value="None">${slotText}</option>` : moduleOptionsHtml}
+                        ${isDisabled ? `<option value="None">${slotText}</option>` : finalModuleOptions}
                     </select>
                 `;
             }
@@ -430,9 +479,28 @@
             container.setAttribute('data-max-modules', newMaxSlots);
             slotCountDisplay.textContent = newMaxSlots;
 
-            const moduleOptionsHtml = sortedModules.map(mod => 
-                `<option value="${mod.name}">${mod.name}</option>`
-            ).join('');
+            // Re-generate module options with groups for the update function
+            const activeModulesHtml = sortedModules
+                .filter(m => m.activation === 'Active')
+                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
+                .join('');
+            
+            const passiveModulesHtml = sortedModules
+                .filter(m => m.activation === 'Passive')
+                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
+                .join('');
+
+            const defaultOption = `<option value="None">None</option>`;
+            
+            const finalModuleOptions = `
+                ${defaultOption}
+                <optgroup label="Active Modules">
+                    ${activeModulesHtml}
+                </optgroup>
+                <optgroup label="Passive Modules">
+                    ${passiveModulesHtml}
+                </optgroup>
+            `;
 
             let newModuleSlotsHtml = '';
             for (let i = 1; i <= 3; i++) {
@@ -444,7 +512,8 @@
                 const oldSelect = document.getElementById(`${armUniqueId}-mod${i}`);
                 const retainedValue = oldSelect && !isDisabled ? oldSelect.value : initialValue;
                 
-                let options = isDisabled ? `<option value="None">${slotText}</option>` : `<option value="None">None</option>` + moduleOptionsHtml.replace(`value="${retainedValue}"`, `value="${retainedValue}" selected`);
+                // Use REPLACE to set selected, messy but functional for string injection
+                let options = isDisabled ? `<option value="None">${slotText}</option>` : finalModuleOptions.replace(`value="${retainedValue}"`, `value="${retainedValue}" selected`);
 
                 newModuleSlotsHtml += `
                     <select id="${armUniqueId}-mod${i}" class="arm-module-select w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white mb-3 ${disabledClass}" 
@@ -495,6 +564,7 @@
             calculate();
         }
 
+        // --- NEW: Update the ship image when dropdown changes ---
         function updateShipImage() {
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             const selectedShipId = shipSelectElement.value;
@@ -517,7 +587,9 @@
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
                 shipSelectElement.value = 'mole';
-                updateShipImage(); // Update image on initial load
+                
+                // Initial image load
+                updateShipImage();
             } else {
                 console.error("populateSelects error: Element not found or ships array empty.");
             }
@@ -636,11 +708,9 @@
 
             const resValue = finalResistance;
             const instabValue = finalInstability;
-            const maxReference = 60; 
-
-            const resistanceRisk = Math.min(resValue, maxReference);
-            const instabilityRisk = Math.min(instabValue, maxReference);
             
+            const resistanceRisk = Math.min(resValue, 100);
+            const instabilityRisk = Math.min(instabValue, 100);
             const totalProfileData = [resistanceRisk, instabilityRisk];
 
             modChart = new Chart(modCtx, {
