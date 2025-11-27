@@ -118,8 +118,10 @@ Contributions are the lifeblood of open source. If you want to improve the UI, u
 3.  Commit your Changes (`git commit -m 'Add some NewFeature'`).
 4.  Push to the Branch (`git push origin feature/NewFeature`).
 5.  Open a Pull Request.
+    <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">🐛 Report Bug
 
-Please see <a href="CONTRIBUTING.md" target="_blank">CONTRIBUTING.md</a> for more details.
+Please see <a href="https://github.com/esramos-design/mfa.github.io/blob/main/Contributing.md
+" target="_blank">CONTRIBUTING.md</a> for more details.
 
 ---
 
