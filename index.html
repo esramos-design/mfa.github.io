@@ -175,14 +175,7 @@
                         </div>
                     </div>
                     
-                    <!-- Gadget Slot -->
-                    <div class="p-3 bg-[#21262d] rounded-xl">
-                        <label for="gadgetSelect" class="block text-xs font-medium mb-1 text-gray-300">Select Gadget (Rock Modifiers)</label>
-                        <select id="gadgetSelect" onchange="calculate()"
-                               class="w-full p-2 rounded-lg bg-[#161b22] border border-[#30363d] text-white text-sm">
-                            <!-- Options populated by JS -->
-                        </select>
-                    </div>
+                    <!-- Gadget Slot MOVED FROM HERE -->
 
                     <button onclick="calculate()"
                             class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 
@@ -223,6 +216,15 @@
                                 Add
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Gadget Slot (Moved Here) -->
+                    <div class="p-4 bg-[#21262d] rounded-xl border border-gray-700">
+                        <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">Select Gadget (Rock Modifiers)</label>
+                        <select id="gadgetSelect" onchange="calculate()"
+                               class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white text-sm">
+                            <!-- Options populated by JS -->
+                        </select>
                     </div>
 
                     <!-- Active Loadout Cards -->
