@@ -311,7 +311,7 @@
                 </section>
                 
                 <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-600">MFA v2.5 + Gemini Integration</p>
+                    <p class="text-gray-600">MFA v2.6 + Gemini Integration</p>
                 </footer>
             </div>
         </div>
@@ -1265,13 +1265,20 @@
             let extraShipRec = null;
             if (reqPwr > currentPwr) {
                 const deficit = reqPwr - currentPwr;
-                const prospectorPower = soloLoadout.stats.power; // Assumes max solo loadout
-                const shipsNeeded = Math.ceil(deficit / prospectorPower);
                 
+                // Option A: Prospector
+                const prospectorPower = soloLoadout.stats.power; 
+                const prospectorsNeeded = Math.ceil(deficit / prospectorPower);
+                
+                // Option B: Golem (Approx power calc for Pitman with same modules if possible, otherwise default solo logic)
+                // Golem has Pitman (~3150 base) similar to Helix I
+                // Let's assume Golem runs same loadout for simplicity of calculation or slightly less efficient
+                const golemPower = 2700 * 1.5 * 1.25; // Pitman base approx * Surge * Rieger
+                const golemsNeeded = Math.ceil(deficit / golemPower);
+
                 extraShipRec = {
-                    count: shipsNeeded,
-                    type: "Prospector (Surge)",
-                    power: prospectorPower
+                    primary: { count: prospectorsNeeded, type: "Prospector" },
+                    secondary: { count: golemsNeeded, type: "Golem" }
                 };
             }
 
@@ -1483,12 +1490,20 @@
                     <h4 class="text-sm font-extrabold text-red-300 uppercase flex items-center gap-2">
                         <span>⚠️</span> Reinforcements Required
                     </h4>
-                    <p class="text-xs text-gray-300 mt-1">
+                    <p class="text-xs text-gray-300 mt-1 mb-2">
                         Power Deficit: <span class="font-bold text-white">${(requiredEffectivePower - totalEffectiveLaserPower).toFixed(0)} MW</span>
                     </p>
-                    <p class="text-sm text-white mt-2 font-bold bg-black/20 p-2 rounded text-center">
-                        +${recommendations.extra.count}x ${recommendations.extra.type}
-                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs font-bold text-white">
+                        <div class="bg-black/30 p-2 rounded">
+                            +${recommendations.extra.primary.count}x ${recommendations.extra.primary.type}
+                        </div>
+                        <div class="flex items-center justify-center text-gray-400 text-[10px] uppercase">
+                            - OR -
+                        </div>
+                        <div class="bg-black/30 p-2 rounded col-span-2">
+                            +${recommendations.extra.secondary.count}x ${recommendations.extra.secondary.type}
+                        </div>
+                    </div>
                 </div>
                 `;
             }
