@@ -29,11 +29,11 @@
 
 ![Mining Fracture Analyser Logo][image1]
 
-# **Mining Fracture Analyser (MFA)**
+# **Mining Fracture Analyser (MFA) \- v2.8**
 
 A real-time cooperative mining calculator for Star Citizen.  
 Stop Guessing. Start Fracturing.  
-[🔴 Launch Live Demo](https://esramos-design.github.io/mfa.github.io/) | [🐛 Report Bug](https://github.com/esramos-design/mfa.github.io/issues) | [✨ Request Feature](https://github.com/esramos-design/mfa.github.io/issues)
+[🔴 Launch Live Demo](https://esramos-design.github.io/mfa.github.io/) | [💬 Join Discord Support](https://discord.gg/wktsh9h46F)
 
 ## **📑 Table of Contents**
 
@@ -56,18 +56,29 @@ Star Citizen mining mechanics involve complex variables: Laser Power, Instabilit
 
 This tool solves that problem by calculating the **Total Combined Effective Laser Power** of your entire crew in real-time, providing a simple "Pass/Fail" verdict before you even activate your lasers.
 
-**Version 2.3** introduces granular active module control, a standalone Windows Application wrapper, and an **AI Senior Foreman** powered by Google Gemini to provide tactical advice and roleplay orders.
+**Version 2.8** introduces advanced **Fleet Recommendations** that calculate reinforcement requirements (Prospector vs Golem vs MOLE) and role-based loadouts ("The Breaker", "The Surgeon").
 
 ## **✨ Key Features**
 
-### **⚡ Active Module Toggle (New in v2.3)**
+### **🛠️ Fleet Solutions (New in v2.8)**
 
-We have introduced a granular control for **Active Modules** (e.g., Surge, Stampede, Brandt).
+The tool now acts as a fleet commander, analyzing power deficits and recommending reinforcements.
+
+* **Reinforcement Calculator:** Automatically calculates how many extra ships are needed to break a rock.  
+* **Flexible Options:** Suggests alternatives: "Need \+1 Prospector OR \+1 Golem OR \+1 MOLE".  
+* **Role-Based MOLE Loadouts:** Suggests specialized configurations for multi-crew efficiency:  
+  * **Breaker:** Max Power/Fracture.  
+  * **Surgeon:** Max Stability/Window.  
+  * **Vacuum:** Max Extraction speed.
+
+### **⚡ Active Module Toggle**
+
+Granular control for **Active Modules** (e.g., Surge, Stampede, Brandt).
 
 * **Dynamic UI:** A toggle switch automatically appears next to any selected Active module.  
 * **Simulation Control:**  
-  * **ON:** The module's effects (Power Multiplier, Instability/Resistance modifiers) are applied. Use this to see if you can crack the rock *with* the module activated.  
-  * **OFF:** The module's effects are ignored. Use this to simulate **cooldowns** or check if you can fracture the rock *without* wasting a charge.
+  * **ON:** The module's effects are applied. Use this to see if you can crack the rock *with* the module activated.  
+  * **OFF:** The module's effects are ignored. Use this to simulate **cooldowns** or saving a charge.
 
 ### **🤖 AI Senior Foreman**
 
@@ -103,7 +114,7 @@ We don't just show numbers; we visualize the physics:
 
 ## **🛠 User Guide: Windows App Installation**
 
-This section is for players who want to run the tool as a standalone program (App Mode).
+This section is for players who want to run the tool as a standalone program (App Mode) rather than in a web browser.
 
 ### **Step 1: Install Python**
 
@@ -116,16 +127,34 @@ This app runs on Python. If you don't have it installed:
 
 Create a new folder on your computer (e.g., Desktop\\MFA\_Tool) and save the following two files inside it:
 
-* index.html: The main application code.  
-* run\_app.py: The launcher script.
+* index.html: The main application code (Download from this repo).  
+* run\_app.py: The launcher script (Create a text file with this name).
+
+**run\_app.py Content:**
+
+import webview  
+import sys  
+import os
+
+if \_\_name\_\_ \== '\_\_main\_\_':  
+    \# Get the absolute path to index.html  
+    html\_file \= os.path.join(os.path.dirname(os.path.abspath(\_\_file\_\_)), 'index.html')  
+      
+    \# Create the window  
+    webview.create\_window(  
+        'Mining Fracture Analyser v2.8',   
+        url=html\_file,  
+        width=1400,   
+        height=900,  
+        background\_color='\#0d1117'  
+    )  
+    webview.start(debug=True)
 
 ### **Step 3: Install the Window Wrapper**
 
 Open your Command Prompt (search for cmd in Windows) and run this command:
 
 pip install pywebview
-
-*(This library allows the HTML tool to run as a native window instead of in a web browser tab, removing the address bar and adding desktop features)*
 
 ### **Step 4: Activate the AI (Gemini API)**
 
@@ -176,8 +205,8 @@ Example Order:
 5. The tool will automatically fill in Mass, Resistance, and Instability.
 
 Using Smart Recommendations  
-If your simulation fails, the Recommendation Engine (Column 5\) kicks in automatically. It will analyze available modules and tell you:  
-*"You need 2 more active lasers and a Surge Module to crack this rock."*
+If your simulation fails, the Fleet Solutions (Column 5\) kicks in automatically. It will calculate the Power Deficit and tell you exactly what reinforcements to call:  
+*"⚠️ Reinforcements Required: \+1x Prospector \- OR \- \+1x Golem \- OR \- \+1x MOLE"*
 
 ## **🧠 Technical: How It Works**
 
@@ -188,6 +217,14 @@ The application uses established community formulas (verified by SC-Trade-Tools 
 3. **Resistance Calculation:** Effective Power \= Total Power \* (1 \- Rock Resistance).  
 4. **Heat Transfer:** Determines if Effective Power \> Rock Heat Threshold.
 
+### **Customizing Data (Gadgets, Heads, Ships)**
+
+Advanced users can customize the tool's data arrays directly in index.html:
+
+* **Ships:** Modify the ships array to add new vehicles or adjust slot counts.  
+* **Laser Heads:** Update allLaserHeads with new mining heads or balance changes.  
+* **Modules/Gadgets:** Edit powerModules or gadgets to reflect the latest in-game patch values.
+
 ## **💻 Developer Guide: Local Setup**
 
 If you wish to contribute to the codebase or run the web version locally without Python.
@@ -195,9 +232,7 @@ If you wish to contribute to the codebase or run the web version locally without
 **Project Structure**
 
 * index.html: Main application structure.  
-* run\_app.py: Python wrapper for desktop use.  
-* /css: Custom styles (if extracted).  
-* /js: Logic files (if extracted).
+* run\_app.py: Python wrapper for desktop use.
 
 Local Web Server  
 Due to browser security policies (CORS) regarding Web Workers (used by Tesseract OCR), simply opening the index.html file in Chrome/Edge will not allow the OCR to work. You must run a local server:
@@ -218,7 +253,8 @@ By participating in this project, you agree to keep the environment safe and wel
 
 **1\. Reporting Bugs**
 
-* **Search existing issues** to see if the bug has already been reported.  
+* **Join the Discord:** Use the \#bug-reports channel in our [Discord Server](https://discord.gg/wktsh9h46F).  
+* **Search existing issues** on GitHub to see if the bug has already been reported.  
 * **Create a new issue** using the Bug Report template.  
 * **Include details:** Browser version, screen resolution (if OCR failed), and the specific rock parameters used.
 
@@ -235,14 +271,6 @@ By participating in this project, you agree to keep the environment safe and wel
 4. Push to the Branch (git push origin feature/AmazingFeature)  
 5. Open a Pull Request
 
-**Development Guidelines**
-
-* **HTML:** Semantic HTML5.  
-* **CSS:** Use Tailwind utility classes where possible.  
-* **JS:** Modern ES6+ syntax (Arrow functions, const/let).  
-* **Comments:** Please comment your code, specifically where mining formulas are applied, so we can update them if CIG changes the game mechanics.  
-* **OCR Testing:** If working on OCR, please test with screenshots from different resolutions (1080p, 1440p, 4k) as UI scaling affects Tesseract accuracy.
-
 ## **⚠️ Troubleshooting**
 
 * **"The AI buttons do nothing":**  
@@ -254,15 +282,13 @@ By participating in this project, you agree to keep the environment safe and wel
   * Ensure the screenshot is clear.  
   * Try cropping the image closer to the stats on the right side of the UI.  
   * OCR relies on visual contrast; darker backgrounds in screenshots help.
- 
-## ⚠️ Disclaimer & License
 
-**Disclaimer**
-This application is a fan-made tool. It uses empirical data. In-game variables such as server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. **Use this tool as a guide, not a guarantee.**
+## **⚠️ Disclaimer & License**
 
-**License**
-Distributed under the GNU General Public License (GPL). See `LICENSE` for more information.
-
-**Contact**
-Developer: CHIRONDRAGON
-
+Disclaimer  
+This application is a fan-made tool. It uses empirical data. In-game variables such as server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. Use this tool as a guide, not a guarantee.  
+License  
+Distributed under the GNU General Public License (GPL). See LICENSE for more information. By contributing, you agree that your contributions will be licensed under its GNU General Public License (GPL).  
+Contact  
+Developer: CHIRONDRAGON  
+Join our Discord Server
