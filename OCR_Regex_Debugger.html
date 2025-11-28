@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFA - OCR Regex Test Bench</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #e5e7eb; font-family: sans-serif; }
+        .input-area { background-color: #161b22; border: 1px solid #30363d; color: #e5e7eb; }
+        .highlight { background-color: rgba(255, 255, 0, 0.2); border-radius: 4px; padding: 2px 4px; }
+    </style>
+</head>
+<body class="p-8 max-w-4xl mx-auto">
+    
+    <h1 class="text-3xl font-bold text-blue-400 mb-6 border-b border-gray-700 pb-2">OCR Regex Test Bench</h1>
+    <p class="text-gray-400 mb-6">Use this tool to verify if the application's regex can correctly extract numbers from messy OCR text output. Useful for debugging Tesseract results like "1 6" or "5,000".</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Input Column -->
+        <div>
+            <label class="block text-sm font-bold text-gray-300 mb-2">Paste OCR / Raw Text Here:</label>
+            <textarea id="inputText" class="w-full h-64 p-4 rounded-lg input-area font-mono text-sm focus:border-blue-500 focus:outline-none" 
+placeholder="Paste text like:
+Mass: 23,400
+Resistance: 5 0 %
+Instability: 12.5"></textarea>
+            
+            <button onclick="runTest()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition">
+                Test Extraction Logic
+            </button>
+        </div>
+
+        <!-- Output Column -->
+        <div class="space-y-6">
+            <div class="p-4 rounded-lg bg-[#21262d] border border-gray-700">
+                <h3 class="text-lg font-bold text-green-400 mb-2">Extraction Results</h3>
+                
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-500">Mass</p>
+                        <p id="res-mass" class="text-xl font-mono text-white">---</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Resistance</p>
+                        <p id="res-resistance" class="text-xl font-mono text-white">---</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Instability</p>
+                        <p id="res-instability" class="text-xl font-mono text-white">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-lg bg-[#21262d] border border-gray-700 text-xs text-gray-400">
+                <h3 class="font-bold text-gray-300 mb-2">Regex Pattern Used:</h3>
+                <code class="block bg-black p-2 rounded break-all">
+                    (?:Label)[\s:.]*([\d][\d\s,.]*)
+                </code>
+                <p class="mt-2">Logic: Look for label, skip separators, capture digits (allowing internal spaces/commas), strip non-digits, parse float.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function runTest() {
+            const text = document.getElementById('inputText').value;
+            
+            // --- CORE LOGIC COPIED FROM INDEX.HTML ---
+            const numberGroup = "([\\d][\\d\\s,.]*)"; 
+            const separators = "[\\s:.]*"; 
+
+            const massRegex = new RegExp("(?:Mass|Mas|M|Rock Mass)" + separators + numberGroup, "i");
+            const resRegex = new RegExp("(?:Resistance|Res|Resist)" + separators + numberGroup, "i");
+            const instRegex = new RegExp("(?:Instability|Inst|Stablity)" + separators + numberGroup, "i");
+
+            const massMatch = text.match(massRegex);
+            const resMatch = text.match(resRegex);
+            const instMatch = text.match(instRegex);
+            
+            // Helper to clean captured string (remove spaces/commas, keep digits/dots)
+            const parseValue = (str) => {
+                const cleaned = str.replace(/[^\d.]/g, '');
+                return parseFloat(cleaned);
+            };
+
+            // Display Logic
+            updateDisplay('res-mass', massMatch, parseValue);
+            updateDisplay('res-resistance', resMatch, parseValue);
+            updateDisplay('res-instability', instMatch, parseValue);
+        }
+
+        function updateDisplay(elementId, match, parser) {
+            const el = document.getElementById(elementId);
+            if (match && match[1]) {
+                const raw = match[1];
+                const parsed = parser(raw);
+                el.innerHTML = `<span class="text-green-400">${parsed}</span> <span class="text-gray-600 text-xs">(Raw: "${raw}")</span>`;
+            } else {
+                el.innerHTML = `<span class="text-red-500">Not Found</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
