@@ -32,7 +32,7 @@
             user-select: text;
         }
         
-        /* Custom scrollbar for Windows-app feel */
+        /* Custom scrollbar for Windows-app feel - Default page scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -120,8 +120,17 @@
                 max-height: calc(100vh - 2rem); 
                 overflow-y: auto; /* Enable scrolling for inputs */
                 padding-top: 0; /* Remove top padding from the scrolling container */
-                scrollbar-width: thin;
+                
+                /* Hide scrollbar but allow scrolling */
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
             }
+            
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            .sticky-column-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+
             .static-header-pin {
                 position: relative;
                 /* top: 0; Removed sticky lock */
@@ -139,7 +148,15 @@
                 max-height: calc(100vh - 2rem); 
                 position: sticky;
                 top: 1rem;
-                scrollbar-width: thin;
+                
+                /* Hide scrollbar but allow scrolling */
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+            
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            .sticky-scroll-content::-webkit-scrollbar {
+                display: none;
             }
         }
     </style>
@@ -902,7 +919,7 @@
             calculate();
         }
 
-        // --- UPDATED: Reverted to Hardcoded Images for reliability ---
+        // --- UPDATED: Hardcoded Image URLs for reliability ---
         function updateShipImage() {
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             const selectedShipId = shipSelectElement.value;
