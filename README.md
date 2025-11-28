@@ -27,11 +27,26 @@
   </p>
 </div>
 
+![Mining Fracture Analyser Logo][image1]
+
 # **Mining Fracture Analyser (MFA)**
 
 A real-time cooperative mining calculator for Star Citizen.  
 Stop Guessing. Start Fracturing.  
 [🔴 Launch Live Demo](https://esramos-design.github.io/mfa.github.io/) | [🐛 Report Bug](https://github.com/esramos-design/mfa.github.io/issues) | [✨ Request Feature](https://github.com/esramos-design/mfa.github.io/issues)
+
+## **📑 Table of Contents**
+
+* [About The Project](https://www.google.com/search?q=%23-about-the-project)  
+* [Key Features](https://www.google.com/search?q=%23-key-features)  
+* [User Guide: Windows App Installation](https://www.google.com/search?q=%23-user-guide-windows-app-installation)  
+* [User Guide: Using the AI Foreman](https://www.google.com/search?q=%23-user-guide-using-the-ai-foreman)  
+* [User Guide: OCR & Features](https://www.google.com/search?q=%23-user-guide-ocr--features)  
+* [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
+* [Developer Guide: Local Setup](https://www.google.com/search?q=%23-developer-guide-local-setup)  
+* [Contributing Guidelines](https://www.google.com/search?q=%23-contributing-guidelines)  
+* [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)  
+* [Disclaimer & License](https://www.google.com/search?q=%23-disclaimer--license)
 
 ## **📖 About The Project**
 
@@ -180,7 +195,9 @@ If you wish to contribute to the codebase or run the web version locally without
 **Project Structure**
 
 * index.html: Main application structure.  
-* run\_app.py: Python wrapper for desktop use.
+* run\_app.py: Python wrapper for desktop use.  
+* /css: Custom styles (if extracted).  
+* /js: Logic files (if extracted).
 
 Local Web Server  
 Due to browser security policies (CORS) regarding Web Workers (used by Tesseract OCR), simply opening the index.html file in Chrome/Edge will not allow the OCR to work. You must run a local server:
@@ -192,6 +209,10 @@ Due to browser security policies (CORS) regarding Web Workers (used by Tesseract
 
 First off, thanks for taking the time to contribute\! 🎉  
 The Mining Fracture Analyser is a community tool built for Star Citizen players. We welcome contributions from developers of all skill levels.
+
+### **💖 Code of Conduct**
+
+By participating in this project, you agree to keep the environment safe and welcoming for everyone. Please be respectful in issues and pull requests.
 
 ### **💡 How Can I Contribute?**
 
@@ -213,6 +234,14 @@ The Mining Fracture Analyser is a community tool built for Star Citizen players.
 3. Commit your Changes (git commit \-m 'Add some AmazingFeature')  
 4. Push to the Branch (git push origin feature/AmazingFeature)  
 5. Open a Pull Request
+
+**Development Guidelines**
+
+* **HTML:** Semantic HTML5.  
+* **CSS:** Use Tailwind utility classes where possible.  
+* **JS:** Modern ES6+ syntax (Arrow functions, const/let).  
+* **Comments:** Please comment your code, specifically where mining formulas are applied, so we can update them if CIG changes the game mechanics.  
+* **OCR Testing:** If working on OCR, please test with screenshots from different resolutions (1080p, 1440p, 4k) as UI scaling affects Tesseract accuracy.
 
 ## **⚠️ Troubleshooting**
 
