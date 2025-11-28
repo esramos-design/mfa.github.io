@@ -1,17 +1,31 @@
-Here is the **Master README** converted into Discord-compatible Markdown.
 
-**Notes for posting:**
+<div align="center">
+  <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">
+    <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mpa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
+  </a>
 
-  * Discord messages have a **2000 character limit** (4000 for Nitro). This document is long, so you will likely need to paste it into **multiple messages** or a **Discord Forum Post**.
-  * I have removed HTML tags (like `<div align="center">`) because Discord does not support them.
-  * I placed the image URL at the top so Discord will automatically generate a preview image for the post.
+  <h1 align="center">Mining Fracture Analyser</h1>
 
------
-
-**Copy the text inside the code block below:**
-
-````markdown
-https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mpa.jpg
+  <p align="center">
+    <strong>A real-time cooperative mining calculator for Star Citizen.</strong>
+    <br />
+    Stop Guessing. Start Fracturing.
+    <br />
+    <br />
+    <a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="_blank">
+      <img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" />
+    </a>
+    <img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" />
+    <img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" />
+    <br />
+    <br />
+    <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">🔴 <strong>Launch Live Demo</strong></a>
+    |
+    <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">🐛 Report Bug</a>
+    |
+    <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">✨ Request Feature</a>
+  </p>
+</div>
 
 # Mining Fracture Analyser (MFA)
 
@@ -223,11 +237,6 @@ Distributed under the GNU General Public License (GPL). See `LICENSE` for more i
 
 **Contact**
 Developer: CHIRONDRAGON
-
-```
-```
-
-
 
 
 
