@@ -1,32 +1,3 @@
-<div align="center"\>  
-<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>  
-<img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mFa.jpg" alt="Mining Fracture Analyser Logo" width="50%"\>  
-</a\>  
-<h1 align="center"\>Mining Fracture Analyser (MFA) v3.6\</h1\>
-
-<p align="center"\>  
-<strong\>Precision. Power. Profit.\</strong\>  
-<br /\>  
-A real-time cooperative mining calculator for Star Citizen.  
-<br /\>  
-Stop Guessing. Start Fracturing.  
-<br /\>  
-<br /\>  
-<a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="\_blank"\>  
-<img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" /\>  
-</a\>  
-<img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" /\>  
-<img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" /\>  
-<br /\>  
-<br /\>  
-<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>🔴 \<strong\>Launch Live Demo\</strong\>\</a\>  
-|  
-<a href="https://discord.gg/wktsh9h46F" target="\_blank"\>💬 \<strong\>Join Discord Support\</strong\>\</a\>  
-|  
-<a href="https://github.com/esramos-design/mfa.github.io/issues" target="\_blank"\>🐛 Report Bug\</a\>  
-</p\>  
-</div\>
-
 <div align="center">
   <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">
     <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mfa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
@@ -55,6 +26,37 @@ Stop Guessing. Start Fracturing.
   </p>
 </div>
 
+
+\<div align="center"\>  
+\<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>  
+\<img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mfa.jpg" alt="Mining Fracture Analyser Logo" width="50%"\>  
+\</a\>  
+\<h1 align="center"\>Mining Fracture Analyser (MFA) v3.6\</h1\>
+
+\<p align="center"\>  
+\<strong\>Precision. Power. Profit.\</strong\>  
+\<br /\>  
+A real-time cooperative mining calculator for Star Citizen.  
+\<br /\>  
+Stop Guessing. Start Fracturing.  
+\<br /\>  
+\<br /\>  
+\<a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="\_blank"\>  
+\<img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" /\>  
+\</a\>  
+\<img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" /\>  
+\<img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" /\>  
+\<br /\>  
+\<br /\>  
+\<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>🔴 \<strong\>Launch Live Demo\</strong\>\</a\>  
+|  
+\<a href="https://discord.gg/wktsh9h46F" target="\_blank"\>💬 \<strong\>Join Discord Support\</strong\>\</a\>  
+|  
+\<a href="https://github.com/esramos-design/mfa.github.io/issues" target="\_blank"\>🐛 Report Bug\</a\>  
+\</p\>  
+\</div\>
+
+# 
 
 # **Overview**
 
