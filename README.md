@@ -27,268 +27,208 @@
   </p>
 </div>
 
-![Mining Fracture Analyser Logo][image1]
+\<div align="center"\>  
+\<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>  
+\<img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mpa.jpg" alt="Mining Fracture Analyser Logo" width="50%"\>  
+\</a\>  
+\<h1 align="center"\>Mining Fracture Analyser (MFA) v3.6\</h1\>
 
-# **Mining Fracture Analyser (MFA) \- v2.8**
-
+\<p align="center"\>  
+\<strong\>Precision. Power. Profit.\</strong\>  
+\<br /\>  
 A real-time cooperative mining calculator for Star Citizen.  
+\<br /\>  
 Stop Guessing. Start Fracturing.  
-[🔴 Launch Live Demo](https://esramos-design.github.io/mfa.github.io/) | [💬 Join Discord Support](https://discord.gg/wktsh9h46F)
+\<br /\>  
+\<br /\>  
+\<a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="\_blank"\>  
+\<img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" /\>  
+\</a\>  
+\<img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" /\>  
+\<img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" /\>  
+\<br /\>  
+\<br /\>  
+\<a href="https://esramos-design.github.io/mfa.github.io/" target="\_blank"\>🔴 \<strong\>Launch Live Demo\</strong\>\</a\>  
+|  
+\<a href="https://discord.gg/wktsh9h46F" target="\_blank"\>💬 \<strong\>Join Discord Support\</strong\>\</a\>  
+|  
+\<a href="https://github.com/esramos-design/mfa.github.io/issues" target="\_blank"\>🐛 Report Bug\</a\>  
+\</p\>  
+\</div\>
 
-## **📑 Table of Contents**
+# 
 
-* [About The Project](https://www.google.com/search?q=%23-about-the-project)  
-* [Key Features](https://www.google.com/search?q=%23-key-features)  
-* [User Guide: Windows App Installation](https://www.google.com/search?q=%23-user-guide-windows-app-installation)  
-* [User Guide: Using the AI Foreman](https://www.google.com/search?q=%23-user-guide-using-the-ai-foreman)  
-* [User Guide: OCR & Features](https://www.google.com/search?q=%23-user-guide-ocr--features)  
-* [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
-* [Developer Guide: Local Setup](https://www.google.com/search?q=%23-developer-guide-local-setup)  
-* [Contributing Guidelines](https://www.google.com/search?q=%23-contributing-guidelines)  
-* [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)  
-* [Disclaimer & License](https://www.google.com/search?q=%23-disclaimer--license)
-
-## **📖 About The Project**
+# **Overview**
 
 The **Mining Fracture Analyser (MFA)** is a specialized calculation engine developed for Star Citizen industrial crews.
 
-Star Citizen mining mechanics involve complex variables: Laser Power, Instability, Resistance, Distance, and Consumables. Guessing these values often results in **overheated rocks (catastrophic explosions)** or wasted time on rocks that are mathematically impossible to break.
+Whether you are running a solo **Drake Golem**, a **MISC Prospector**, or coordinating a full **Argo MOLE** multi-crew, MFA calculates your **Total Combined Effective Laser Power (MW)** in real-time. It accounts for complex variables—Laser Power, Instability, Resistance, Distance, and Consumables—to provide a simple "Pass/Fail" verdict before you even activate your lasers.
 
-This tool solves that problem by calculating the **Total Combined Effective Laser Power** of your entire crew in real-time, providing a simple "Pass/Fail" verdict before you even activate your lasers.
+**Version 3.6** introduces the "Aerospace Platinum" light theme, updated support for the Drake Golem (Fixed Pitman Heads), and data sourced directly from **UEX Corp**.
 
-**Version 2.8** introduces advanced **Fleet Recommendations** that calculate reinforcement requirements (Prospector vs Golem vs MOLE) and role-based loadouts ("The Breaker", "The Surgeon").
+## **📑 Table of Contents**
+
+* [Key Features](https://www.google.com/search?q=%23-key-features)  
+* [User Guide: Installation & Setup](https://www.google.com/search?q=%23-user-guide-installation--setup)  
+* [User Guide: The AI Foreman](https://www.google.com/search?q=%23-user-guide-the-ai-foreman)  
+* [User Guide: OCR Auto-Scan](https://www.google.com/search?q=%23-user-guide-ocr-auto-scan)  
+* [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
+* [Contributing](https://www.google.com/search?q=%23-contributing)  
+* [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)
 
 ## **✨ Key Features**
 
-### **🛠️ Fleet Solutions (New in v2.8)**
+### **🛠️ Fleet Solutions & Smart Recommendations**
 
-The tool now acts as a fleet commander, analyzing power deficits and recommending reinforcements.
+The tool acts as a fleet commander, analyzing power deficits and recommending reinforcements.
 
-* **Reinforcement Calculator:** Automatically calculates how many extra ships are needed to break a rock.  
-* **Flexible Options:** Suggests alternatives: "Need \+1 Prospector OR \+1 Golem OR \+1 MOLE".  
+* **Reinforcement Calculator:** Automatically calculates how many extra ships are needed to break a rock (e.g., *"⚠️ Reinforcements Required: \+1x Prospector OR \+1x MOLE"*).  
 * **Role-Based MOLE Loadouts:** Suggests specialized configurations for multi-crew efficiency:  
   * **Breaker:** Max Power/Fracture.  
   * **Surgeon:** Max Stability/Window.  
   * **Vacuum:** Max Extraction speed.
 
+### **🚀 Multi-Crew Fleet Simulation**
+
+Simulate any combination of ships currently in the game:
+
+* **Argo MOLE:** 3 Laser Heads (Configurable per head).  
+* **MISC Prospector:** 1 Laser Head.  
+* **Drake Golem:** Mining Turret Support (Fixed Pitman heads).  
+* **Heat Management:** Toggle individual heads on/off to simulate heat management strategies.
+
 ### **⚡ Active Module Toggle**
 
 Granular control for **Active Modules** (e.g., Surge, Stampede, Brandt).
 
-* **Dynamic UI:** A toggle switch automatically appears next to any selected Active module.  
-* **Simulation Control:**  
-  * **ON:** The module's effects are applied. Use this to see if you can crack the rock *with* the module activated.  
-  * **OFF:** The module's effects are ignored. Use this to simulate **cooldowns** or saving a charge.
+* **ON:** The module's effects are applied. Use this to see if you can crack the rock *with* the module activated.  
+* **OFF:** The module's effects are ignored. Use this to simulate cooldowns or saving a charge.
 
 ### **🤖 AI Senior Foreman**
 
-Powered by Google Gemini API:
+Powered by the **Google Gemini API**:
 
-* **Analyze Strategy:** Reads current rock stats and provides a strategic risk assessment (e.g., "High Instability detected, recommend Stampede module").  
+* **Analyze Strategy:** Reads current rock stats and provides a strategic risk assessment (e.g., *"High Instability detected, recommend Stampede module"*).  
 * **Generate Orders:** Creates roleplay-ready "Command Uplink" text blocks for voice/text comms.
 
 ### **📸 OCR Auto-Scan (Tesseract.js)**
 
 Don't waste time typing numbers while piloting.
 
-* **Step 1:** Take a screenshot of your mining UI.  
-* **Step 2:** Press Ctrl+V (Paste) directly into the app.  
-* **Result:** The app automatically extracts Mass, Resistance, and Instability.
-
-### **🚀 Multi-Crew Fleet Simulation**
-
-Simulate any combination of ships currently in the game:
-
-* **Argo MOLE** (3 Laser Heads) \- Configurable per head.  
-* **MISC Prospector** (1 Laser Head)  
-* **Drake Golem** (Mining Turret Support)  
-* *Heat Management:* Toggle individual heads on/off to simulate heat management strategies.
+* **Paste & Go:** Take a screenshot of your mining UI and press Ctrl+V directly into the app.  
+* **Auto-Extraction:** Automatically extracts Mass, Resistance, and Instability.
 
 ### **📊 Advanced Visual Analytics**
-
-We don't just show numbers; we visualize the physics:
 
 * **Power Margin Chart:** Visualizes your power surplus vs. the rock's requirement.  
 * **Risk Profile:** A Doughnut chart comparing Resistance, Instability, and your Safety Margin.  
 * **Resistance Curve:** A predictive line graph showing laser efficiency across the heating window.
 
-## **🛠 User Guide: Windows App Installation**
+### **🎨 Themes**
 
-This section is for players who want to run the tool as a standalone program (App Mode) rather than in a web browser.
+* **Dark Mode:** The classic high-contrast interface.  
+* **Aerospace Platinum:** A new, clean light mode for high-visibility environments.
 
-### **Step 1: Install Python**
+## **🛠 User Guide: Installation & Setup**
 
-This app runs on Python. If you don't have it installed:
+You can use MFA in three ways depending on your preference.
 
-1. Download Python from [python.org](https://www.python.org/downloads/).  
-2. **CRUCIAL:** During installation, check the box that says **"Add Python to PATH"**.
+### **Method 1: Live Web Version (Easiest)**
 
-### **Step 2: Save the Application Files**
+Simply visit the [GitHub Pages link](https://esramos-design.github.io/mfa.github.io/) to use the tool immediately in your browser.
 
-Create a new folder on your computer (e.g., Desktop\\MFA\_Tool) and save the following two files inside it:
+### **Method 2: Local Single-File**
 
-* index.html: The main application code (Download from this repo).  
-* run\_app.py: The launcher script (Create a text file with this name).
+1. Download index.html from this repository.  
+2. Double-click to open in Chrome, Edge, or Firefox.  
+3. *Note:* OCR features may be limited by browser security (CORS) when running locally without a server.
 
-**run\_app.py Content:**
+### **Method 3: Windows Desktop App (Advanced)**
 
-import webview  
-import sys  
-import os
+For the best experience without a browser bar, run MFA as a standalone Python app.
 
-if \_\_name\_\_ \== '\_\_main\_\_':  
-    \# Get the absolute path to index.html  
-    html\_file \= os.path.join(os.path.dirname(os.path.abspath(\_\_file\_\_)), 'index.html')  
-      
-    \# Create the window  
-    webview.create\_window(  
-        'Mining Fracture Analyser v2.8',   
-        url=html\_file,  
-        width=1400,   
-        height=900,  
-        background\_color='\#0d1117'  
-    )  
-    webview.start(debug=True)
+1. **Install Python:** Download from [python.org](https://www.python.org/). **CRUCIAL:** Check **"Add Python to PATH"** during installation.  
+2. **Install Wrapper:** Open Command Prompt (cmd) and run:  
+   pip install pywebview
 
-### **Step 3: Install the Window Wrapper**
+3. **Create Script:** Create a file named run\_app.py in the same folder as your index.html with the following content:  
+   import webview  
+   import sys  
+   import os
 
-Open your Command Prompt (search for cmd in Windows) and run this command:
+   if \_\_name\_\_ \== '\_\_main\_\_':  
+       html\_file \= os.path.join(os.path.dirname(os.path.abspath(\_\_file\_\_)), 'index.html')  
+       webview.create\_window(  
+           'Mining Fracture Analyser v3.6',  
+           url=html\_file,  
+           width=1400,  
+           height=900,  
+           background\_color='\#0d1117'  
+       )  
+       webview.start(debug=True)
 
-pip install pywebview
+4. **Run:** Double-click run\_app.py.
 
-### **Step 4: Activate the AI (Gemini API)**
+## **🤖 User Guide: The AI Foreman**
 
-To use the "Analyze Strategy" and "Generate Orders" buttons, you need a free API key.
+To unlock the **Analyze Strategy** and **Generate Orders** buttons, you must configure a free Google Gemini API key.
 
-1. **Get a Key:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and create a free API key.  
-2. **Edit index.html:**  
-   * Right-click index.html and select **Open with Notepad** (or VS Code).  
-   * Find this line (approx. line 430): const apiKey \= "";  
+1. **Get a Key:** Visit [Google AI Studio](https://aistudio.google.com/app/apikey) and create a free API key.  
+2. **Configure:**  
+   * Open index.html in a text editor (Notepad, VS Code).  
+   * Find the line: const apiKey \= ""; (Near the bottom).  
    * Paste your key: const apiKey \= "YOUR\_KEY\_HERE";  
-   * Save the file.
+   * Save and refresh the app.
 
-### **Step 5: Run the App**
+**Feature Usage:**
 
-Double-click run\_app.py (or run python run\_app.py in terminal). The application will launch in a dark-mode window.
+* **Analyze Strategy:** Click this when you are unsure if a rock is safe. It will output advice like *"Equip a Stampede module to counter the 40% instability."*  
+* **Generate Orders:** Click this to generate a text block like: *"/// COMMAND UPLINK /// Target Mass 23k. MOLE 1, active Surge on my mark. EXECUTE."*
 
-## **🤖 User Guide: Using the AI Foreman**
+## **📸 User Guide: OCR Auto-Scan**
 
-Once you have entered your rock parameters and set up your mining team, the **Analytics Column** (Column 3\) will unlock the AI features.
-
-Feature 1: ✨ Analyze Strategy  
-Use this when: You are unsure if the rock is safe to mine or what modules to equip.
-
-1. Click the **Analyze Strategy** button (Purple).  
-2. The AI will read the current rock stats and your crew's loadout.  
-3. It outputs a **Strategic Assessment**:  
-   * **Risk Analysis:** Warns if high instability makes an explosion likely.  
-   * **Loadout Advice:** Suggests specific modules (e.g., "Equip a **Stampede** module to counter the 40% instability").
-
-Feature 2: ✨ Generate Orders  
-Use this when: You are the crew leader and need to give clear instructions.
-
-1. Click the **Generate Orders** button (Blue).  
-2. The AI generates a formatted **"Command Uplink"** text block.  
-3. **Usage:** Read it aloud over Discord or copy/paste it into in-game chat.
-
-Example Order:  
-"/// COMMAND UPLINK /// Target Mass 23k. Resistance Critical. MOLE 1, active Surge on my mark. Prospectors, hold laser power at 20% to stabilize. EXECUTE."
-
-## **📷 User Guide: OCR & Features**
-
-**Using OCR (Auto-Scan)**
-
-1. While in-game, verify you are looking at the rock's scan data.  
-2. Take a screenshot (Print Screen) or use Snipping Tool.  
-3. **CTRL+V (Paste)** the image directly into the MFA App window.  
+1. In-game, align your ship so the Rock Scan data is clearly visible on your UI.  
+2. Take a screenshot (Print Screen or Snipping Tool).  
+3. Switch to the MFA tool and press **CTRL+V (Paste)**.  
 4. *Alternatively:* Click the "Auto-Scan Rock" box to upload an image file.  
-5. The tool will automatically fill in Mass, Resistance, and Instability.
+5. Verify the Mass, Resistance, and Instability values have populated correctly.
 
-Using Smart Recommendations  
-If your simulation fails, the Fleet Solutions (Column 5\) kicks in automatically. It will calculate the Power Deficit and tell you exactly what reinforcements to call:  
-*"⚠️ Reinforcements Required: \+1x Prospector \- OR \- \+1x Golem \- OR \- \+1x MOLE"*
+**Tip:** Darker backgrounds in Star Citizen (space) usually yield better OCR results than bright backgrounds (planet surfaces).
 
 ## **🧠 Technical: How It Works**
 
-The application uses established community formulas (verified by SC-Trade-Tools and RedMonsterSC) to calculate:
+The application uses established community formulas verified by **UEX Corp** and **RedMonsterSC**.
 
 1. **Base Power:** Sum of all active laser heads.  
 2. **Module Modifiers:** Applies buffs/debuffs from Surges, Stampedes, Torrents, etc.  
 3. **Resistance Calculation:** Effective Power \= Total Power \* (1 \- Rock Resistance).  
 4. **Heat Transfer:** Determines if Effective Power \> Rock Heat Threshold.
 
-### **Customizing Data (Gadgets, Heads, Ships)**
+### **Tech Stack**
 
-Advanced users can customize the tool's data arrays directly in index.html:
+* **Core:** HTML5, JavaScript (ES6+), Tailwind CSS.  
+* **Visualization:** Chart.js.  
+* **OCR:** Tesseract.js.  
+* **AI:** Google Gemini API.
 
-* **Ships:** Modify the ships array to add new vehicles or adjust slot counts.  
-* **Laser Heads:** Update allLaserHeads with new mining heads or balance changes.  
-* **Modules/Gadgets:** Edit powerModules or gadgets to reflect the latest in-game patch values.
+## **🤝 Contributing**
 
-## **💻 Developer Guide: Local Setup**
+We welcome contributions\! Please join our [Discord Server](https://discord.gg/wktsh9h46F) to discuss changes.
 
-If you wish to contribute to the codebase or run the web version locally without Python.
+1. **Fork** the Project.  
+2. Create your **Feature Branch** (git checkout \-b feature/AmazingFeature).  
+3. **Commit** your Changes (git commit \-m 'Add some AmazingFeature').  
+4. **Push** to the Branch (git push origin feature/AmazingFeature).  
+5. Open a **Pull Request**.
 
-**Project Structure**
+## **Disclaimer & License**
 
-* index.html: Main application structure.  
-* run\_app.py: Python wrapper for desktop use.
+**Disclaimer:** This application is a fan-made tool using empirical data. Star Citizen server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. Use this tool as a guide, not a guarantee.
 
-Local Web Server  
-Due to browser security policies (CORS) regarding Web Workers (used by Tesseract OCR), simply opening the index.html file in Chrome/Edge will not allow the OCR to work. You must run a local server:
+**License:** Distributed under the GNU General Public License (GPL). See LICENSE for more information.
 
-* **VS Code:** Right-click index.html \-\> "Open with Live Server".  
-* **Python:** Run python \-m http.server 8000 in the directory.
+**Credits:**
 
-## **🤝 Contributing Guidelines**
-
-First off, thanks for taking the time to contribute\! 🎉  
-The Mining Fracture Analyser is a community tool built for Star Citizen players. We welcome contributions from developers of all skill levels.
-
-### **💖 Code of Conduct**
-
-By participating in this project, you agree to keep the environment safe and welcoming for everyone. Please be respectful in issues and pull requests.
-
-### **💡 How Can I Contribute?**
-
-**1\. Reporting Bugs**
-
-* **Join the Discord:** Use the \#bug-reports channel in our [Discord Server](https://discord.gg/wktsh9h46F).  
-* **Search existing issues** on GitHub to see if the bug has already been reported.  
-* **Create a new issue** using the Bug Report template.  
-* **Include details:** Browser version, screen resolution (if OCR failed), and the specific rock parameters used.
-
-**2\. Suggesting Enhancements**
-
-* Open a new issue with the tag enhancement.  
-* Explain why this feature would be useful to the mining community.
-
-**3\. Pull Requests (Code Contributions)**
-
-1. Fork the Project  
-2. Create your Feature Branch (git checkout \-b feature/AmazingFeature)  
-3. Commit your Changes (git commit \-m 'Add some AmazingFeature')  
-4. Push to the Branch (git push origin feature/AmazingFeature)  
-5. Open a Pull Request
-
-## **⚠️ Troubleshooting**
-
-* **"The AI buttons do nothing":**  
-  * Did you paste your API key into index.html?  
-  * Check your internet connection.  
-* **"ModuleNotFoundError: No module named 'webview'":**  
-  * You missed Step 3 in the Installation. Run pip install pywebview in your terminal.  
-* **OCR Not Picking up numbers:**  
-  * Ensure the screenshot is clear.  
-  * Try cropping the image closer to the stats on the right side of the UI.  
-  * OCR relies on visual contrast; darker backgrounds in screenshots help.
-
-## **⚠️ Disclaimer & License**
-
-Disclaimer  
-This application is a fan-made tool. It uses empirical data. In-game variables such as server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. Use this tool as a guide, not a guarantee.  
-License  
-Distributed under the GNU General Public License (GPL). See LICENSE for more information. By contributing, you agree that your contributions will be licensed under its GNU General Public License (GPL).  
-Contact  
-Developer: CHIRONDRAGON  
-Join our Discord Server
+* Data provided by [UEX Corp](https://www.google.com/search?q=https://uexcorp.space/).  
+* Images property of Cloud Imperium Games.  
+* Developer: CHIRONDRAGON.
