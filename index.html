@@ -175,20 +175,34 @@
     <div class="main-container">
         
         <!-- GLOBAL HEADER (NEW LAYOUT) -->
-        <div class="col-span-1 lg:col-span-4 w-full bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30 p-6 flex flex-row items-center mb-2 gap-6">
-             <div class="flex-shrink-0 w-24"> <!-- Fixed width for logo container -->
-                <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
-                <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
-                    alt="Mining Fracture Analyser Logo" 
-                    class="w-full h-auto rounded-lg object-contain shadow-lg"
-                    onerror="this.onerror=null; this.src='https://placehold.co/150x150/161b22/e5e7eb?text=MFA';">
+        <div class="col-span-1 lg:col-span-4 w-full bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30 p-6 flex flex-row items-center justify-between mb-2 gap-6">
+             <div class="flex flex-row items-center gap-6">
+                 <div class="flex-shrink-0 w-24"> <!-- Fixed width for logo container -->
+                    <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
+                    <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
+                        alt="Mining Fracture Analyser Logo" 
+                        class="w-full h-auto rounded-lg object-contain shadow-lg"
+                        onerror="this.onerror=null; this.src='https://placehold.co/150x150/161b22/e5e7eb?text=MFA';">
+                </div>
+                <div class="text-left max-w-4xl"> <!-- Left align text container -->
+                    <h1 class="text-2xl font-bold text-white mb-2">Mining Fracture Analyser</h1>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        The Mining Fracture Analyser is a precision calculation engine built for industrial crews. Whether you are running a solo Prospector or a full Argo MOLE multi-crew, this tool removes the guesswork.
+                        It calculates your Total Combined Effective Laser Power (MW) in real-time, accounting for distance, resistance, and module buffs. Know exactly if you can crack that 40% resistance rock before you waste a Surge module.
+                    </p>
+                </div>
             </div>
-            <div class="text-left"> <!-- Left align text container -->
-                <h1 class="text-2xl font-bold text-white mb-2">Mining Fracture Analyser</h1>
-                <p class="text-sm text-gray-400 leading-relaxed">
-                    The Mining Fracture Analyser is a precision calculation engine built for industrial crews. Whether you are running a solo Prospector or a full Argo MOLE multi-crew, this tool removes the guesswork.
-                    It calculates your Total Combined Effective Laser Power (MW) in real-time, accounting for distance, resistance, and module buffs. Know exactly if you can crack that 40% resistance rock before you waste a Surge module.
-                </p>
+            
+            <!-- Header Buttons -->
+            <div class="flex flex-col gap-2 min-w-[140px]">
+                <a href="https://github.com/esramos-design/mfa.github.io/blob/main/README.md" target="_blank" 
+                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold uppercase rounded-lg transition-colors text-center border border-gray-600 shadow-md flex items-center justify-center gap-2">
+                   <span>📄</span> View Readme
+                </a>
+                <a href="https://discord.gg/wktsh9h46F" target="_blank"
+                   class="px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold uppercase rounded-lg transition-colors text-center border border-blue-500/30 shadow-md flex items-center justify-center gap-2">
+                   <span>💬</span> Join Discord
+                </a>
             </div>
         </div>
 
@@ -318,32 +332,34 @@
             <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 rounded-2xl shadow-2xl border border-blue-900/30 space-y-6 no-scrollbar">
                 
                 <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Analytics</h2>
+
+                <!-- Calculation Results (MOVED TO TOP) -->
+                <section id="results" class="pt-2">
+                    <p class="text-center text-gray-400 italic text-sm">Configure your loadout to see results.</p>
+                </section>
+
+                <!-- MOVED CHARTS BELOW RESULTS AND INVERTED ORDER -->
                 
-                <!-- Chart 1: Power vs Required -->
-                <div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
-                    <h3 class="text-xs font-bold text-blue-300 mb-2 text-center uppercase">Power vs. Margin</h3>
-                    <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
-                </div>
+                <!-- Chart 1: Power vs Resistance Curve (Was 3rd) -->
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-purple-600/50">
+                   <h3 class="text-xs font-bold text-purple-300 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
+                   <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
+               </div>
                  
-                 <!-- Chart 2: Rock Difficulty Profile -->
+                <!-- Chart 2: Risk Profile (Was 2nd) -->
                 <div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
                     <h3 class="text-xs font-bold text-yellow-300 mb-2 text-center uppercase">Risk Profile</h3>
                     <div class="h-48 w-full"><canvas id="modChart"></canvas></div>
                 </div>
 
-                 <!-- Chart 3: Power vs Resistance Curve -->
-                 <div class="p-4 bg-gray-900/50 rounded-xl border border-purple-600/50">
-                    <h3 class="text-xs font-bold text-purple-300 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
-                    <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
+                <!-- Chart 3: Power vs. Margin (Was 1st) -->
+                <div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
+                    <h3 class="text-xs font-bold text-blue-300 mb-2 text-center uppercase">Power vs. Margin</h3>
+                    <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
                 </div>
-
-                <!-- Calculation Results -->
-                <section id="results" class="pt-2">
-                    <p class="text-center text-gray-400 italic text-sm">Configure your loadout to see results.</p>
-                </section>
                 
                 <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-600">MFA v3.1 + Gemini Integration</p>
+                    <p class="text-gray-600">MFA v3.4 + Gemini Integration</p>
                 </footer>
             </div>
         </div>
@@ -535,7 +551,7 @@
                 defaultLaser: 2700, 
                 moduleSlots: 2, 
                 isFixedLaser: true, 
-                fixedLaserName: "Pitman (~3150 MW)"
+                fixedLaserName: "Pitman (~2700 MW)"
             } 
         ];
 
