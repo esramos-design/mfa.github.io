@@ -343,7 +343,7 @@
                 </section>
                 
                 <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-600">MFA v3.0 + Gemini Integration</p>
+                    <p class="text-gray-600">MFA v3.1 + Gemini Integration</p>
                 </footer>
             </div>
         </div>
@@ -1265,7 +1265,8 @@
 
             const size2Heads = allLaserHeads.filter(h => h.size === 2);
             const size1Heads = allLaserHeads.filter(h => h.size === 1);
-            
+            const golemHead = allLaserHeads.find(h => h.name.includes("Pitman"));
+
             // Define Meta Modules
             const modSurge = powerModules.find(m => m.name.includes("Surge"));
             const modStampede = powerModules.find(m => m.name.includes("Stampede"));
@@ -1285,11 +1286,15 @@
             const vacuumLaser = size2Heads.find(h => h.name.includes("Impact II")) || size2Heads[0];
             const vacuumLoadout = calcLoadout(vacuumLaser, null, modTorrent, modXtr);
 
-            // 2. Solo Loadouts (Prospector/Golem)
+            // 2. Solo Loadouts (Prospector)
             const soloLaser = size1Heads.find(h => h.name.includes("Helix I")) || size1Heads[0];
             const soloLoadout = calcLoadout(soloLaser, modSurge, modRieger, null);
 
-            // 3. Extra Ship Calculation
+             // 3. Solo Loadouts (Golem) - Using Pitman (Fixed)
+             // Modules: Surge (Active) + Rieger (Passive) to maximize fixed head power
+             const golemLoadout = calcLoadout(golemHead, modSurge, modRieger, null);
+
+            // 4. Extra Ship Calculation
             let extraShipRec = null;
             if (reqPwr > currentPwr) {
                 const deficit = reqPwr - currentPwr;
@@ -1298,8 +1303,8 @@
                 const prospectorPower = soloLoadout.stats.power; 
                 const prospectorsNeeded = Math.ceil(deficit / prospectorPower);
                 
-                // Option B: Golem (Approx power calc for Pitman with same modules if possible, otherwise default solo logic)
-                const golemPower = 2700 * 1.5 * 1.25; // Pitman base approx * Surge * Rieger
+                // Option B: Golem
+                const golemPower = golemLoadout.stats.power;
                 const golemsNeeded = Math.ceil(deficit / golemPower);
 
                 // Option C: MOLE (3x Breaker Loadout Power)
@@ -1319,7 +1324,8 @@
                     { role: "Laser 2: Surgeon", ...surgeonLoadout, desc: "Max Stability & Window" },
                     { role: "Laser 3: Vacuum", ...vacuumLoadout, desc: "Max Extraction Speed" }
                 ],
-                solo: { role: "Balanced Solo", ...soloLoadout, desc: "General Purpose" },
+                prospector: { role: "Balanced Solo", ...soloLoadout, desc: "General Purpose" },
+                golem: { role: "Golem Optimized", ...golemLoadout, desc: "Fixed Head (Pitman)" }, // New Golem specific recommendation
                 extra: extraShipRec
             };
         }
@@ -1547,11 +1553,26 @@
 
             recHtml += `<h3 class="text-xs font-bold text-gray-500 uppercase mb-2 text-center border-b border-gray-800 pb-1">Recommended Loadouts</h3>`;
             
-            // Always show all recommendations now per request
+            // Updated grouping and ordering:
+            // 1. MOLE Group
+            recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
+            recHtml += `<h4 class="text-xs font-bold text-indigo-400 uppercase mb-2 text-center">MOLE (Size 2)</h4>`;
             recHtml += renderCard(recommendations.mole[0], 'text-red-400'); // Breaker
             recHtml += renderCard(recommendations.mole[1], 'text-blue-400'); // Surgeon
             recHtml += renderCard(recommendations.mole[2], 'text-green-400'); // Vacuum
-            recHtml += renderCard(recommendations.solo, 'text-yellow-400'); // Solo
+            recHtml += `</div>`;
+
+            // 2. Prospector Group
+            recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
+            recHtml += `<h4 class="text-xs font-bold text-green-400 uppercase mb-2 text-center">Prospector (Size 1)</h4>`;
+            recHtml += renderCard(recommendations.prospector, 'text-yellow-400'); // Solo
+            recHtml += `</div>`;
+            
+             // 3. Golem Group
+             recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
+             recHtml += `<h4 class="text-xs font-bold text-orange-400 uppercase mb-2 text-center">Golem (Fixed S0)</h4>`;
+             recHtml += renderCard(recommendations.golem, 'text-orange-400'); // Golem
+             recHtml += `</div>`;
 
             recHtml += `</div>`;
 
