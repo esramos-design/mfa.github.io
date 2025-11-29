@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,159 +13,192 @@
     <!-- Load Markdown Parser for AI responses -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Define the Inter font family and a space-themed dark background */
+        /* Define the Inter font family */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* App-like behavior: Disable text selection on UI, enable only on inputs/results */
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Dark Theme (Default) */
+            --bg-main: #0d1117;
+            --bg-panel: #161b22;
+            --bg-card: #21262d;
+            --bg-input: #161b22;
+            --border-main: #30363d;
+            --border-blue: rgba(30, 58, 138, 0.3);
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --text-strong: #f3f4f6;
+            --chart-grid: #374151;
+            --chart-text: #e5e7eb;
+            --scrollbar-track: #0d1117;
+            --scrollbar-thumb: #30363d;
+            --scrollbar-hover: #38bdf8;
+            
+            /* Neon Glows */
+            --glow-blue: 0 0 15px rgba(56, 189, 248, 0.2);
+            --glow-purple: 0 0 15px rgba(168, 85, 247, 0.2);
+            --glow-yellow: 0 0 15px rgba(234, 179, 8, 0.2);
+        }
+
+        [data-theme="light"] {
+            /* Light Theme Overrides */
+            --bg-main: #f3f4f6;       
+            --bg-panel: #ffffff;      
+            --bg-card: #f9fafb;       
+            --bg-input: #ffffff;
+            --border-main: #e5e7eb;   
+            --border-blue: rgba(59, 130, 246, 0.2);
+            --text-main: #374151;     
+            --text-muted: #4b5563;    
+            --text-strong: #111827;   
+            --chart-grid: #e5e7eb;
+            --chart-text: #374151;
+            --scrollbar-track: #f3f4f6;
+            --scrollbar-thumb: #d1d5db;
+            --scrollbar-hover: #3b82f6;
+
+            /* Neon Glows (Subtler for light mode) */
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.4);
+            --glow-purple: 0 0 15px rgba(147, 51, 234, 0.4);
+            --glow-yellow: 0 0 15px rgba(234, 179, 8, 0.4);
+        }
+
+        /* App-like behavior */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* Deep space blue/black */
-            color: #e5e7eb; /* Light gray text */
+            background-color: var(--bg-main);
+            color: var(--text-main);
             min-height: 100vh;
-            user-select: none; /* App-feel */
+            user-select: none; 
             cursor: default;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Allow selection where it matters */
-        input, select, #results-wrapper, #warnings-wrapper, #configs-wrapper, #ai-response-area {
-            user-select: text;
+        input, select, #results-wrapper, #warnings-wrapper, #configs-wrapper, #ai-response-area, h1, h2, h3, h4, p, span {
+            user-select: text; /* Allow selection for copy-pasting values */
         }
         
-        /* Custom scrollbar for Windows-app feel - Default page scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d1117; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #30363d; 
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #38bdf8; 
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
-        /* Custom input and select styling for a sci-fi look */
+        /* Input styling */
         input[type="number"], select {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            color: #e5e7eb; /* Softer light gray for input text */
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-main);
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s;
             -webkit-appearance: none; 
             -moz-appearance: none;
             appearance: none;
             padding-right: 2.5rem; 
         }
 
-        /* --- FOCUS STYLE --- */
         input[type="number"]:focus, select:focus {
-            border-color: #38bdf8; /* Bright Sky Blue for high visibility */
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); /* Wider, brighter focus ring */
+            border-color: #38bdf8; 
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); 
             outline: none;
         }
 
-        /* Styling for the dynamically added ship arms */
+        /* Ship Arm Card */
         .ship-arm-card {
-            background-color: #21262d;
-            border: 1px solid #30363d;
-            transition: border-color 0.2s, opacity 0.2s;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-main);
+            transition: border-color 0.2s, opacity 0.2s, background-color 0.3s;
         }
         .ship-arm-card:hover {
             border-color: #60a5fa;
         }
-        /* Disabled state styling */
         .ship-arm-card.disabled-arm {
             opacity: 0.5;
-            border-color: #30363d;
+            border-color: var(--border-main);
         }
 
-        /* New Layout container: Wider for 5 columns */
+        /* Layout */
         .main-container {
-            max-width: 2400px; /* Increased max width */
+            max-width: 2400px;
             width: 98%;
-            display: grid; /* Enables stacking by default */
+            display: grid;
             gap: 1.5rem;
             margin: 0 auto;
         }
         
-        /* AI Response Styling */
+        /* AI Box */
         .ai-response-box {
             background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
             border: 1px solid rgba(96, 165, 250, 0.3);
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.1) inset;
         }
-        .typing-cursor::after {
-            content: '▋';
-            animation: blink 1s step-start infinite;
-            color: #60a5fa;
+        
+        /* Visual Gadget Selector Styling */
+        .gadget-radio:checked + div {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
         }
-        @keyframes blink { 50% { opacity: 0; } }
 
         @media (min-width: 1440px) {
             .main-container {
-                grid-template-columns: repeat(4, 1fr); /* Four columns for large desktop */
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
-        /* --- SCROLLBAR HIDING UTILITY --- */
-        /* Applies to any element with these classes to hide scrollbars cross-browser */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* --- NEON HOVER CLASSES --- */
+        .neon-hover-blue, .neon-hover-purple, .neon-hover-yellow {
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
         }
         
-        /* CRITICAL CSS FOR INDEPENDENT SCROLLING COLUMNS */
+        .neon-hover-blue:hover {
+            border-color: #3b82f6; 
+            box-shadow: var(--glow-blue);
+        }
+        
+        .neon-hover-purple:hover {
+            border-color: #a855f7; 
+            box-shadow: var(--glow-purple);
+        }
+        
+        .neon-hover-yellow:hover {
+            border-color: #eab308; 
+            box-shadow: var(--glow-yellow);
+        }
+
         @media (min-width: 1024px) {
-            /* Sticky Column Wrapper */
             .sticky-column-wrapper {
                 position: sticky;
-                top: 1rem; /* Space from the top */
-                /* Calculate height to fit between top margin and bottom of viewport */
+                top: 1rem; 
                 max-height: calc(100vh - 2rem); 
-                overflow-y: auto; /* Enable scrolling for inputs */
-                padding-top: 0; /* Remove top padding from the scrolling container */
-                
-                /* Apply no-scrollbar logic directly here for robust coverage */
+                overflow-y: auto; 
+                padding-top: 0; 
                 -ms-overflow-style: none;  
                 scrollbar-width: none;  
             }
-            
-            .sticky-column-wrapper::-webkit-scrollbar {
-                display: none;
-            }
+            .sticky-column-wrapper::-webkit-scrollbar { display: none; }
 
             .static-header-pin {
                 position: relative;
-                /* top: 0; Removed sticky lock */
-                z-index: 10; /* Ensure it stays above scrolling content */
-                /* Use padding equal to the main wrapper's original top padding (p-6/p-8) to match the border/box visually */
+                z-index: 10; 
                 padding: 1.5rem 2rem 1.5rem 2rem; 
-                background-color: #161b22; /* Match parent background */
-                border-bottom: 1px solid #30363d; /* Visual separation line */
-                margin-bottom: 2rem; /* Add spacing back after the header */
+                background-color: var(--bg-panel);
+                border-bottom: 1px solid var(--border-main);
+                margin-bottom: 2rem; 
+                transition: background-color 0.3s ease;
             }
 
-            /* Generic sticky scroll content class */
             .sticky-scroll-content {
                 overflow-y: auto;
                 max-height: calc(100vh - 2rem); 
                 position: sticky;
                 top: 1rem;
-                
-                /* Apply no-scrollbar logic directly here for robust coverage */
                 -ms-overflow-style: none; 
                 scrollbar-width: none; 
             }
-            
-            .sticky-scroll-content::-webkit-scrollbar {
-                display: none;
-            }
+            .sticky-scroll-content::-webkit-scrollbar { display: none; }
         }
     </style>
 </head>
@@ -174,27 +207,31 @@
     <!-- MAIN GRID CONTAINER -->
     <div class="main-container">
         
-        <!-- GLOBAL HEADER (Row Layout) -->
-        <div class="col-span-1 lg:col-span-4 w-full bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30 p-6 flex flex-row items-center justify-between mb-2 gap-6">
-             <div class="flex flex-row items-center gap-6">
-                 <div class="flex-shrink-0 w-24"> <!-- Fixed width for logo container -->
-                    <!-- LOGO: Uses local file 'mpa.jpg' with fallback -->
+        <!-- GLOBAL HEADER -->
+        <div class="col-span-1 lg:col-span-4 w-full bg-[var(--bg-panel)] rounded-2xl shadow-2xl border border-[var(--border-blue)] p-6 flex flex-col md:flex-row items-center justify-between mb-2 gap-6 transition-colors duration-300">
+             <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                 <div class="flex-shrink-0 w-24"> 
                     <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
                         alt="Mining Fracture Analyser Logo" 
                         class="w-full h-auto rounded-lg object-contain shadow-lg"
                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/161b22/e5e7eb?text=MFA';">
                 </div>
-                <div class="text-left max-w-4xl"> <!-- Left align text container -->
-                    <h1 class="text-2xl font-bold text-white mb-2">Mining Fracture Analyser</h1>
-                    <p class="text-sm text-gray-400 leading-relaxed">
-                        The Mining Fracture Analyser is a precision calculation engine built for industrial crews. Whether you are running a solo Prospector or a full Argo MOLE multi-crew, this tool removes the guesswork.
-                        It calculates your Total Combined Effective Laser Power (MW) in real-time, accounting for distance, resistance, and module buffs. Know exactly if you can crack that 40% resistance rock before you waste a Surge module.
+                <div class="max-w-4xl">
+                    <h1 class="text-2xl font-bold text-[var(--text-main)] mb-2">Mining Fracture Analyser</h1>
+                    <p class="text-sm text-[var(--text-muted)] leading-relaxed">
+                        Precision calculation engine for industrial crews. Real-time Total Combined Effective Laser Power (MW) calculation accounting for distance, resistance, and module buffs.
+                        Updated for latest UEX data.
                     </p>
                 </div>
             </div>
             
             <!-- Header Buttons -->
-            <div class="flex flex-col gap-2 min-w-[140px]">
+            <div class="flex flex-col gap-2 min-w-[140px] w-full md:w-auto">
+                <button onclick="toggleTheme()" 
+                        class="px-4 py-2 bg-[var(--bg-card)] hover:bg-[var(--border-main)] text-[var(--text-main)] text-xs font-bold uppercase rounded-lg transition-colors text-center border border-[var(--border-main)] shadow-md flex items-center justify-center gap-2">
+                    <span id="theme-icon">☀️</span> <span id="theme-text">Light Mode</span>
+                </button>
+
                 <a href="https://github.com/esramos-design/mfa.github.io/blob/main/README.md" target="_blank" 
                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold uppercase rounded-lg transition-colors text-center border border-gray-600 shadow-md flex items-center justify-center gap-2">
                    <span>📄</span> View Readme
@@ -206,97 +243,89 @@
             </div>
         </div>
 
-        <!-- COLUMN 1: ROCK PARAMS & OCR -->
+        <!-- COLUMN 1: ROCK PARAMS & OCR & GADGETS (Blue Glow) -->
         <div class="w-full">
-            <!-- Added no-scrollbar class for extra safety -->
-            <div class="sticky-column-wrapper bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30 no-scrollbar">
+            <div class="sticky-column-wrapper bg-[var(--bg-panel)] rounded-2xl shadow-2xl border border-[var(--border-blue)] no-scrollbar transition-colors duration-300 neon-hover-blue">
                 
-                <!-- STATIC HEADER PINNED AT TOP -->
                 <div class="static-header-pin p-6 sm:p-8 rounded-t-2xl">
                      <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Rock Analysis</h2>
                 </div>
                 
-                <!-- SCROLLABLE BODY CONTENT -->
                 <div class="p-6 space-y-6">
-
-                    <!-- NEW OCR SECTION -->
-                    <div class="mb-6 p-1 border-2 border-dashed border-gray-600 rounded-xl hover:border-blue-400 transition-colors bg-[#0d1117]" id="ocr-drop-zone">
+                    <!-- OCR SECTION -->
+                    <div class="mb-6 p-1 border-2 border-dashed border-[var(--border-main)] rounded-xl hover:border-blue-400 transition-colors bg-[var(--bg-main)]" id="ocr-drop-zone">
                         <div class="relative flex flex-col items-center justify-center py-6 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
-                            
-                            <!-- Loading Overlay (Hidden by default) -->
-                            <div id="ocr-loading" class="absolute inset-0 bg-[#0d1117]/90 z-10 flex flex-col items-center justify-center rounded-xl hidden">
+                            <div id="ocr-loading" class="absolute inset-0 bg-[var(--bg-main)]/90 z-10 flex flex-col items-center justify-center rounded-xl hidden">
                                 <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-2"></div>
                                 <p class="text-blue-400 font-bold animate-pulse">ANALYSING ROCK DATA...</p>
-                                <p class="text-xs text-gray-500" id="ocr-status">Initializing Tesseract...</p>
+                                <p class="text-xs text-[var(--text-muted)]" id="ocr-status">Initializing Tesseract...</p>
                             </div>
-
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[var(--text-muted)] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <p class="text-sm text-gray-300 font-semibold">Auto-Scan Rock (OCR)</p>
-                            <p class="text-xs text-gray-500 mt-1">Click to Upload or <span class="text-blue-400 font-bold">CTRL+V</span> Screenshot</p>
+                            <p class="text-sm text-[var(--text-muted)] font-semibold">Auto-Scan Rock (OCR)</p>
+                            <p class="text-xs text-[var(--text-muted)] mt-1">Click to Upload or <span class="text-blue-400 font-bold">CTRL+V</span> Screenshot</p>
                             <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
                         </div>
                     </div>
-                    <!-- END OCR SECTION -->
 
-                    <!-- 2. Rock Parameters Group -->
-                    <h2 class="text-lg font-semibold text-blue-300 border-b border-gray-700 pb-2">Rock Setup</h2>
-                    
+                    <!-- Rock Parameters -->
+                    <h2 class="text-lg font-semibold text-blue-300 border-b border-[var(--border-main)] pb-2">Rock Setup</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Rock Stats Input -->
-                        <div class="p-3 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
-                            <label for="resistance" class="block text-xs font-medium mb-1 text-gray-300">Base Resistance (%)</label>
+                        <div class="p-3 bg-[var(--bg-card)] rounded-xl col-span-2 sm:col-span-1">
+                            <label for="resistance" class="block text-xs font-medium mb-1 text-[var(--text-muted)]">Base Resistance (%)</label>
                             <input type="number" id="resistance" value="16.0" step="0.1" placeholder="e.g., 16.0"
                                     class="w-full p-2 rounded-lg text-sm font-mono" oninput="calculate()">
                         </div>
-                        
-                        <div class="p-3 bg-[#21262d] rounded-xl col-span-2 sm:col-span-1">
-                            <label for="instability" class="block text-xs font-medium mb-1 text-gray-300">Base Instability (%)</label>
+                        <div class="p-3 bg-[var(--bg-card)] rounded-xl col-span-2 sm:col-span-1">
+                            <label for="instability" class="block text-xs font-medium mb-1 text-[var(--text-muted)]">Base Instability (%)</label>
                             <input type="number" id="instability" value="20.0" step="0.1" placeholder="e.g., 20.0"
                                     class="w-full p-2 rounded-lg text-sm font-mono" oninput="calculate()">
                         </div>
-
-                        <!-- Target Rock Mass Input -->
-                        <div class="p-3 bg-[#21262d] rounded-xl col-span-2">
-                            <label for="rockMass" class="block text-xs font-medium mb-1 text-gray-300">Target Rock Mass (kg)</label>
+                        <div class="p-3 bg-[var(--bg-card)] rounded-xl col-span-2">
+                            <label for="rockMass" class="block text-xs font-medium mb-1 text-[var(--text-muted)]">Target Rock Mass (kg)</label>
                             <input type="number" id="rockMass" value="23922" placeholder="e.g., 23922"
                                     class="w-full p-2 rounded-lg text-sm font-mono" oninput="calculate()">
                         </div>
                     </div>
-
                     <button onclick="calculate()"
                             class="w-full p-4 text-lg font-bold rounded-xl transition-all duration-200 
                                 bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg active:scale-95 text-white border border-indigo-500">
                         RUN SIMULATION
                     </button>
 
+                    <!-- VISUAL GADGET LIST (Moved from Col 2) -->
+                    <div class="mt-6 p-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border-main)]">
+                        <label class="block text-sm font-medium mb-3 text-[var(--text-muted)] border-b border-[var(--border-main)] pb-2">Select Active Gadget</label>
+                        
+                        <div id="gadget-list-container" class="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar pr-1">
+                            <!-- Populated by JS -->
+                        </div>
+                        
+                        <!-- Hidden input to store selected gadget value -->
+                        <input type="hidden" id="gadgetSelect" value="None">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- COLUMN 2: TEAM ASSEMBLY & GADGETS -->
+        <!-- COLUMN 2: TEAM ASSEMBLY (Blue Glow) -->
         <div class="w-full">
-            <div class="sticky-column-wrapper bg-[#161b22] rounded-2xl shadow-2xl border border-blue-900/30 no-scrollbar">
+            <div class="sticky-column-wrapper bg-[var(--bg-panel)] rounded-2xl shadow-2xl border border-[var(--border-blue)] no-scrollbar transition-colors duration-300 neon-hover-blue">
                 
-                <!-- HEADER FOR COLUMN 2 -->
                 <div class="static-header-pin p-6 rounded-t-2xl">
                     <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Team Assembly</h2>
                 </div>
 
                 <div class="p-6 space-y-6">
-                    <!-- 1. Ship Assembly -->
-                    <div class="p-4 bg-blue-900/20 rounded-xl border border-blue-700/50">
+                    <div class="p-4 bg-blue-900/10 rounded-xl border border-blue-700/30">
                         <label for="shipSelectToAdd" class="block text-sm font-medium mb-2 text-blue-300">Add Mining Ship</label>
-                        
-                        <!-- Dynamic Ship Image Display (Reverted to Image) -->
                         <div class="mb-4 flex justify-center bg-black/20 rounded-lg p-2">
                             <img id="selectedShipImage" src="" alt="Selected Ship" class="rounded-lg shadow-md border border-blue-900/50 max-h-32 object-contain w-full hidden">
                         </div>
-
                         <div class="flex space-x-2">
-                            <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white text-sm" onchange="updateShipImage()">
+                            <select id="shipSelectToAdd" class="flex-grow p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] text-sm" onchange="updateShipImage()">
                                 <!-- Options populated by JS -->
                             </select>
                             <button onclick="addShipLoadout()"
@@ -307,19 +336,9 @@
                         </div>
                     </div>
 
-                    <!-- Gadget Slot (Moved Here) -->
-                    <div class="p-4 bg-[#21262d] rounded-xl border border-gray-700">
-                        <label for="gadgetSelect" class="block text-sm font-medium mb-2 text-gray-300">Select Gadget (Rock Modifiers)</label>
-                        <select id="gadgetSelect" onchange="calculate()"
-                               class="w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white text-sm">
-                            <!-- Options populated by JS -->
-                        </select>
-                    </div>
-
-                    <!-- Active Loadout Cards -->
-                    <h2 class="text-lg font-semibold text-gray-300 border-b border-gray-700 pb-2">Active Laser Heads:</h2>
+                    <h2 class="text-lg font-semibold text-[var(--text-muted)] border-b border-[var(--border-main)] pb-2">Active Laser Heads:</h2>
                     <div id="multiShipContainer" class="space-y-4 min-h-[100px] p-2 rounded-xl">
-                        <p class="text-center text-gray-500 text-sm p-4 border border-dashed border-gray-700 rounded-lg">
+                        <p id="empty-state-msg" class="text-center text-[var(--text-muted)] text-sm p-4 border border-dashed border-[var(--border-main)] rounded-lg">
                             Add ships above to configure their mining laser heads.
                         </p>
                     </div>
@@ -327,48 +346,42 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: ANALYTIC RESULTS & CHARTS -->
+        <!-- COLUMN 3: ANALYTIC RESULTS & CHARTS (Purple Glow) -->
         <div class="w-full">
-            <div id="results-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 rounded-2xl shadow-2xl border border-blue-900/30 space-y-6 no-scrollbar">
+            <div id="results-wrapper" class="sticky-scroll-content bg-[var(--bg-panel)] p-6 rounded-2xl shadow-2xl border border-[var(--border-blue)] space-y-6 no-scrollbar transition-colors duration-300 neon-hover-purple">
                 
                 <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Analytics</h2>
 
-                <!-- Calculation Results (MOVED TO TOP) -->
                 <section id="results" class="pt-2">
-                    <p class="text-center text-gray-400 italic text-sm">Configure your loadout to see results.</p>
+                    <p class="text-center text-[var(--text-muted)] italic text-sm">Configure your loadout to see results.</p>
                 </section>
 
-                <!-- MOVED CHARTS BELOW RESULTS AND INVERTED ORDER -->
-                
-                <!-- Chart 1: Power vs Resistance Curve (Was 3rd) -->
-                <div class="p-4 bg-gray-900/50 rounded-xl border border-purple-600/50">
-                   <h3 class="text-xs font-bold text-purple-300 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
+                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-purple-600/30">
+                   <h3 class="text-xs font-bold text-purple-400 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
                    <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
                </div>
                  
-                <!-- Chart 2: Risk Profile (Was 2nd) -->
-                <div class="p-4 bg-gray-900/50 rounded-xl border border-yellow-600/50">
-                    <h3 class="text-xs font-bold text-yellow-300 mb-2 text-center uppercase">Risk Profile</h3>
+                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-yellow-600/30">
+                    <h3 class="text-xs font-bold text-yellow-500 mb-2 text-center uppercase">Risk Profile</h3>
                     <div class="h-48 w-full"><canvas id="modChart"></canvas></div>
                 </div>
 
-                <!-- Chart 3: Power vs. Margin (Was 1st) -->
-                <div class="p-4 bg-gray-900/50 rounded-xl border border-blue-600/50">
-                    <h3 class="text-xs font-bold text-blue-300 mb-2 text-center uppercase">Power vs. Margin</h3>
+                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-blue-600/30">
+                    <h3 class="text-xs font-bold text-blue-400 mb-2 text-center uppercase">Power vs. Margin</h3>
                     <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
                 </div>
                 
-                <footer class="pt-4 border-t border-gray-700/50 text-center text-xs">
-                    <p class="text-gray-600">MFA v3.5 + Gemini Integration</p>
+                <footer class="pt-4 border-t border-[var(--border-main)] text-center text-xs">
+                    <p class="text-[var(--text-muted)]">MFA v3.6 Enhanced</p>
                 </footer>
             </div>
         </div>
 
-        <!-- COLUMN 4 (MERGED): AI, WARNINGS & RECOMMENDATIONS -->
+        <!-- COLUMN 4: AI, WARNINGS & RECOMMENDATIONS (Yellow Glow) -->
         <div class="w-full">
-            <div id="warnings-wrapper" class="sticky-scroll-content bg-[#161b22] p-6 rounded-2xl shadow-2xl border border-blue-900/30 space-y-6 no-scrollbar">
+            <div id="warnings-wrapper" class="sticky-scroll-content bg-[var(--bg-panel)] p-6 rounded-2xl shadow-2xl border border-[var(--border-blue)] space-y-6 no-scrollbar transition-colors duration-300 neon-hover-yellow">
                 
-                <!-- AI SECTION (Moved Here) -->
+                <!-- AI SECTION -->
                 <div id="ai-section" class="hidden">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
@@ -385,32 +398,27 @@
                     </div>
                     
                     <div class="ai-response-box p-4 rounded-lg relative min-h-[100px]">
-                         <!-- Loading State -->
                         <div id="ai-loading" class="hidden absolute inset-0 flex items-center justify-center bg-gray-900/80 rounded-lg z-10">
                             <div class="flex flex-col items-center">
                                 <div class="w-2 h-2 bg-blue-400 rounded-full animate-ping mb-2"></div>
                                 <p class="text-xs text-blue-300 font-mono animate-pulse">Establishing Comms...</p>
                             </div>
                         </div>
-
-                        <!-- Content Area -->
                          <div id="ai-content" class="text-sm text-gray-300 font-mono leading-relaxed whitespace-pre-wrap">
                             <span class="text-gray-500 italic">// Awaiting uplink... Run simulation first.</span>
                          </div>
                     </div>
                 </div>
-                <!-- END AI SECTION -->
 
-                <h2 class="text-xl font-extrabold text-yellow-400 text-center uppercase tracking-wide border-t border-gray-700/50 pt-6">Analysis & Fleet Solutions</h2>
-                <!-- Warning output -->
+                <h2 class="text-xl font-extrabold text-yellow-500 text-center uppercase tracking-wide border-t border-[var(--border-main)] pt-6">Analysis & Fleet Solutions</h2>
+                
                 <section id="warnings" class="pt-2">
-                    <p class="text-center text-gray-400 italic text-sm">Warnings and requirements will appear here.</p>
+                    <p class="text-center text-[var(--text-muted)] italic text-sm">Warnings and requirements will appear here.</p>
                 </section>
                 
-                <!-- FLEET SOLUTIONS (MERGED FROM COL 5) -->
-                 <h3 class="text-lg font-extrabold text-green-400 text-center uppercase tracking-wide border-t border-gray-700/50 pt-6">Recommended Loadouts</h3>
+                 <h3 class="text-lg font-extrabold text-green-500 text-center uppercase tracking-wide border-t border-[var(--border-main)] pt-6">Recommended Loadouts</h3>
                 <section id="configs" class="pt-2">
-                    <p class="text-center text-gray-400 italic text-sm">Fleet recommendations will appear here.</p>
+                    <p class="text-center text-[var(--text-muted)] italic text-sm">Fleet recommendations will appear here.</p>
                 </section>
 
             </div>
@@ -419,10 +427,40 @@
     </div>
 
     <script>
-        // API Key for Gemini (Provided by Environment)
-        const apiKey = "";
+        const apiKey = ""; // API Key provided by environment
         
-        // Global variables for simulation state
+        function initTheme() {
+            const storedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', storedTheme);
+            updateThemeIcon(storedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            if (currentSimState.power > 0) {
+                calculate();
+            }
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            if (theme === 'light') {
+                icon.textContent = '🌙';
+                text.textContent = 'Dark Mode';
+            } else {
+                icon.textContent = '☀️';
+                text.textContent = 'Light Mode';
+            }
+        }
+        
+        // --- SIMULATION LOGIC ---
         let currentSimState = {
             mass: 0,
             resistance: 0,
@@ -432,8 +470,6 @@
             activeArms: 0
         };
 
-        // --- GEMINI API INTEGRATION ---
-        
         async function askAI(mode) {
             const aiLoading = document.getElementById('ai-loading');
             const aiContent = document.getElementById('ai-content');
@@ -444,9 +480,8 @@
             }
 
             aiLoading.classList.remove('hidden');
-            aiContent.innerHTML = ''; // Clear previous
+            aiContent.innerHTML = ''; 
 
-            // Construct Prompt based on Mode
             let prompt = "";
             const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
             const crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
@@ -479,7 +514,6 @@
 
             try {
                 const response = await callGemini(prompt);
-                // Parse markdown to HTML for display
                 aiContent.innerHTML = marked.parse(response);
             } catch (error) {
                 aiContent.innerHTML = `<span class="text-red-500">// COMM LINK FAILURE: ${error.message}</span>`;
@@ -490,14 +524,10 @@
 
         async function callGemini(prompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }]
-            };
-
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
             let attempts = 0;
             const maxAttempts = 3;
             const delays = [1000, 2000, 4000];
-
             while (attempts < maxAttempts) {
                 try {
                     const response = await fetch(url, {
@@ -505,9 +535,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    
                     const data = await response.json();
                     return data.candidates[0].content.parts[0].text;
                 } catch (e) {
@@ -518,60 +546,28 @@
             }
         }
 
-        // Global chart instances
         let powerChart = null;
         let modChart = null;
         let resistanceChart = null;
 
-        // Data Definitions
         const ships = [
-            { 
-                id: "mole", 
-                name: "Argo MOLE", 
-                arms: 3, 
-                maxLaserSize: 2, 
-                defaultLaser: 4080, 
-                moduleSlots: 3, 
-                isFixedLaser: false
-            }, 
-            { 
-                id: "prospector", 
-                name: "MISC Prospector", 
-                arms: 1, 
-                maxLaserSize: 1, 
-                defaultLaser: 3150, 
-                moduleSlots: 2, 
-                isFixedLaser: false
-            }, 
-            { 
-                id: "golem", 
-                name: "Drake Golem", 
-                arms: 1, 
-                maxLaserSize: 1, 
-                defaultLaser: 2700, 
-                moduleSlots: 2, 
-                isFixedLaser: true, 
-                fixedLaserName: "Pitman (~3150 MW)"
-            } 
+            { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false }, 
+            { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
+            { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~2700 MW)" } 
         ];
 
-        // --- EXPANDED DATA STRUCTURES WITH ALL STATS ---
         const allLaserHeads = [
             { name: "Arbor MHV", size: 0, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35, optimalWindow: 1.0, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0 }, 
             { name: "S0 Helix", size: 0, power: 1000, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 0, optimalWindow: 0.7, shatterDamage: 80, extractionRate: 1.2, inertFiltering: -0.1, optimalChargeRate: 1.2, overchargeRate: 1.2 }, 
             { name: "S00 Hofstede", size: 0, power: 500, moduleSlots: 0, resistanceEffect: -30, instabilityEffect: 10, optimalWindow: 1.5, shatterDamage: 40, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 2.0, overchargeRate: 1.0 }, 
             { name: "Lawson", size: 0, power: 1890, moduleSlots: 0, resistanceEffect: 0, instabilityEffect: 0, optimalWindow: 1.0, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0 },
             { name: "Pitman", size: 0, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35, optimalWindow: 0.8, shatterDamage: 90, extractionRate: 1.1, inertFiltering: 0.0, optimalChargeRate: 1.1, overchargeRate: 1.3 }, 
-
-            // Size 1
             { name: "Arbor MH1", size: 1, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35, optimalWindow: 1.0, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0 },
             { name: "Helix I", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0.0, optimalWindow: 0.6, shatterDamage: 80, extractionRate: 1.0, inertFiltering: -0.15, optimalChargeRate: 1.2, overchargeRate: 1.5 },
             { name: "Hofstede-S1", size: 1, power: 2100, moduleSlots: 1, resistanceEffect: -30, instabilityEffect: 10, optimalWindow: 1.5, shatterDamage: 40, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 2.0, overchargeRate: 1.0 },
             { name: "Impact I", size: 1, power: 2100, moduleSlots: 2, resistanceEffect: 10, instabilityEffect: -10, optimalWindow: 1.1, shatterDamage: 60, extractionRate: 1.3, inertFiltering: 0.0, optimalChargeRate: 1.3, overchargeRate: 1.1 },
             { name: "Klein-S1", size: 1, power: 2220, moduleSlots: 0, resistanceEffect: -45, instabilityEffect: 35, optimalWindow: 0.9, shatterDamage: 70, extractionRate: 1.1, inertFiltering: 0.0, optimalChargeRate: 1.5, overchargeRate: 1.2 },
             { name: "Lancet MH1", size: 1, power: 1400, moduleSlots: 1, resistanceEffect: -10, instabilityEffect: -75, optimalWindow: 3.0, shatterDamage: 30, extractionRate: 0.8, inertFiltering: 0.2, optimalChargeRate: 0.5, overchargeRate: 0.5 },
-
-            // Size 2
             { name: "Arbor MH2", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35, optimalWindow: 1.0, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0 },
             { name: "Helix II", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0.0, optimalWindow: 0.6, shatterDamage: 80, extractionRate: 1.0, inertFiltering: -0.2, optimalChargeRate: 1.2, overchargeRate: 1.5 },
             { name: "Hofstede-S2", size: 2, power: 3360, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 10, optimalWindow: 1.5, shatterDamage: 40, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 2.0, overchargeRate: 1.0 },
@@ -583,17 +579,16 @@
             return b.power - a.power;
         });
 
-        // Expanded Modules
         const powerModules = [
             { name: "Surge (Active)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Brandt (Active)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Stampede (Active)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Forel (Active)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active', windowEffect: 60, extractionEffect: 0, inertEffect: 0 },
             { name: "Lifeline (Active)", multiplier: 1.00, resistanceEffect: -15, instabilityEffect: -20.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Torpid (Active)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 }, // Often used to slow charge
+            { name: "Torpid (Active)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 }, 
             { name: "Rime (Active)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Optimum (Active)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active', windowEffect: 20, extractionEffect: 0, inertEffect: 0 },
-            { name: "Rieger-C3 (Passive)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive', windowEffect: -5, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rieger-C3 (Passive)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive', windowEffect: -1, extractionEffect: 0, inertEffect: 0 },
             { name: "Rieger-C2 (Passive)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0 },
             { name: "Focus III (Passive)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 40, extractionEffect: 0, inertEffect: 0 },
             { name: "Focus II (Passive)", multiplier: 0.90, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 37, extractionEffect: 0, inertEffect: 0 },
@@ -605,6 +600,8 @@
             { name: "XTR-L (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 22, extractionEffect: 0, inertEffect: 23 },
             { name: "XTR (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 15, extractionEffect: 0, inertEffect: 20 },
             { name: "FLTR-XL (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 24 },
+            { name: "FLTR-L (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 23 },
+            { name: "FLTR (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 20 },
             { name: "Vaux-C3 (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "None", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Default', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
         ]; 
@@ -624,14 +621,19 @@
         const sortedModules = sortModules([...powerModules]); 
 
         const gadgets = [
-            { name: "Sabir (-50% Res, +15% Inst)", reduction: -50.0, instabilityEffect: 15, type: 'Multiplicative' }, 
-            { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative' },
-            { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive' }, 
-            { name: "Waveshift (Stability/Charge Rate, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility' }, 
-            { name: "Stalwart (Instability Reduction, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility' }, 
-            { name: "Okunis (Optimal Window/Charge Rate)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility' },
-            { name: "None", reduction: 0.0, instabilityEffect: 0.0, type: 'None' }, 
-        ].sort((a, b) => b.reduction - a.reduction);
+            { name: "Sabir (-50% Res, +15% Inst)", reduction: -50.0, instabilityEffect: 15, type: 'Multiplicative', desc: "-50% Resistance, +15% Instability" }, 
+            { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative', desc: "-30% Resistance, -30% Window Size" },
+            { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive', desc: "+10% Resistance, -70% Instability" }, 
+            { name: "Waveshift (Stability/Charge Rate, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, +100% Window Size" }, 
+            { name: "Stalwart (Instability Reduction, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, +50% Rate, -30% Window Size" }, 
+            { name: "Okunis (Optimal Window/Charge Rate)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility', desc: "+100% Rate, +50% Window Size" },
+            { name: "None", reduction: 0.0, instabilityEffect: 0.0, type: 'None', desc: "No Gadget Attached" }, 
+        ].sort((a, b) => {
+            // Sort None to top, then by reduction
+            if (a.name === "None") return -1;
+            if (b.name === "None") return 1;
+            return b.reduction - a.reduction;
+        });
 
         let armIdCounter = 0; 
 
@@ -640,23 +642,15 @@
             const armUniqueId = `arm-${ship.id}-${armIdCounter}`;
             const isFixedLaser = ship.isFixedLaser; 
 
-            // Filter heads based on ship restrictions
             const availableHeads = allLaserHeads.filter(head => {
-                // Golem (Fixed)
                 if (ship.id === 'golem') return head.name.includes('Pitman');
-                
-                // General exclusions
-                if (head.name.includes('Pitman')) return false; // Pitman is Golem only
-                if (head.size === 0) return false; // Exclude other Size 0s
-                
-                // Specific Ship Restrictions
-                if (ship.id === 'mole') return head.size === 2; // MOLE: Size 2 ONLY
-                if (ship.id === 'prospector') return head.size === 1; // Prospector: Size 1 ONLY
-                
+                if (head.name.includes('Pitman')) return false; 
+                if (head.size === 0) return false; 
+                if (ship.id === 'mole') return head.size === 2; 
+                if (ship.id === 'prospector') return head.size === 1; 
                 return head.size <= ship.maxLaserSize;
             });
 
-            // Helper to generate option HTML
             const generateOption = (head) => {
                 let isSelected = false;
                 if (ship.id === 'mole' && head.name.includes('Helix II')) isSelected = true;
@@ -673,13 +667,10 @@
                         </option>`;
             };
 
-            // Group by Size for Dropdown
             const size2Heads = availableHeads.filter(h => h.size === 2);
             const size1Heads = availableHeads.filter(h => h.size === 1);
-            
             let laserOptionsHtml = '';
 
-            // Generate Optgroups
             if (size2Heads.length > 0) {
                 laserOptionsHtml += `<optgroup label="Size 2 Laser Heads">`;
                 laserOptionsHtml += size2Heads.map(generateOption).join('');
@@ -690,8 +681,6 @@
                 laserOptionsHtml += size1Heads.map(generateOption).join('');
                 laserOptionsHtml += `</optgroup>`;
             }
-            
-            // Fallback if no groups (e.g. Golem or empty)
             if (laserOptionsHtml === '' && availableHeads.length > 0) {
                  laserOptionsHtml = availableHeads.map(generateOption).join('');
             }
@@ -705,7 +694,6 @@
             } else {
                 defaultLaserData = allLaserHeads.find(h => h.power === ship.defaultLaser);
             }
-            
             const actualMaxSlots = defaultLaserData?.moduleSlots || ship.moduleSlots;
 
             if (isFixedLaser) {
@@ -716,55 +704,33 @@
                 laserSelectAttributes = `onchange="updateLaserConfig(this, '${armUniqueId}'); calculate();"`;
             }
             
-            // --- MODULE DROPDOWN GROUPING ---
-            const activeModulesHtml = sortedModules
-                .filter(m => m.activation === 'Active')
-                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
-                .join('');
-            
-            const passiveModulesHtml = sortedModules
-                .filter(m => m.activation === 'Passive')
-                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
-                .join('');
-
+            const activeModulesHtml = sortedModules.filter(m => m.activation === 'Active').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
+            const passiveModulesHtml = sortedModules.filter(m => m.activation === 'Passive').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
             const defaultOption = `<option value="None" selected>None</option>`;
-            
-            const finalModuleOptions = `
-                ${defaultOption}
-                <optgroup label="Active Modules">
-                    ${activeModulesHtml}
-                </optgroup>
-                <optgroup label="Passive Modules">
-                    ${passiveModulesHtml}
-                </optgroup>
-            `;
+            const finalModuleOptions = `${defaultOption}<optgroup label="Active Modules">${activeModulesHtml}</optgroup><optgroup label="Passive Modules">${passiveModulesHtml}</optgroup>`;
 
             let moduleSlotsHtml = '<div id="module-slots-container-' + armUniqueId + '">';
             for (let i = 1; i <= 3; i++) {
                 const isDisabled = i > actualMaxSlots;
                 const slotText = isDisabled ? `--- SLOT DISABLED (${actualMaxSlots} Slots Max) ---` : `Module Slot ${i}`;
-                const initialValue = 'None'; 
                 const disabledClass = isDisabled ? 'opacity-50' : '';
-                
                 const toggleContainerId = `${armUniqueId}-mod${i}-toggle-container`;
                 const toggleId = `${armUniqueId}-mod${i}-active-toggle`;
                 
                 moduleSlotsHtml += `
                     <div class="flex items-center gap-2 mb-3">
-                        <select id="${armUniqueId}-mod${i}" class="arm-module-select flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white ${disabledClass}" 
-                                onchange="checkModuleActive(this, '${toggleContainerId}'); calculate()" value="${initialValue}" ${isDisabled ? 'disabled' : ''}>
+                        <select id="${armUniqueId}-mod${i}" class="arm-module-select flex-grow p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] ${disabledClass}" 
+                                onchange="checkModuleActive(this, '${toggleContainerId}'); calculate()" ${isDisabled ? 'disabled' : ''}>
                             ${isDisabled ? `<option value="None">${slotText}</option>` : finalModuleOptions}
                         </select>
-                        
-                        <div id="${toggleContainerId}" class="hidden flex-col items-center justify-center bg-[#161b22] border border-blue-900/30 rounded px-2 py-1 h-full ml-1 min-h-[50px] min-w-[60px]">
+                        <div id="${toggleContainerId}" class="hidden flex-col items-center justify-center bg-[var(--bg-input)] border border-[var(--border-blue)] rounded px-2 py-1 h-full ml-1 min-h-[50px] min-w-[60px]">
                             <span class="text-[9px] text-blue-300 font-bold mb-1 leading-none uppercase tracking-wide">Active</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="${toggleId}" class="sr-only peer" checked onchange="calculate()">
                                 <div class="w-8 h-4 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
                             </label>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
             moduleSlotsHtml += '</div>';
 
@@ -772,10 +738,9 @@
                 <div id="${armUniqueId}" class="p-4 rounded-xl shadow-lg ship-arm-card space-y-3" data-ship-id="${ship.id}" data-max-modules="${actualMaxSlots}">
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex items-center space-x-2">
-                            <h4 class="text-lg font-bold ${ship.id === 'mole' ? 'text-indigo-400' : ship.id === 'prospector' ? 'text-green-400' : 'text-amber-400'}">
+                            <h4 class="text-lg font-bold ${ship.id === 'mole' ? 'text-indigo-400' : ship.id === 'prospector' ? 'text-green-500' : 'text-amber-500'}">
                                 ${ship.name} - Head ${armIndex}
                             </h4>
-                            <!-- Toggle Switch -->
                             <label class="relative inline-flex items-center cursor-pointer ml-3">
                                 <input type="checkbox" id="${armUniqueId}-enable" class="sr-only peer" checked onchange="toggleArm('${armUniqueId}'); calculate();">
                                 <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
@@ -788,14 +753,14 @@
                         </button>
                     </div>
 
-                    <label class="block text-sm font-medium text-gray-400">Laser Head (Base Power)</label>
-                    <select id="${armUniqueId}-laser" class="arm-laser-select w-full p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white"
+                    <label class="block text-sm font-medium text-[var(--text-muted)]">Laser Head (Base Power)</label>
+                    <select id="${armUniqueId}-laser" class="arm-laser-select w-full p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)]"
                             data-max-size="${ship.maxLaserSize}" ${laserSelectAttributes} ${laserSelectDisabled}>
                         ${laserOptionsHtml}
                     </select>
-                    <p class="text-xs text-gray-500 italic text-right -mt-2 mb-2">Click or tap to view options</p>
+                    <p class="text-xs text-[var(--text-muted)] italic text-right -mt-2 mb-2">Click or tap to view options</p>
 
-                    <label class="block text-sm font-medium text-gray-400">Modules (Max <span id="${armUniqueId}-slot-count">${actualMaxSlots}</span> Slots)</label>
+                    <label class="block text-sm font-medium text-[var(--text-muted)]">Modules (Max <span id="${armUniqueId}-slot-count">${actualMaxSlots}</span> Slots)</label>
                     ${moduleSlotsHtml}
                 </div>
             `;
@@ -805,7 +770,6 @@
             const selectedName = selectElement.value;
             const module = powerModules.find(m => m.name === selectedName);
             const container = document.getElementById(toggleContainerId);
-            
             if (container) {
                 if (module && module.activation === 'Active') {
                     container.classList.remove('hidden');
@@ -820,7 +784,6 @@
         function toggleArm(armId) {
             const container = document.getElementById(armId);
             const checkbox = document.getElementById(armId + '-enable');
-            
             if (checkbox.checked) {
                 container.classList.remove('disabled-arm');
             } else {
@@ -840,71 +803,43 @@
             container.setAttribute('data-max-modules', newMaxSlots);
             slotCountDisplay.textContent = newMaxSlots;
 
-            // Re-generate module options with groups for the update function
-            const activeModulesHtml = sortedModules
-                .filter(m => m.activation === 'Active')
-                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
-                .join('');
-            
-            const passiveModulesHtml = sortedModules
-                .filter(m => m.activation === 'Passive')
-                .map(mod => `<option value="${mod.name}">${mod.name}</option>`)
-                .join('');
-
+            const activeModulesHtml = sortedModules.filter(m => m.activation === 'Active').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
+            const passiveModulesHtml = sortedModules.filter(m => m.activation === 'Passive').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
             const defaultOption = `<option value="None">None</option>`;
-            
-            const finalModuleOptions = `
-                ${defaultOption}
-                <optgroup label="Active Modules">
-                    ${activeModulesHtml}
-                </optgroup>
-                <optgroup label="Passive Modules">
-                    ${passiveModulesHtml}
-                </optgroup>
-            `;
+            const finalModuleOptions = `${defaultOption}<optgroup label="Active Modules">${activeModulesHtml}</optgroup><optgroup label="Passive Modules">${passiveModulesHtml}</optgroup>`;
 
             let newModuleSlotsHtml = '';
             for (let i = 1; i <= 3; i++) {
                 const isDisabled = i > newMaxSlots;
                 const slotText = isDisabled ? `--- SLOT DISABLED (${newMaxSlots} Slots Max) ---` : `Module Slot ${i}`;
-                const initialValue = 'None'; 
                 const disabledClass = isDisabled ? 'opacity-50' : '';
-
                 const oldSelect = document.getElementById(`${armUniqueId}-mod${i}`);
-                const retainedValue = oldSelect && !isDisabled ? oldSelect.value : initialValue;
-                
-                // Determine if we show toggle
+                const retainedValue = oldSelect && !isDisabled ? oldSelect.value : 'None'; 
                 const retainedModule = powerModules.find(m => m.name === retainedValue);
                 const showToggle = retainedModule && retainedModule.activation === 'Active';
                 const toggleDisplay = showToggle ? 'flex' : 'hidden';
-                
                 const toggleContainerId = `${armUniqueId}-mod${i}-toggle-container`;
                 const toggleId = `${armUniqueId}-mod${i}-active-toggle`;
-                
-                // Check previous toggle state if it existed to preserve "Checked/Unchecked" state
                 const oldToggle = document.getElementById(toggleId);
-                const wasChecked = oldToggle ? oldToggle.checked : true; // Default true
+                const wasChecked = oldToggle ? oldToggle.checked : true; 
 
-                // Use REPLACE to set selected, messy but functional for string injection
                 let options = isDisabled ? `<option value="None">${slotText}</option>` : finalModuleOptions.replace(`value="${retainedValue}"`, `value="${retainedValue}" selected`);
 
                 newModuleSlotsHtml += `
                     <div class="flex items-center gap-2 mb-3">
-                        <select id="${armUniqueId}-mod${i}" class="arm-module-select flex-grow p-3 rounded-lg bg-[#161b22] border border-[#30363d] text-white ${disabledClass}" 
-                                onchange="checkModuleActive(this, '${toggleContainerId}'); calculate()" value="${retainedValue}" ${isDisabled ? 'disabled' : ''}>
+                        <select id="${armUniqueId}-mod${i}" class="arm-module-select flex-grow p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] ${disabledClass}" 
+                                onchange="checkModuleActive(this, '${toggleContainerId}'); calculate()" ${isDisabled ? 'disabled' : ''}>
                             ${options}
                         </select>
-                        <div id="${toggleContainerId}" class="${toggleDisplay} flex-col items-center justify-center bg-[#161b22] border border-blue-900/30 rounded px-2 py-1 h-full ml-1 min-h-[50px] min-w-[60px]">
+                        <div id="${toggleContainerId}" class="${toggleDisplay} flex-col items-center justify-center bg-[var(--bg-input)] border border-[var(--border-blue)] rounded px-2 py-1 h-full ml-1 min-h-[50px] min-w-[60px]">
                             <span class="text-[9px] text-blue-300 font-bold mb-1 leading-none uppercase tracking-wide">Active</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="${toggleId}" class="sr-only peer" ${wasChecked ? 'checked' : ''} onchange="calculate()">
                                 <div class="w-8 h-4 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
                             </label>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
-
             slotContainer.innerHTML = newModuleSlotsHtml;
         }
 
@@ -913,54 +848,40 @@
             const selectElement = document.getElementById('shipSelectToAdd');
             const selectedShipId = selectElement.value;
             const shipData = ships.find(s => s.id === selectedShipId);
-
             if (!shipData) return;
 
-            const placeholder = container.querySelector('p.text-gray-500');
-            if (placeholder) {
-                placeholder.remove();
-            }
+            const placeholder = document.getElementById('empty-state-msg');
+            if (placeholder) placeholder.remove();
             
             for (let i = 1; i <= shipData.arms; i++) {
                 const armHtml = createArmConfigHtml(i, shipData);
                 container.insertAdjacentHTML('beforeend', armHtml);
             }
-            
             calculate();
         }
 
         function removeArmConfig(armId) {
             const armElement = document.getElementById(armId);
-            if (armElement) {
-                armElement.remove();
-            }
+            if (armElement) armElement.remove();
             
             const container = document.getElementById('multiShipContainer');
             if (container.children.length === 0) {
                 container.innerHTML = `
-                    <p class="text-center text-gray-500 p-4 border border-dashed border-gray-700 rounded-lg">
+                    <p id="empty-state-msg" class="text-center text-[var(--text-muted)] text-sm p-4 border border-dashed border-[var(--border-main)] rounded-lg">
                         Add ships above to configure their mining laser heads.
-                    </p>
-                `;
+                    </p>`;
             }
             calculate();
         }
 
-        // --- UPDATED: Reverted to Hardcoded Images for reliability ---
         function updateShipImage() {
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             const selectedShipId = shipSelectElement.value;
             const imageElement = document.getElementById('selectedShipImage');
-
-            // Hardcoded mapping to ensure correct display without relying on data array
             let imageUrl = '';
-            if (selectedShipId === 'mole') {
-                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true";
-            } else if (selectedShipId === 'prospector') {
-                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true";
-            } else if (selectedShipId === 'golem') {
-                imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true";
-            }
+            if (selectedShipId === 'mole') imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true";
+            else if (selectedShipId === 'prospector') imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true";
+            else if (selectedShipId === 'golem') imageUrl = "https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true";
 
             if (imageUrl) {
                 imageElement.src = imageUrl;
@@ -971,48 +892,68 @@
         }
 
         function populateSelects() {
-            // --- ROBUST SHIP LIST POPULATION ---
             const shipSelectElement = document.getElementById('shipSelectToAdd');
             if (shipSelectElement && ships.length > 0) {
                 shipSelectElement.innerHTML = ships.map((ship) => 
                     `<option value="${ship.id}">${ship.name} (Laser Heads: ${ship.arms})</option>`
                 ).join('');
                 shipSelectElement.value = 'mole';
-                
-                // Initial image load
                 updateShipImage();
-            } else {
-                console.error("populateSelects error: Element not found or ships array empty.");
             }
-            
-            // --- ROBUST GADGET LIST POPULATION ---
-            const gadgetSelectElement = document.getElementById('gadgetSelect');
-            if (gadgetSelectElement && gadgets.length > 0) {
-                const defaultGadget = gadgets.find(g => g.name === "None");
-                gadgetSelectElement.innerHTML = gadgets.map(g =>
-                    `<option value="${g.name}" ${g === defaultGadget ? 'selected' : ''}>${g.name}</option>`
-                ).join('');
-
-                if (defaultGadget) {
-                    gadgetSelectElement.value = defaultGadget.name;
-                }
-            }
-            
+            // Populate Visual Gadgets List instead of Select
+            populateGadgetList();
             calculate(); 
+        }
+
+        function populateGadgetList() {
+            const listContainer = document.getElementById('gadget-list-container');
+            if (!listContainer) return;
+
+            let html = '';
+            gadgets.forEach((gadget, index) => {
+                // Generate unique ID
+                const gadgetToggleId = `gadget-toggle-${index}`;
+                // Default check 'None'
+                const isChecked = gadget.name === "None" ? 'checked' : ''; 
+                // Determine styling based on type
+                let typeColor = 'text-gray-400';
+                if(gadget.type === 'Multiplicative') typeColor = 'text-purple-400';
+                else if(gadget.type === 'Additive') typeColor = 'text-blue-400';
+                else if(gadget.type === 'Utility') typeColor = 'text-green-400';
+
+                html += `
+                <div class="relative flex items-center justify-between p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] hover:border-blue-500/50 transition-colors cursor-pointer" onclick="document.getElementById('${gadgetToggleId}').click()">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-sm font-bold text-[var(--text-main)]">${gadget.name.split('(')[0]}</h4>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-main)] bg-[var(--bg-card)] ${typeColor}">${gadget.type}</span>
+                        </div>
+                        <p class="text-xs text-[var(--text-muted)] mt-0.5">${gadget.desc}</p>
+                    </div>
+                    <div class="ml-3">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="radio" name="activeGadget" value="${gadget.name}" id="${gadgetToggleId}" class="gadget-radio sr-only peer" ${isChecked} onchange="handleGadgetToggle(this)">
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        function handleGadgetToggle(radioInput) {
+            // Update hidden input for compatibility
+            const hiddenInput = document.getElementById('gadgetSelect');
+            if(hiddenInput) hiddenInput.value = radioInput.value;
+            calculate();
         }
 
         function assessDifficulty(instability, resistance) {
             let difficultyScore = resistance * 1.5 + instability;
-            
-            if (difficultyScore >= 100) {
-                return { text: "EXTREME: Very high instability and resistance. Requires exceptional skill and stability modules.", color: "text-red-500" };
-            } else if (difficultyScore >= 60) {
-                return { text: "HARD: High instability/resistance. Requires specialized modules (Forel/Torrent) for safe charging.", color: "text-orange-400" };
-            } else if (difficultyScore >= 30) {
-                return { text: "MODERATE: Average difficulty. Standard play should be fine, but stability modules are helpful.", color: "text-yellow-300" };
-            } else {
-                return { text: "EASY: Low difficulty rock. Minimal risk of overheating or explosion.", color: "text-green-400" };
-            }
+            if (difficultyScore >= 100) return { text: "EXTREME: Very high instability and resistance. Requires exceptional skill and stability modules.", color: "text-red-500" };
+            else if (difficultyScore >= 60) return { text: "HARD: High instability/resistance. Requires specialized modules (Forel/Torrent) for safe charging.", color: "text-orange-400" };
+            else if (difficultyScore >= 30) return { text: "MODERATE: Average difficulty. Standard play should be fine, but stability modules are helpful.", color: "text-yellow-500" };
+            else return { text: "EASY: Low difficulty rock. Minimal risk of overheating or explosion.", color: "text-green-500" };
         }
 
         function updateCharts(effectivePower, requiredPower, finalResistance, finalInstability, rockMass) {
@@ -1021,6 +962,10 @@
             const resistanceCanvas = document.getElementById('resistanceChart');
 
             if (!powerCanvas || !modCanvas || !resistanceCanvas) return;
+
+            const style = getComputedStyle(document.body);
+            const gridColor = style.getPropertyValue('--chart-grid').trim();
+            const textColor = style.getPropertyValue('--chart-text').trim();
 
             const powerCtx = powerCanvas.getContext('2d');
             const modCtx = modCanvas.getContext('2d');
@@ -1045,14 +990,8 @@
                     datasets: [{
                         label: 'Power',
                         data: [dataPower, dataRequired],
-                        backgroundColor: [
-                            success ? '#10b981' : '#f87171',
-                            '#3b82f6', 
-                        ],
-                        borderColor: [
-                            success ? '#059669' : '#dc2626',
-                            '#2563eb',
-                        ],
+                        backgroundColor: [success ? '#10b981' : '#f87171', '#3b82f6'],
+                        borderColor: [success ? '#059669' : '#dc2626', '#2563eb'],
                         borderWidth: 1,
                         borderRadius: 4
                     }]
@@ -1064,17 +1003,12 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        title: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.x !== null) {
-                                        label += (context.parsed.x * 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MW';
-                                    }
+                                    if (label) label += ': ';
+                                    if (context.parsed.x !== null) label += (context.parsed.x * 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' MW';
                                     return label;
                                 }
                             }
@@ -1085,94 +1019,52 @@
                             min: 0,
                             max: dataMax,
                             ticks: {
-                                callback: function(value) {
-                                    return value.toFixed(0) + ' kMW';
-                                },
-                                color: '#9ca3af' 
+                                callback: function(value) { return value.toFixed(0) + ' kMW'; },
+                                color: textColor 
                             },
-                            grid: { color: '#374151' } 
+                            grid: { color: gridColor } 
                         },
                         y: {
-                            ticks: { color: '#e5e7eb' },
+                            ticks: { color: textColor },
                             grid: { display: false }
                         }
                     }
                 }
             });
 
-            const resValue = finalResistance;
-            const instabValue = finalInstability;
-            
-            // Calculate Risk Profile
-            // Base assumes a "Safe Capacity" of 100. 
-            // Any sum of Resistance + Instability reduces the Safe Margin.
-            let safeMargin = 100 - (resValue + instabValue);
-            if (safeMargin < 0) safeMargin = 0; // Prevent negative margin if risks are extreme
-
-            const totalProfileData = [resValue, instabValue, safeMargin];
+            let safeMargin = 100 - (finalResistance + finalInstability);
+            if (safeMargin < 0) safeMargin = 0; 
 
             modChart = new Chart(modCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: [
-                        `Resistance (${resValue.toFixed(1)}%)`, 
-                        `Instability (${instabValue.toFixed(2)}%)`,
-                        `Safe Margin (${safeMargin.toFixed(1)}%)`
-                    ],
+                    labels: [`Resistance (${finalResistance.toFixed(1)}%)`, `Instability (${finalInstability.toFixed(2)}%)`, `Safe Margin (${safeMargin.toFixed(1)}%)`],
                     datasets: [{
-                        label: 'Risk Contribution',
-                        data: totalProfileData,
-                        backgroundColor: [
-                            'rgba(239, 68, 68, 0.9)', // Red (Resistance)
-                            'rgba(147, 51, 234, 0.9)', // Purple (Instability)
-                            'rgba(55, 65, 81, 0.5)'    // Dark Grey (Safe Margin)
-                        ],
-                        borderColor: '#161b22',
-                        borderWidth: 2,
+                        data: [finalResistance, finalInstability, safeMargin],
+                        backgroundColor: ['rgba(239, 68, 68, 0.9)', 'rgba(234, 179, 8, 0.9)', 'rgba(55, 65, 81, 0.5)'],
+                        borderColor: 'transparent',
+                        borderWidth: 0,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#e5e7eb',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        title: {
-                            display: false, // Title handled by HTML header
-                        },
-                        tooltip: {
-                             callbacks: {
-                                label: (context) => {
-                                    const value = context.raw;
-                                    return `${context.label}`;
-                                }
-                            }
-                        }
+                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } }
                     },
                     cutout: '60%' 
                 }
             });
 
-            // --- Chart 3: Resistance Curve Data Generation ---
             const resLabels = [];
             const reqData = [];
             const myPowerData = [];
-            
-            // Sweep Resistance from 0 to 100%
             for(let i=0; i<=100; i+=5) {
                 resLabels.push(i + '%');
-                // Calculate required power using tool logic: (mass * (1 - resistanceDecimal)) / 5
                 let decimal = i / 100.0;
                 let req = (rockMass * (1.0 - decimal)) / 5.0;
-                reqData.push(req / 1000); // Convert to kMW
-                myPowerData.push(effectivePower / 1000); // My power is constant relative to Rock Resistance in this model
+                reqData.push(req / 1000); 
+                myPowerData.push(effectivePower / 1000); 
             }
             
             resistanceChart = new Chart(resistanceCtx, {
@@ -1180,69 +1072,29 @@
                 data: {
                     labels: resLabels,
                     datasets: [
-                        {
-                            label: 'Team Power',
-                            data: myPowerData,
-                            borderColor: '#3b82f6', // Blue
-                            backgroundColor: '#3b82f6',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            pointHoverRadius: 5
-                        },
-                        {
-                            label: 'Required Power (Calc)',
-                            data: reqData,
-                            borderColor: '#fbbf24', // Amber/Yellow
-                            backgroundColor: '#fbbf24',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                            pointHoverRadius: 5
-                        }
+                        { label: 'Team Power', data: myPowerData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 },
+                        { label: 'Required Power (Calc)', data: reqData, borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 5 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: {
-                            labels: { color: '#9ca3af', font: { size: 10 } }
-                        },
-                        title: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' kMW';
-                                }
-                            }
-                        }
+                        legend: { labels: { color: textColor, font: { size: 10 } } },
+                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' kMW'; } } }
                     },
                     scales: {
-                         x: {
-                            ticks: { color: '#9ca3af', maxTicksLimit: 11 },
-                            grid: { color: '#374151' },
-                            title: { display: true, text: 'Resistance %', color: '#6b7280', font: { size: 10 } }
-                        },
-                        y: {
-                            ticks: { color: '#9ca3af' },
-                            grid: { color: '#374151' },
-                            title: { display: true, text: 'Power (kMW)', color: '#6b7280', font: { size: 10 } }
-                        }
+                         x: { ticks: { color: textColor, maxTicksLimit: 11 }, grid: { color: gridColor }, title: { display: true, text: 'Resistance %', color: textColor, font: { size: 10 } } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor }, title: { display: true, text: 'Power (kMW)', color: textColor, font: { size: 10 } } }
                     }
                 }
             });
         }
 
-        // --- ENHANCED RECOMMENDATION ENGINE ---
         function generateSmartLoadouts(mass, res, inst, reqPwr, currentPwr) {
-            // Helper to calc stats for a single laser + modules
             const calcLoadout = (laser, activeM, passiveM1, passiveM2) => {
                 const modules = [activeM, passiveM1, passiveM2].filter(Boolean);
-                
                 let pwrMult = 1.0;
                 let resEff = laser.resistanceEffect;
                 let instEff = laser.instabilityEffect;
@@ -1265,17 +1117,7 @@
                 return {
                     laser: laser,
                     modules: modules,
-                    stats: {
-                        power: laser.power * pwrMult,
-                        resistanceRed: resEff,
-                        instability: instEff,
-                        window: winMult,
-                        extraction: extrMult,
-                        inert: inertMult,
-                        shatter: shatter,
-                        chargeRate: chargeRate,
-                        overcharge: overcharge
-                    }
+                    stats: { power: laser.power * pwrMult, resistanceRed: resEff, instability: instEff, window: winMult, extraction: extrMult, inert: inertMult, shatter: shatter, chargeRate: chargeRate, overcharge: overcharge }
                 };
             };
 
@@ -1283,7 +1125,6 @@
             const size1Heads = allLaserHeads.filter(h => h.size === 1);
             const golemHead = allLaserHeads.find(h => h.name.includes("Pitman"));
 
-            // Define Meta Modules
             const modSurge = powerModules.find(m => m.name.includes("Surge"));
             const modStampede = powerModules.find(m => m.name.includes("Stampede"));
             const modRieger = powerModules.find(m => m.name.includes("Rieger-C3"));
@@ -1292,41 +1133,22 @@
             const modTorrent = powerModules.find(m => m.name.includes("Torrent III"));
             const modXtr = powerModules.find(m => m.name.includes("XTR-XL"));
 
-            // 1. MOLE Loadouts
             const breakerLaser = size2Heads.find(h => h.name.includes("Helix II")) || size2Heads[0];
             const breakerLoadout = calcLoadout(breakerLaser, modSurge, modRieger, modRieger);
-
             const surgeonLaser = size2Heads.find(h => h.name.includes("Lancet MH2")) || size2Heads[0];
             const surgeonLoadout = calcLoadout(surgeonLaser, modBrandt, modFocus, modFocus);
-
             const vacuumLaser = size2Heads.find(h => h.name.includes("Impact II")) || size2Heads[0];
             const vacuumLoadout = calcLoadout(vacuumLaser, null, modTorrent, modXtr);
-
-            // 2. Solo Loadouts (Prospector)
             const soloLaser = size1Heads.find(h => h.name.includes("Helix I")) || size1Heads[0];
             const soloLoadout = calcLoadout(soloLaser, modSurge, modRieger, null);
+            const golemLoadout = calcLoadout(golemHead, modSurge, modRieger, null);
 
-             // 3. Solo Loadouts (Golem) - Using Pitman (Fixed)
-             // Modules: Surge (Active) + Rieger (Passive) to maximize fixed head power
-             const golemLoadout = calcLoadout(golemHead, modSurge, modRieger, null);
-
-            // 4. Extra Ship Calculation
             let extraShipRec = null;
             if (reqPwr > currentPwr) {
                 const deficit = reqPwr - currentPwr;
-                
-                // Option A: Prospector
-                const prospectorPower = soloLoadout.stats.power; 
-                const prospectorsNeeded = Math.ceil(deficit / prospectorPower);
-                
-                // Option B: Golem
-                const golemPower = golemLoadout.stats.power;
-                const golemsNeeded = Math.ceil(deficit / golemPower);
-
-                // Option C: MOLE (3x Breaker Loadout Power)
-                const molePower = breakerLoadout.stats.power * 3;
-                const molesNeeded = Math.ceil(deficit / molePower);
-
+                const prospectorsNeeded = Math.ceil(deficit / soloLoadout.stats.power);
+                const golemsNeeded = Math.ceil(deficit / golemLoadout.stats.power);
+                const molesNeeded = Math.ceil(deficit / (breakerLoadout.stats.power * 3));
                 extraShipRec = {
                     primary: { count: prospectorsNeeded, type: "Prospector" },
                     secondary: { count: golemsNeeded, type: "Golem" },
@@ -1341,7 +1163,7 @@
                     { role: "Laser 3: Vacuum", ...vacuumLoadout, desc: "Max Extraction Speed" }
                 ],
                 prospector: { role: "Balanced Solo", ...soloLoadout, desc: "General Purpose" },
-                golem: { role: "Golem Optimized", ...golemLoadout, desc: "Fixed Head (Pitman)" }, // New Golem specific recommendation
+                golem: { role: "Golem Optimized", ...golemLoadout, desc: "Fixed Head (Pitman)" }, 
                 extra: extraShipRec
             };
         }
@@ -1354,10 +1176,10 @@
             const allArms = document.querySelectorAll('.ship-arm-card');
             
             if (allArms.length === 0) {
-                displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-gray-400');
+                displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-[var(--text-muted)]');
                 if (aiSection) aiSection.classList.add('hidden');
-                if (configsContainer) configsContainer.innerHTML = `<p class="text-center text-gray-400 italic">Max power configs will appear here.</p>`;
-                if (warningsContainer) warningsContainer.innerHTML = `<p class="text-center text-gray-400 italic">Warnings will appear here.</p>`;
+                if (configsContainer) configsContainer.innerHTML = `<p class="text-center text-[var(--text-muted)] italic">Max power configs will appear here.</p>`;
+                if (warningsContainer) warningsContainer.innerHTML = `<p class="text-center text-[var(--text-muted)] italic">Warnings will appear here.</p>`;
                 if (powerChart) { powerChart.destroy(); powerChart = null; }
                 if (modChart) { modChart.destroy(); modChart = null; }
                 if (resistanceChart) { resistanceChart.destroy(); resistanceChart = null; }
@@ -1367,7 +1189,6 @@
             let totalEffectiveLaserPower = 0;
             let totalResistanceMultiplier = 1.0; 
             let totalInstabilityMultiplier = 1.0; 
-            let validationError = false;
             let activeArmsCount = 0;
 
             allArms.forEach(arm => {
@@ -1376,10 +1197,16 @@
                 const isEnabled = isEnabledCheck ? isEnabledCheck.checked : true;
                 if (!isEnabled) return;
                 
+                const laserSelect = document.getElementById(`${armUniqueId}-laser`);
+                // FIX: Safety check to prevent crash if DOM element is missing
+                if (!laserSelect) return; 
+
                 activeArmsCount++;
                 const maxModules = parseInt(arm.dataset.maxModules);
-                const laserSelect = document.getElementById(`${armUniqueId}-laser`);
-                const basePower = parseFloat(laserSelect ? laserSelect.value : '0');
+                const basePower = parseFloat(laserSelect.value || '0');
+                
+                // FIX: Check if option exists
+                if (laserSelect.selectedIndex === -1) return;
                 const selectedOption = laserSelect.options[laserSelect.selectedIndex];
                 
                 let armResMult = 1.0 + (parseFloat(selectedOption.getAttribute('data-resistance')) || 0) / 100;
@@ -1404,7 +1231,6 @@
                         }
                     }
                 }
-                
                 totalResistanceMultiplier *= armResMult;
                 totalInstabilityMultiplier *= armInstMult;
                 totalEffectiveLaserPower += basePower * modPowerMult;
@@ -1418,6 +1244,7 @@
 
             const baseResistance = parseFloat(document.getElementById('resistance').value);
             const initialInstability = parseFloat(document.getElementById('instability').value);
+            // USE HIDDEN INPUT VALUE FROM VISUAL LIST
             const gadgetSelect = document.getElementById('gadgetSelect');
             const selectedGadget = gadgets.find(g => g.name === gadgetSelect.value);
             const rockMass = parseFloat(document.getElementById('rockMass').value);
@@ -1443,154 +1270,153 @@
             }
             const isSuccess = breakableMassLimit >= rockMass;
 
-            currentSimState = {
-                mass: rockMass,
-                resistance: finalEffectiveResistance,
-                instability: finalModifiedInstability,
-                power: totalEffectiveLaserPower,
-                success: isSuccess,
-                activeArms: activeArmsCount
-            };
+            currentSimState = { mass: rockMass, resistance: finalEffectiveResistance, instability: finalModifiedInstability, power: totalEffectiveLaserPower, success: isSuccess, activeArms: activeArmsCount };
             if (aiSection) aiSection.classList.remove('hidden');
 
             const formattedEffectivePower = totalEffectiveLaserPower.toLocaleString(undefined, { maximumFractionDigits: 0 });
             const verdictClass = isSuccess ? 'bg-green-700/80' : 'bg-red-700/80';
             const verdictIcon = isSuccess ? '✅' : '❌';
             const verdictText = isSuccess ? 'FRACTURE SUCCESSFUL' : 'POWER INSUFFICIENT';
-            
             const difficulty = assessDifficulty(finalModifiedInstability, finalEffectiveResistance);
 
             resultsContainer.innerHTML = `
-                <div class="space-y-6 text-white text-center">
+                <div class="space-y-6 text-[var(--text-main)] text-center">
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
-                            <p class="text-sm text-gray-400">Final Resistance</p>
+                        <div class="p-3 rounded-xl bg-[var(--bg-card)] shadow-inner border border-[var(--border-main)]">
+                            <p class="text-sm text-[var(--text-muted)]">Final Resistance</p>
                             <p class="text-3xl font-extrabold text-red-400 mt-1">${finalEffectiveResistance.toFixed(1)}%</p>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#21262d] shadow-inner border border-gray-700">
-                            <p class="text-sm text-gray-400">Final Instability</p>
+                        <div class="p-3 rounded-xl bg-[var(--bg-card)] shadow-inner border border-[var(--border-main)]">
+                            <p class="text-sm text-[var(--text-muted)]">Final Instability</p>
                             <p class="text-3xl font-extrabold text-purple-400 mt-1">${finalModifiedInstability.toFixed(1)}%</p>
                         </div>
                     </div>
-                    <div class="p-3 rounded-xl bg-indigo-900/40 shadow-inner border border-indigo-700">
-                        <p class="text-sm text-gray-400">Total Effective Power</p>
-                        <p class="text-4xl font-extrabold text-yellow-300 mt-1">${formattedEffectivePower} MW</p>
+                    <div class="p-3 rounded-xl bg-[var(--bg-card)] shadow-inner border border-indigo-700">
+                        <p class="text-sm text-[var(--text-muted)]">Total Effective Power</p>
+                        <p class="text-4xl font-extrabold text-yellow-500 mt-1">${formattedEffectivePower} MW</p>
                     </div>
                     <div class="p-4 rounded-xl font-semibold text-lg text-white ${verdictClass} shadow-xl">
                         <p class="text-2xl">${verdictIcon} ${verdictText}</p>
                         <p class="text-xs font-normal mt-1 opacity-80">Req: ${requiredEffectivePower.toFixed(0)} MW</p>
                     </div>
-                    <div class="p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                    <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border-main)]">
                         <p class="mt-1 font-bold ${difficulty.color}">${difficulty.text}</p>
                     </div>
                 </div>
             `;
 
-            // --- GENERATE SMART RECOMMENDATIONS ---
             const recommendations = generateSmartLoadouts(rockMass, baseResistance, initialInstability, requiredEffectivePower, totalEffectiveLaserPower);
             
             const renderCard = (rec, colorClass) => {
                 const mods = rec.modules.map(m => m.name.replace(/\(Active\)|\(Passive\)/g, '').trim()).join(' + ');
                 return `
-                <div class="mb-4 p-3 rounded-xl bg-[#161b22] border border-gray-700 shadow-md">
-                    <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
+                <div class="mb-4 p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-main)] shadow-md">
+                    <div class="flex justify-between items-center border-b border-[var(--border-main)] pb-2 mb-2">
                         <div>
                             <h4 class="text-sm font-bold ${colorClass}">${rec.role}</h4>
-                            <p class="text-[10px] text-gray-400 uppercase tracking-wider">${rec.desc}</p>
+                            <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">${rec.desc}</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-xs font-mono text-white bg-gray-800 px-2 py-1 rounded">${rec.laser.name}</span>
+                            <span class="text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] px-2 py-1 rounded">${rec.laser.name}</span>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-gray-400 font-mono mb-2">
-                        <div class="bg-gray-800/50 rounded p-1">
-                            <div class="text-yellow-400 font-bold text-xs">${(rec.stats.power/1000).toFixed(1)}k</div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-[var(--text-muted)] font-mono mb-2">
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
+                            <div class="text-yellow-500 font-bold text-xs">${(rec.stats.power/1000).toFixed(1)}k</div>
                             <div>PWR</div>
                         </div>
-                        <div class="bg-gray-800/50 rounded p-1">
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
                             <div class="text-red-400 font-bold text-xs">${rec.stats.resistanceRed > 0 ? '+' : ''}${rec.stats.resistanceRed.toFixed(0)}%</div>
                             <div>RES</div>
                         </div>
-                        <div class="bg-gray-800/50 rounded p-1">
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
                             <div class="text-purple-400 font-bold text-xs">${rec.stats.instability > 0 ? '+' : ''}${rec.stats.instability.toFixed(0)}%</div>
                             <div>INST</div>
                         </div>
-                        <div class="bg-gray-800/50 rounded p-1">
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
                             <div class="text-blue-400 font-bold text-xs">${rec.stats.window.toFixed(1)}x</div>
                             <div>WIN</div>
                         </div>
-                        <div class="bg-gray-800/50 rounded p-1">
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
                             <div class="text-green-400 font-bold text-xs">${rec.stats.extraction.toFixed(1)}x</div>
                             <div>EXTR</div>
                         </div>
-                        <div class="bg-gray-800/50 rounded p-1">
-                            <div class="text-gray-300 font-bold text-xs">${(rec.stats.inert * 100).toFixed(0)}%</div>
+                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
+                            <div class="text-[var(--text-main)] font-bold text-xs">${(rec.stats.inert * 100).toFixed(0)}%</div>
                             <div>INERT</div>
                         </div>
                     </div>
-                    <div class="text-xs text-gray-500 border-t border-gray-800 pt-2 flex justify-between">
-                       <span>Modules: <span class="text-gray-300">${mods}</span></span>
+                    <div class="text-xs text-[var(--text-muted)] border-t border-[var(--border-main)] pt-2 flex justify-between">
+                       <span>Modules: <span class="text-[var(--text-strong)] font-semibold">${mods}</span></span>
                     </div>
                 </div>`;
             };
 
             let recHtml = `<div class="space-y-2">`;
             
-            // --- NEW: EXTRA SHIP RECOMMENDATION ---
             if (recommendations.extra) {
+                const deficit = (requiredEffectivePower - totalEffectiveLaserPower).toFixed(0);
                 recHtml += `
-                <div class="p-3 mb-4 rounded-xl bg-red-900/40 border border-red-500 shadow-lg animate-pulse">
-                    <h4 class="text-sm font-extrabold text-red-300 uppercase flex items-center gap-2">
-                        <span>⚠️</span> Reinforcements Required
-                    </h4>
-                    <p class="text-xs text-gray-300 mt-1 mb-2">
-                        Power Deficit: <span class="font-bold text-white">${(requiredEffectivePower - totalEffectiveLaserPower).toFixed(0)} MW</span>
-                    </p>
-                    <div class="grid grid-cols-2 gap-2 text-center text-xs font-bold text-white">
-                        <div class="bg-black/30 p-2 rounded">
-                            +${recommendations.extra.primary.count}x ${recommendations.extra.primary.type}
+                <div class="mb-6 p-5 rounded-xl border border-red-500/30 bg-red-500/10 relative overflow-hidden">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+                        <h4 class="text-sm font-black text-red-500 uppercase tracking-widest flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Reinforcements Required
+                        </h4>
+                        <span class="text-xs font-mono font-bold text-red-600 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded border border-red-500/20">
+                            MISSING POWER: ${deficit} MW
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-2">
+                        <!-- Option A -->
+                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold">A</div>
+                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
+                            </div>
+                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.primary.count}x <span class="text-green-500">Prospector</span></span>
                         </div>
-                        <div class="flex items-center justify-center text-gray-400 text-[10px] uppercase">
-                            - OR -
+                        
+                        <!-- Option B -->
+                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center text-xs font-bold">B</div>
+                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
+                            </div>
+                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.secondary.count}x <span class="text-orange-500">Golem</span></span>
                         </div>
-                        <div class="bg-black/30 p-2 rounded col-span-2">
-                            +${recommendations.extra.secondary.count}x ${recommendations.extra.secondary.type}
-                        </div>
-                        <div class="flex items-center justify-center text-gray-400 text-[10px] uppercase col-span-2">
-                            - OR -
-                        </div>
-                        <div class="bg-black/30 p-2 rounded col-span-2">
-                            +${recommendations.extra.tertiary.count}x ${recommendations.extra.tertiary.type}
+
+                        <!-- Option C -->
+                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center text-xs font-bold">C</div>
+                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
+                            </div>
+                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.tertiary.count}x <span class="text-indigo-500">MOLE</span></span>
                         </div>
                     </div>
                 </div>
                 `;
             }
 
-            recHtml += `<h3 class="text-xs font-bold text-gray-500 uppercase mb-2 text-center border-b border-gray-800 pb-1">Recommended Loadouts</h3>`;
-            
-            // Updated grouping and ordering:
-            // 1. MOLE Group
-            recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
+            recHtml += `<h3 class="text-xs font-bold text-[var(--text-muted)] uppercase mb-2 text-center border-b border-[var(--border-main)] pb-1">Recommended Loadouts</h3>`;
+            recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
             recHtml += `<h4 class="text-xs font-bold text-indigo-400 uppercase mb-2 text-center">MOLE (Size 2)</h4>`;
-            recHtml += renderCard(recommendations.mole[0], 'text-red-400'); // Breaker
-            recHtml += renderCard(recommendations.mole[1], 'text-blue-400'); // Surgeon
-            recHtml += renderCard(recommendations.mole[2], 'text-green-400'); // Vacuum
+            recHtml += renderCard(recommendations.mole[0], 'text-red-400');
+            recHtml += renderCard(recommendations.mole[1], 'text-blue-400');
+            recHtml += renderCard(recommendations.mole[2], 'text-green-500');
             recHtml += `</div>`;
-
-            // 2. Prospector Group
-            recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
-            recHtml += `<h4 class="text-xs font-bold text-green-400 uppercase mb-2 text-center">Prospector (Size 1)</h4>`;
-            recHtml += renderCard(recommendations.prospector, 'text-yellow-400'); // Solo
+            recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
+            recHtml += `<h4 class="text-xs font-bold text-green-500 uppercase mb-2 text-center">Prospector (Size 1)</h4>`;
+            recHtml += renderCard(recommendations.prospector, 'text-yellow-500');
             recHtml += `</div>`;
-            
-             // 3. Golem Group
-             recHtml += `<div class="mb-4 border border-gray-700 rounded-xl p-2 bg-[#0d1117]/50">`;
+             recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
              recHtml += `<h4 class="text-xs font-bold text-orange-400 uppercase mb-2 text-center">Golem (Fixed S0)</h4>`;
-             recHtml += renderCard(recommendations.golem, 'text-orange-400'); // Golem
-             recHtml += `</div>`;
-
-            recHtml += `</div>`;
+             recHtml += renderCard(recommendations.golem, 'text-orange-400');
+             recHtml += `</div></div>`;
 
             configsContainer.innerHTML = recHtml;
             warningsContainer.innerHTML = ''; 
@@ -1598,15 +1424,11 @@
             updateCharts(totalEffectiveLaserPower, requiredEffectivePower, finalEffectiveResistance, finalModifiedInstability, rockMass);
         }
 
-        // ... (Existing OCR and Helper functions remain unchanged) ...
-        
         function displayResult(message, className) {
             document.getElementById('results').innerHTML = `<p class="text-center mt-4 ${className} font-bold text-lg">${message}</p>`;
         }
         
         // --- OCR FUNCTIONALITY ---
-
-        // 1. Paste Event Listener (Global)
         document.addEventListener('paste', function(e) {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let index in items) {
@@ -1614,19 +1436,17 @@
                 if (item.kind === 'file' && item.type.includes('image/')) {
                     const blob = item.getAsFile();
                     processOCR(blob);
-                    break; // Only process the first image found
+                    break; 
                 }
             }
         });
 
-        // 2. File Input Handler
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 processOCR(input.files[0]);
             }
         }
 
-        // 3. Main OCR Processing Function
         async function processOCR(imageBlob) {
             const loadingOverlay = document.getElementById('ocr-loading');
             const statusText = document.getElementById('ocr-status');
@@ -1635,23 +1455,13 @@
             statusText.innerText = "Preprocessing Image...";
 
             try {
-                // Create a worker
                 const worker = await Tesseract.createWorker();
-                
                 statusText.innerText = "Recognizing Text...";
-                
-                // Run recognition
                 const ret = await worker.recognize(imageBlob);
                 const text = ret.data.text;
-                
-                console.log("OCR Result:", text); // Debugging
                 statusText.innerText = "Parsing Data...";
-                
-                // Parse the text
                 applyScannedData(text);
-                
                 await worker.terminate();
-                
             } catch (err) {
                 console.error(err);
                 alert("Failed to scan image. Please ensure the screenshot is clear.");
@@ -1660,19 +1470,9 @@
             }
         }
 
-        // 4. Parse Regex & Update Inputs
         function applyScannedData(text) {
-            // Clean up common OCR misinterpretations for numbers (e.g., 'S' instead of '5', 'O' instead of '0')
-            // Note: Simple cleanup, complex cases might require specific handling
-            
-            // Regex Patterns optimized for Star Citizen UI
-            // Modified to capture digits separated by spaces (e.g., "1 6" which Tesseract might output)
-            // Strategy: Skip non-digits after label, then capture a sequence of digits/spaces/commas/dots
-            
-            // Define a capture group that must start with a digit, but can contain spaces, commas, or dots thereafter
             const numberGroup = "([\\d][\\d\\s,.]*)"; 
-            const separators = "[\\s:.]*"; // Strict separators to prevent jumping to the wrong number on the page
-
+            const separators = "[\\s:.]*"; 
             const massRegex = new RegExp("(?:Mass|Mas|M|Rock Mass)" + separators + numberGroup, "i");
             const resRegex = new RegExp("(?:Resistance|Res|Resist)" + separators + numberGroup, "i");
             const instRegex = new RegExp("(?:Instability|Inst|Stablity)" + separators + numberGroup, "i");
@@ -1682,44 +1482,26 @@
             const instMatch = text.match(instRegex);
 
             let updated = false;
-            
-            // Helper to clean captured string (remove spaces/commas, keep digits/dots)
             const parseValue = (str) => {
-                // Replace everything that isn't a digit or a dot
-                // This handles "1 6" -> "16", "4,500" -> "4500", "16.5" -> "16.5"
                 const cleaned = str.replace(/[^\d.]/g, '');
                 return parseFloat(cleaned);
             };
 
             if (massMatch && massMatch[1]) {
                 const val = parseValue(massMatch[1]);
-                if (!isNaN(val)) {
-                    document.getElementById('rockMass').value = val;
-                    updated = true;
-                }
+                if (!isNaN(val)) { document.getElementById('rockMass').value = val; updated = true; }
             }
-
             if (resMatch && resMatch[1]) {
                 const val = parseValue(resMatch[1]);
-                if (!isNaN(val)) {
-                    document.getElementById('resistance').value = val;
-                    updated = true;
-                }
+                if (!isNaN(val)) { document.getElementById('resistance').value = val; updated = true; }
             }
-
             if (instMatch && instMatch[1]) {
                 const val = parseValue(instMatch[1]);
-                if (!isNaN(val)) {
-                    document.getElementById('instability').value = val;
-                    updated = true;
-                }
+                if (!isNaN(val)) { document.getElementById('instability').value = val; updated = true; }
             }
 
             if (updated) {
-                // Trigger calculation to update charts
                 calculate();
-                
-                // Visual feedback
                 const container = document.getElementById('ocr-drop-zone');
                 container.classList.add('border-green-500');
                 setTimeout(() => container.classList.remove('border-green-500'), 2000);
@@ -1728,9 +1510,8 @@
             }
         }
 
-        // --- CRITICAL FIX: Ensure DOM is loaded before populating ---
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Populate Ship Select
+            initTheme(); // Initial theme setup
             populateSelects();
         });
 
