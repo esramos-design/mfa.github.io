@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">
-    <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mpa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
+    <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mFa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
   </a>
 
   <h1 align="center">Mining Fracture Analyser</h1>
