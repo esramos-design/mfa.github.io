@@ -27,177 +27,171 @@
 </div>
 
 
-# **Overview**
+## **📑 Table of Contents**
+
+1. [About The Project](https://www.google.com/search?q=%23-about-the-project)  
+2. [Key Features](https://www.google.com/search?q=%23-key-features)  
+3. [User Guide: Windows App Installation](https://www.google.com/search?q=%23-user-guide-windows-app-installation)  
+4. [User Guide: Using the AI Foreman](https://www.google.com/search?q=%23-user-guide-using-the-ai-foreman)  
+5. [User Guide: OCR & Features](https://www.google.com/search?q=%23-user-guide-ocr--features)  
+6. [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
+7. [Developer Guide: Local Setup](https://www.google.com/search?q=%23-developer-guide-local-setup)  
+8. [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)  
+9. [Disclaimer & License](https://www.google.com/search?q=%23-disclaimer--license)
+
+## **📖 About The Project**
 
 The **Mining Fracture Analyser (MFA)** is a specialized calculation engine developed for Star Citizen industrial crews.
 
-Whether you are running a solo **Drake Golem**, a **MISC Prospector**, or coordinating a full **Argo MOLE** multi-crew, MFA calculates your **Total Combined Effective Laser Power (MW)** in real-time. It accounts for complex variables—Laser Power, Instability, Resistance, Distance, and Consumables—to provide a simple "Pass/Fail" verdict before you even activate your lasers.
+Star Citizen mining mechanics involve complex variables: Laser Power, Instability, Resistance, Distance, and Consumables. Guessing these values often results in **overheated rocks (catastrophic explosions)** or wasted time on rocks that are mathematically impossible to break.
 
-**Version 3.6** introduces the "Aerospace Platinum" light theme, updated support for the Drake Golem (Fixed Pitman Heads), and data sourced directly from **UEX Corp**.
+This tool solves that problem by calculating the **Total Combined Effective Laser Power** of your entire crew in real-time, providing a simple "Pass/Fail" verdict before you even activate your lasers.
 
-## **📑 Table of Contents**
-
-* [Key Features](https://www.google.com/search?q=%23-key-features)  
-* [User Guide: Installation & Setup](https://www.google.com/search?q=%23-user-guide-installation--setup)  
-* [User Guide: The AI Foreman](https://www.google.com/search?q=%23-user-guide-the-ai-foreman)  
-* [User Guide: OCR Auto-Scan](https://www.google.com/search?q=%23-user-guide-ocr-auto-scan)  
-* [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
-* [Contributing](https://www.google.com/search?q=%23-contributing)  
-* [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)
+**Version 3.6** introduces a standalone Windows Application wrapper and an advanced **AI Senior Foreman** powered by Google Gemini to provide tactical advice, risk assessments, and roleplay orders.
 
 ## **✨ Key Features**
 
-### **🛠️ Fleet Solutions & Smart Recommendations**
+### **🤖 AI Senior Foreman (Powered by Gemini)**
 
-The tool acts as a fleet commander, analyzing power deficits and recommending reinforcements.
+Your virtual crew chief. Located in the **Requirements Panel**, the AI analyzes your specific situation to provide:
 
-* **Reinforcement Calculator:** Automatically calculates how many extra ships are needed to break a rock (e.g., *"⚠️ Reinforcements Required: \+1x Prospector OR \+1x MOLE"*).  
-* **Role-Based MOLE Loadouts:** Suggests specialized configurations for multi-crew efficiency:  
-  * **Breaker:** Max Power/Fracture.  
-  * **Surgeon:** Max Stability/Window.  
-  * **Vacuum:** Max Extraction speed.
-
-### **🚀 Multi-Crew Fleet Simulation**
-
-Simulate any combination of ships currently in the game:
-
-* **Argo MOLE:** 3 Laser Heads (Configurable per head).  
-* **MISC Prospector:** 1 Laser Head.  
-* **Drake Golem:** Mining Turret Support (Fixed Pitman heads).  
-* **Heat Management:** Toggle individual heads on/off to simulate heat management strategies.
-
-### **⚡ Active Module Toggle**
-
-Granular control for **Active Modules** (e.g., Surge, Stampede, Brandt).
-
-* **ON:** The module's effects are applied. Use this to see if you can crack the rock *with* the module activated.  
-* **OFF:** The module's effects are ignored. Use this to simulate cooldowns or saving a charge.
-
-### **🤖 AI Senior Foreman**
-
-Powered by the **Google Gemini API**:
-
-* **Analyze Strategy:** Reads current rock stats and provides a strategic risk assessment (e.g., *"High Instability detected, recommend Stampede module"*).  
-* **Generate Orders:** Creates roleplay-ready "Command Uplink" text blocks for voice/text comms.
+* **Strategic Assessments:** "Is this rock safe? What modules do I need?"  
+* **Risk Reports:** Detailed breakdown of explosion probability.  
+* **Optimization Tips:** Mathematical suggestions to improve yield.  
+* **Roleplay Orders:** Generates "Command Uplink" text blocks for in-game chat.
 
 ### **📸 OCR Auto-Scan (Tesseract.js)**
 
 Don't waste time typing numbers while piloting.
 
-* **Paste & Go:** Take a screenshot of your mining UI and press Ctrl+V directly into the app.  
-* **Auto-Extraction:** Automatically extracts Mass, Resistance, and Instability.
+* **Step 1:** Take a screenshot of your mining UI.  
+* **Step 2:** Press Ctrl+V (Paste) directly into the app.  
+* **Result:** The app automatically extracts Mass, Resistance, and Instability.
+
+### **🚀 Multi-Crew Fleet Simulation**
+
+Simulate any combination of ships currently in the game:
+
+* **Argo MOLE** (3 Laser Heads) \- Configurable per head.  
+* **MISC Prospector** (1 Laser Head)  
+* **Drake Golem** (Mining Turret Support)  
+* *Heat Management:* Toggle individual heads on/off to simulate heat management strategies.
 
 ### **📊 Advanced Visual Analytics**
 
-* **Power Margin Chart:** Visualizes your power surplus vs. the rock's requirement.  
+We don't just show numbers; we visualize the physics:
+
+* **Power vs. Margin:** Visualizes your power surplus vs. the rock's requirement.  
 * **Risk Profile:** A Doughnut chart comparing Resistance, Instability, and your Safety Margin.  
 * **Resistance Curve:** A predictive line graph showing laser efficiency across the heating window.
 
-### **🎨 Themes**
+## **🛠 User Guide: Windows App Installation**
 
-* **Dark Mode:** The classic high-contrast interface.  
-* **Aerospace Platinum:** A new, clean light mode for high-visibility environments.
+This section is for players who want to run the tool as a standalone program (App Mode) on their PC.
 
-## **🛠 User Guide: Installation & Setup**
+### **Step 1: Install Python**
 
-You can use MFA in three ways depending on your preference.
+This app runs on Python. If you don't have it installed:
 
-### **Method 1: Live Web Version (Easiest)**
+1. Download Python from [python.org](https://www.python.org/downloads/).  
+2. **CRUCIAL:** During installation, check the box that says **"Add Python to PATH"**.
 
-Simply visit the [GitHub Pages link](https://esramos-design.github.io/mfa.github.io/) to use the tool immediately in your browser.
+### **Step 2: Save the Application Files**
 
-### **Method 2: Local Single-File**
+Create a new folder on your computer (e.g., Desktop\\MFA\_Tool) and save the following two files inside it:
 
-1. Download index.html from this repository.  
-2. Double-click to open in Chrome, Edge, or Firefox.  
-3. *Note:* OCR features may be limited by browser security (CORS) when running locally without a server.
+* index.html: The main application code.  
+* run\_app.py: The launcher script.
 
-### **Method 3: Windows Desktop App (Advanced)**
+### **Step 3: Install the Window Wrapper**
 
-For the best experience without a browser bar, run MFA as a standalone Python app.
+Open your Command Prompt (search for cmd in Windows) and run this command:
 
-1. **Install Python:** Download from [python.org](https://www.python.org/). **CRUCIAL:** Check **"Add Python to PATH"** during installation.  
-2. **Install Wrapper:** Open Command Prompt (cmd) and run:  
-   pip install pywebview
+pip install pywebview
 
-3. **Create Script:** Create a file named run\_app.py in the same folder as your index.html with the following content:  
-   import webview  
-   import sys  
-   import os
+*(This* library allows the HTML *tool to run as a native window instead of in a web browser tab, removing the address bar and adding desktop features)*
 
-   if \_\_name\_\_ \== '\_\_main\_\_':  
-       html\_file \= os.path.join(os.path.dirname(os.path.abspath(\_\_file\_\_)), 'index.html')  
-       webview.create\_window(  
-           'Mining Fracture Analyser v3.6',  
-           url=html\_file,  
-           width=1400,  
-           height=900,  
-           background\_color='\#0d1117'  
-       )  
-       webview.start(debug=True)
+### **Step 4: Run the App**
 
-4. **Run:** Double-click run\_app.py.
+Double-click run\_app.py (or run python run\_app.py in terminal). The application will launch in a dark-mode window.
 
-## **🤖 User Guide: The AI Foreman**
+## **🤖 User Guide: Using the AI Foreman**
 
-To unlock the **Analyze Strategy** and **Generate Orders** buttons, you must configure a free Google Gemini API key.
+The AI Foreman is located in the **bottom-right panel** (Column 4). It requires a one-time setup.
 
-1. **Get a Key:** Visit [Google AI Studio](https://aistudio.google.com/app/apikey) and create a free API key.  
-2. **Configure:**  
-   * Open index.html in a text editor (Notepad, VS Code).  
-   * Find the line: const apiKey \= ""; (Near the bottom).  
-   * Paste your key: const apiKey \= "YOUR\_KEY\_HERE";  
-   * Save and refresh the app.
+### **1\. Activating the AI (API Key Setup)**
 
-**Feature Usage:**
+1. **Get a Free Key:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and create a free API key.  
+2. **In the App:** Click the **"🔑 Config"** button in the AI Foreman header.  
+3. **Paste Key:** Enter your key into the popup modal and click **Save**.  
+   * *Note: Your key is saved locally on your computer. It is never sent to our servers.*
 
-* **Analyze Strategy:** Click this when you are unsure if a rock is safe. It will output advice like *"Equip a Stampede module to counter the 40% instability."*  
-* **Generate Orders:** Click this to generate a text block like: *"/// COMMAND UPLINK /// Target Mass 23k. MOLE 1, active Surge on my mark. EXECUTE."*
+### **2\. Available Modes**
 
-## **📸 User Guide: OCR Auto-Scan**
+Once configured, you can use the following buttons:
 
-1. In-game, align your ship so the Rock Scan data is clearly visible on your UI.  
-2. Take a screenshot (Print Screen or Snipping Tool).  
-3. Switch to the MFA tool and press **CTRL+V (Paste)**.  
+* **🧠 Strategy:** Provides a general assessment of the rock. Tells you if your current team can break it and suggests a general approach.  
+* **⚠️ Risk Report:** Focuses purely on safety. Analyzes the **Instability** value and warns you of explosion risks. Recommends safety distances or specific stability modules (like Stampede/Optimum).  
+* **🔧 Module Tips:** Acts as a loadout engineer. Suggests the mathematically optimal modules to equip for *this specific rock* (e.g., "Resistance is high, swap to a Brandt module").  
+* **📢 Orders:** Generates a short, roleplay-style text block (e.g., "/// COMMAND UPLINK /// Target Mass 23k...") that you can copy/paste into Star Citizen's in-game chat to coordinate your team.  
+* **Custom Query:** Type your own question (e.g., "How much is this rock worth?") into the text box and press Enter.
+
+## **📷 User Guide: OCR & Features**
+
+### **Using OCR (Auto-Scan)**
+
+1. While in-game, verify you are looking at the rock's scan data.  
+2. Take a screenshot (Print Screen) or use Snipping Tool.  
+3. **CTRL+V (Paste)** the image directly into the MFA App window.  
 4. *Alternatively:* Click the "Auto-Scan Rock" box to upload an image file.  
-5. Verify the Mass, Resistance, and Instability values have populated correctly.
+5. The tool will automatically fill in Mass, Resistance, and Instability.
 
-**Tip:** Darker backgrounds in Star Citizen (space) usually yield better OCR results than bright backgrounds (planet surfaces).
+### **Using Smart Recommendations**
+
+If your simulation fails (Power Insufficient), the **Recommended Loadouts** section (bottom right) will automatically suggest:
+
+* **Optimal Loadouts:** Specific laser/module combos for MOLEs, Prospectors, and Golems.  
+* **Reinforcements:** Exactly how many extra ships you need to invite to break the rock.
 
 ## **🧠 Technical: How It Works**
 
-The application uses established community formulas verified by **UEX Corp** and **RedMonsterSC**.
+The application uses established community formulas (verified by SC-Trade-Tools and RedMonsterSC) to calculate:
 
 1. **Base Power:** Sum of all active laser heads.  
 2. **Module Modifiers:** Applies buffs/debuffs from Surges, Stampedes, Torrents, etc.  
 3. **Resistance Calculation:** Effective Power \= Total Power \* (1 \- Rock Resistance).  
 4. **Heat Transfer:** Determines if Effective Power \> Rock Heat Threshold.
 
-### **Tech Stack**
+## **💻 Developer Guide: Local Setup**
 
-* **Core:** HTML5, JavaScript (ES6+), Tailwind CSS.  
-* **Visualization:** Chart.js.  
-* **OCR:** Tesseract.js.  
-* **AI:** Google Gemini API.
+If you wish to contribute to the codebase or run the web version locally without Python.
 
-## **🤝 Contributing**
+### **Local Web Server**
 
-We welcome contributions\! Please join our [Discord Server](https://discord.gg/wktsh9h46F) to discuss changes.
+Due to browser security policies (CORS) regarding Web Workers (used by Tesseract OCR), simply opening the index.html file in Chrome/Edge will **not** allow the OCR to work. You must run a local server:
 
-1. **Fork** the Project.  
-2. Create your **Feature Branch** (git checkout \-b feature/AmazingFeature).  
-3. **Commit** your Changes (git commit \-m 'Add some AmazingFeature').  
-4. **Push** to the Branch (git push origin feature/AmazingFeature).  
-5. Open a **Pull Request**.
+* **VS Code:** Right-click index.html \-\> "Open with Live Server".  
+* **Python:** Run python \-m http.server 8000 in the directory.
 
-## **Disclaimer & License**
+## **⚠️ Troubleshooting**
+
+* **"The AI buttons do nothing":**  
+  * Did you click **"🔑 Config"** and save your API key?  
+  * Check your internet connection.  
+* **"ModuleNotFoundError: No module named 'webview'":**  
+  * You missed Step 3 in the Installation. Run pip install pywebview in your terminal.  
+* **OCR Not Picking up numbers:**  
+  * Ensure the screenshot is clear.  
+  * Try cropping the image closer to the stats on the right side of the UI.  
+  * OCR relies on visual contrast; darker backgrounds in screenshots help.
+
+## **⚠️ Disclaimer & License**
 
 **Disclaimer:** This application is a fan-made tool using empirical data. Star Citizen server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. Use this tool as a guide, not a guarantee.
 
 **License:** Distributed under the GNU General Public License (GPL). See LICENSE for more information.
 
 **Credits:**
-
 * Data provided by [UEX Corp](https://www.google.com/search?q=https://uexcorp.space/).  
 * Images property of Cloud Imperium Games.  
 * Developer: CHIRONDRAGON.
