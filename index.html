@@ -73,20 +73,24 @@
             cursor: default;
             overflow-x: hidden;
             transition: background-color 0.3s ease, color 0.3s ease;
+            
+            /* Firefox Scrollbar Support */
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
         }
 
         input, select, #results-wrapper, #warnings-wrapper, #configs-wrapper, #ai-response-area, h1, h2, h3, h4, p, span {
             user-select: text; 
         }
         
-        /* Custom scrollbar */
+        /* Custom scrollbar (Webkit/Chrome/Edge) */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
         ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
         /* Input styling */
-        input[type="number"], select {
+        input[type="number"], select, input[type="text"], input[type="password"] {
             background-color: var(--bg-input);
             border: 1px solid var(--border-main);
             color: var(--text-main);
@@ -94,10 +98,9 @@
             -webkit-appearance: none; 
             -moz-appearance: none;
             appearance: none;
-            padding-right: 2.5rem; 
         }
 
-        input[type="number"]:focus, select:focus {
+        input[type="number"]:focus, select:focus, input[type="text"]:focus, input[type="password"]:focus {
             border-color: #38bdf8; 
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); 
             outline: none;
@@ -139,6 +142,26 @@
             background-color: rgba(59, 130, 246, 0.1);
         }
 
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
+            z-index: 100; display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.2s ease-in-out;
+        }
+        .modal-backdrop.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background: var(--bg-panel); border: 1px solid var(--border-blue);
+            padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95); transition: transform 0.2s ease-in-out;
+        }
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
         @media (min-width: 1440px) {
             .main-container {
                 grid-template-columns: repeat(4, 1fr);
@@ -149,60 +172,48 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* --- NEON HOVER CLASSES --- */
-        .neon-hover-blue, .neon-hover-purple, .neon-hover-yellow {
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        
-        .neon-hover-blue:hover {
-            border-color: #3b82f6; 
-            box-shadow: var(--glow-blue);
-        }
-        
-        .neon-hover-purple:hover {
-            border-color: #a855f7; 
-            box-shadow: var(--glow-purple);
-        }
-        
-        .neon-hover-yellow:hover {
-            border-color: #eab308; 
-            box-shadow: var(--glow-yellow);
-        }
+        .neon-hover-blue:hover { border-color: #3b82f6; box-shadow: var(--glow-blue); }
+        .neon-hover-purple:hover { border-color: #a855f7; box-shadow: var(--glow-purple); }
+        .neon-hover-yellow:hover { border-color: #eab308; box-shadow: var(--glow-yellow); }
 
         @media (min-width: 1024px) {
             .sticky-column-wrapper {
-                position: sticky;
-                top: 1rem; 
-                max-height: calc(100vh - 2rem); 
-                overflow-y: auto; 
-                padding-top: 0; 
-                -ms-overflow-style: none;  
-                scrollbar-width: none;  
+                position: sticky; top: 1rem; max-height: calc(100vh - 2rem); 
+                overflow-y: auto; padding-top: 0; -ms-overflow-style: none; scrollbar-width: none; 
             }
-            .sticky-column-wrapper::-webkit-scrollbar { display: none; }
-
             .static-header-pin {
-                position: relative;
-                z-index: 10; 
-                padding: 1.5rem 2rem 1.5rem 2rem; 
-                background-color: var(--bg-panel);
-                border-bottom: 1px solid var(--border-main);
-                margin-bottom: 2rem; 
-                transition: background-color 0.3s ease;
+                position: relative; z-index: 10; padding: 1.5rem 2rem; 
+                background-color: var(--bg-panel); border-bottom: 1px solid var(--border-main);
+                margin-bottom: 2rem; transition: background-color 0.3s ease;
             }
-
             .sticky-scroll-content {
-                overflow-y: auto;
-                max-height: calc(100vh - 2rem); 
-                position: sticky;
-                top: 1rem;
-                -ms-overflow-style: none; 
-                scrollbar-width: none; 
+                overflow-y: auto; max-height: calc(100vh - 2rem); position: sticky; top: 1rem;
+                -ms-overflow-style: none; scrollbar-width: none; 
             }
-            .sticky-scroll-content::-webkit-scrollbar { display: none; }
         }
     </style>
 </head>
 <body class="p-4 sm:p-6 flex justify-center items-start">
+
+    <!-- API KEY MODAL -->
+    <div id="api-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-[var(--text-strong)] mb-2">Configure AI Foreman</h3>
+            <p class="text-sm text-[var(--text-muted)] mb-4">To use the AI Analysis features, you need a free Google Gemini API Key. This key is saved locally in your browser/app.</p>
+            
+            <label class="block text-xs font-bold text-blue-400 uppercase mb-1">Google Gemini API Key</label>
+            <input type="password" id="api-key-input" placeholder="Paste key starting with AIza..." 
+                   class="w-full p-3 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] mb-4 focus:ring-2 focus:ring-blue-500 outline-none">
+            
+            <div class="flex justify-end gap-3">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-4 py-2 text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center">
+                    Get Free Key ↗
+                </a>
+                <button onclick="closeApiModal()" class="px-4 py-2 rounded-lg text-sm font-bold text-[var(--text-muted)] hover:bg-[var(--border-main)] transition">Cancel</button>
+                <button onclick="saveApiKey()" class="px-6 py-2 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition">Save Key</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MAIN GRID CONTAINER -->
     <div class="main-container">
@@ -235,10 +246,6 @@
                 <a href="https://github.com/esramos-design/mfa.github.io/blob/main/README.md" target="_blank" 
                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold uppercase rounded-lg transition-colors text-center border border-gray-600 shadow-md flex items-center justify-center gap-2">
                    <span>📄</span> View Readme
-                </a>
-                <a href="https://discord.gg/wktsh9h46F" target="_blank"
-                   class="px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold uppercase rounded-lg transition-colors text-center border border-blue-500/30 shadow-md flex items-center justify-center gap-2">
-                   <span>💬</span> Join Discord
                 </a>
             </div>
         </div>
@@ -295,16 +302,12 @@
                         RUN SIMULATION
                     </button>
 
-                    <!-- VISUAL GADGET LIST (Moved from Col 2) -->
+                    <!-- VISUAL GADGET LIST -->
                     <div class="mt-6 p-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border-main)]">
                         <label class="block text-sm font-medium mb-3 text-[var(--text-muted)] border-b border-[var(--border-main)] pb-2">Select Active Gadget</label>
-                        
-                        <!-- INCREASED HEIGHT TO 600px TO SHOW ALL -->
                         <div id="gadget-list-container" class="space-y-3 max-h-[600px] overflow-y-auto no-scrollbar pr-1">
                             <!-- Populated by JS -->
                         </div>
-                        
-                        <!-- Hidden input to store selected gadget value -->
                         <input type="hidden" id="gadgetSelect" value="None">
                     </div>
                 </div>
@@ -314,11 +317,9 @@
         <!-- COLUMN 2: TEAM ASSEMBLY (Blue Glow) -->
         <div class="w-full">
             <div class="sticky-column-wrapper bg-[var(--bg-panel)] rounded-2xl shadow-2xl border border-[var(--border-blue)] no-scrollbar transition-colors duration-300 neon-hover-blue">
-                
                 <div class="static-header-pin p-6 rounded-t-2xl">
                     <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Team Assembly</h2>
                 </div>
-
                 <div class="p-6 space-y-6">
                     <div class="p-4 bg-blue-900/10 rounded-xl border border-blue-700/30">
                         <label for="shipSelectToAdd" class="block text-sm font-medium mb-2 text-blue-300">Add Mining Ship</label>
@@ -336,7 +337,6 @@
                             </button>
                         </div>
                     </div>
-
                     <h2 class="text-lg font-semibold text-[var(--text-muted)] border-b border-[var(--border-main)] pb-2">Active Laser Heads:</h2>
                     <div id="multiShipContainer" class="space-y-4 min-h-[100px] p-2 rounded-xl">
                         <p id="empty-state-msg" class="text-center text-[var(--text-muted)] text-sm p-4 border border-dashed border-[var(--border-main)] rounded-lg">
@@ -350,27 +350,29 @@
         <!-- COLUMN 3: ANALYTIC RESULTS & CHARTS (Purple Glow) -->
         <div class="w-full">
             <div id="results-wrapper" class="sticky-scroll-content bg-[var(--bg-panel)] p-6 rounded-2xl shadow-2xl border border-[var(--border-blue)] space-y-6 no-scrollbar transition-colors duration-300 neon-hover-purple">
-                
                 <h2 class="text-xl font-extrabold text-blue-400 text-center uppercase tracking-wide">Analytics</h2>
+                
+                <!-- 1. Power vs Margin (Moved to Top) -->
+                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-blue-600/30">
+                    <h3 class="text-xs font-bold text-blue-400 mb-2 text-center uppercase">Power vs. Margin</h3>
+                    <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
+                </div>
 
                 <section id="results" class="pt-2">
                     <p class="text-center text-[var(--text-muted)] italic text-sm">Configure your loadout to see results.</p>
                 </section>
 
-                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-purple-600/30">
-                   <h3 class="text-xs font-bold text-purple-400 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
-                   <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
-               </div>
-                 
+                <!-- 2. Risk Profile (Middle) -->
                 <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-yellow-600/30">
                     <h3 class="text-xs font-bold text-yellow-500 mb-2 text-center uppercase">Risk Profile</h3>
                     <div class="h-48 w-full"><canvas id="modChart"></canvas></div>
                 </div>
 
-                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-blue-600/30">
-                    <h3 class="text-xs font-bold text-blue-400 mb-2 text-center uppercase">Power vs. Margin</h3>
-                    <div class="h-32 w-full"><canvas id="powerChart"></canvas></div>
-                </div>
+                <!-- 3. Power vs Resistance Curve (Moved to Bottom) -->
+                <div class="p-4 bg-[var(--bg-card)] rounded-xl border border-purple-600/30">
+                   <h3 class="text-xs font-bold text-purple-400 mb-2 text-center uppercase">Power vs. Resistance Curve</h3>
+                   <div class="h-48 w-full"><canvas id="resistanceChart"></canvas></div>
+               </div>
                 
                 <footer class="pt-4 border-t border-[var(--border-main)] text-center text-xs">
                     <p class="text-[var(--text-muted)]">MFA v3.6 Enhanced</p>
@@ -381,55 +383,102 @@
         <!-- COLUMN 4: AI, WARNINGS & RECOMMENDATIONS (Yellow Glow) -->
         <div class="w-full">
             <div id="warnings-wrapper" class="sticky-scroll-content bg-[var(--bg-panel)] p-6 rounded-2xl shadow-2xl border border-[var(--border-blue)] space-y-6 no-scrollbar transition-colors duration-300 neon-hover-yellow">
-                
-                <!-- AI SECTION -->
-                <div id="ai-section" class="hidden">
-                    <div class="flex items-center justify-between mb-3">
+                <!-- AI SECTION (Always Visible) -->
+                <div id="ai-section">
+                    <div class="flex items-center justify-between mb-4 border-b border-[var(--border-main)] pb-3">
                         <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
                             <span class="text-lg">🤖</span> AI Senior Foreman
                         </h3>
-                        <div class="flex gap-2">
-                            <button onclick="askAI('briefing')" class="px-3 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors shadow-lg shadow-blue-900/20">
-                                ✨ Orders
-                            </button>
-                            <button onclick="askAI('strategy')" class="px-3 py-1 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded transition-colors shadow-lg shadow-purple-900/20">
-                                ✨ Strategy
-                            </button>
-                        </div>
+                        <!-- API Key Button MOVED HERE -->
+                        <button onclick="openApiModal()" class="px-3 py-1.5 bg-gradient-to-r from-purple-900 to-blue-900 hover:from-purple-800 hover:to-blue-800 text-white text-xs font-bold uppercase rounded border border-purple-500/50 shadow-md flex items-center gap-2 transition-all">
+                            <span>🔑</span> Config
+                        </button>
                     </div>
                     
-                    <div class="ai-response-box p-4 rounded-lg relative min-h-[100px]">
-                        <div id="ai-loading" class="hidden absolute inset-0 flex items-center justify-center bg-gray-900/80 rounded-lg z-10">
+                    <!-- Presets -->
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button onclick="askAI('strategy')" class="px-3 py-2 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded transition shadow-lg shadow-purple-900/20 text-left flex items-center gap-2">
+                            <span>🧠</span> Strategy
+                        </button>
+                        <button onclick="askAI('risk')" class="px-3 py-2 text-xs font-bold text-gray-900 bg-yellow-500 hover:bg-yellow-400 rounded transition shadow-lg shadow-yellow-900/20 text-left flex items-center gap-2">
+                            <span>⚠️</span> Risk Report
+                        </button>
+                        <button onclick="askAI('optimize')" class="px-3 py-2 text-xs font-bold text-white bg-green-600 hover:bg-green-700 rounded transition shadow-lg shadow-green-900/20 text-left flex items-center gap-2">
+                            <span>🔧</span> Module Tips
+                        </button>
+                        <button onclick="askAI('briefing')" class="px-3 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded transition shadow-lg shadow-blue-900/20 text-left flex items-center gap-2">
+                            <span>📢</span> Orders
+                        </button>
+                    </div>
+
+                    <!-- Custom Input -->
+                    <div class="relative mb-4">
+                        <input type="text" id="ai-custom-input" placeholder="Type custom question..." 
+                               class="w-full p-3 pr-10 rounded-lg bg-[var(--bg-input)] border border-[var(--border-main)] text-sm text-[var(--text-main)] focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all outline-none"
+                               onkeypress="if(event.key === 'Enter') askAI('custom')">
+                        <button onclick="askAI('custom')" class="absolute right-2 top-2 text-purple-400 hover:text-white p-1">
+                            ➤
+                        </button>
+                    </div>
+
+                    <!-- Response Box -->
+                    <div class="ai-response-box p-4 rounded-lg relative min-h-[100px] border border-purple-500/20">
+                        <div id="ai-loading" class="hidden absolute inset-0 flex items-center justify-center bg-gray-900/90 rounded-lg z-10 backdrop-blur-sm">
                             <div class="flex flex-col items-center">
-                                <div class="w-2 h-2 bg-blue-400 rounded-full animate-ping mb-2"></div>
-                                <p class="text-xs text-blue-300 font-mono animate-pulse">Establishing Comms...</p>
+                                <div class="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                                <p class="text-xs text-purple-300 font-mono animate-pulse">Establishing Uplink...</p>
                             </div>
                         </div>
                          <div id="ai-content" class="text-sm text-gray-300 font-mono leading-relaxed whitespace-pre-wrap">
-                            <span class="text-gray-500 italic">// Awaiting uplink... Run simulation first.</span>
+                            <span class="text-gray-500 italic">// AI System Online. Input Configured. Awaiting Query.</span>
                          </div>
                     </div>
                 </div>
 
                 <h2 class="text-xl font-extrabold text-yellow-500 text-center uppercase tracking-wide border-t border-[var(--border-main)] pt-6">Analysis & Fleet Solutions</h2>
-                
                 <section id="warnings" class="pt-2">
                     <p class="text-center text-[var(--text-muted)] italic text-sm">Warnings and requirements will appear here.</p>
                 </section>
-                
                  <h3 class="text-lg font-extrabold text-green-500 text-center uppercase tracking-wide border-t border-[var(--border-main)] pt-6">Recommended Loadouts</h3>
                 <section id="configs" class="pt-2">
                     <p class="text-center text-[var(--text-muted)] italic text-sm">Fleet recommendations will appear here.</p>
                 </section>
-
             </div>
         </div>
-
     </div>
 
     <script>
-        const apiKey = ""; // API Key provided by environment
-        
+        // --- API KEY MANAGEMENT ---
+        function openApiModal() {
+            const modal = document.getElementById('api-modal');
+            const input = document.getElementById('api-key-input');
+            const currentKey = localStorage.getItem('gemini_api_key');
+            
+            if(currentKey) input.value = currentKey;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeApiModal() {
+            const modal = document.getElementById('api-modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 200);
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input');
+            const key = input.value.trim();
+            if(key) {
+                localStorage.setItem('gemini_api_key', key);
+                closeApiModal();
+                alert("API Key Saved! The AI Foreman is ready.");
+            } else {
+                alert("Please enter a valid API key.");
+            }
+        }
+
+        // --- THEME MANAGEMENT ---
         function initTheme() {
             const storedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', storedTheme);
@@ -472,8 +521,16 @@
         };
 
         async function askAI(mode) {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            
+            if (!apiKey) {
+                openApiModal();
+                return;
+            }
+
             const aiLoading = document.getElementById('ai-loading');
             const aiContent = document.getElementById('ai-content');
+            const customInput = document.getElementById('ai-custom-input');
             
             if (currentSimState.power === 0) {
                 aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: No simulation data. Please run the simulation first.</span>`;
@@ -497,34 +554,45 @@
                 
                 Provide a short, strategic assessment (max 100 words).
                 1. Is this safe? (High instability means risk of explosion).
-                2. Suggest specific Modules (e.g., Stampede for instability, Surge for power, Brandt for resistance) or Gadgets (BoreMax, Sabir) if the rock is difficult.
+                2. Suggest specific Modules based on the rock stats.
                 3. Use sci-fi terminology appropriate for Star Citizen.`;
             } else if (mode === 'briefing') {
                  prompt = `You are a Mining Crew Commander in Star Citizen.
                  Generate a short, tactical 'Copy/Paste' order for the crew chat.
-                 Scenario:
-                 ${rockDetails}
-                 ${crewDetails}
-                 
-                 The briefing should:
-                 1. Be brief and commanding.
-                 2. Call out the target mass and resistance.
-                 3. If power is low, order them to use modules (Surge!). If instability is high, order them to be careful.
-                 4. Format it like a transmission: "/// COMMAND UPLINK /// ... "`;
+                 Scenario: ${rockDetails} ${crewDetails}
+                 Format it like a transmission: "/// COMMAND UPLINK /// ... "`;
+            } else if (mode === 'risk') {
+                prompt = `Act as a Safety Officer. Analyze ONLY the risk factors for this rock:
+                ${rockDetails}
+                Assess explosion probability based on Instability. Recommend safety protocols (distance, shield management, specific modules). Keep it brief and urgent.`;
+            } else if (mode === 'optimize') {
+                prompt = `Act as a Loadout Engineer.
+                ${rockDetails}
+                Current Power: ${currentSimState.power.toFixed(0)} MW.
+                Suggest the mathematical optimal modules to improve efficiency. Should we use Surge? Brandt? Stampede? Explain why for this specific rock mass/resistance.`;
+            } else if (mode === 'custom') {
+                const query = customInput.value;
+                if (!query) { aiLoading.classList.add('hidden'); return; }
+                prompt = `Context: Star Citizen Mining Simulation.
+                Rock: ${rockDetails}
+                Crew: ${crewDetails}
+                User Question: "${query}"
+                Answer the user's question specifically acting as a Mining Foreman.`;
             }
 
             try {
-                const response = await callGemini(prompt);
+                const response = await callGemini(apiKey, prompt);
                 aiContent.innerHTML = marked.parse(response);
             } catch (error) {
                 aiContent.innerHTML = `<span class="text-red-500">// COMM LINK FAILURE: ${error.message}</span>`;
             } finally {
                 aiLoading.classList.add('hidden');
+                if(mode === 'custom') customInput.value = '';
             }
         }
 
-        async function callGemini(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        async function callGemini(key, prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
             let attempts = 0;
             const maxAttempts = 3;
@@ -536,7 +604,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status} - Check API Key`);
                     const data = await response.json();
                     return data.candidates[0].content.parts[0].text;
                 } catch (e) {
@@ -581,30 +649,30 @@
         });
 
         const powerModules = [
-            { name: "Surge (Active)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Brandt (Active)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Stampede (Active)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Forel (Active)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active', windowEffect: 60, extractionEffect: 0, inertEffect: 0 },
-            { name: "Lifeline (Active)", multiplier: 1.00, resistanceEffect: -15, instabilityEffect: -20.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Torpid (Active)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 }, 
-            { name: "Rime (Active)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: -10.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Optimum (Active)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active', windowEffect: 20, extractionEffect: 0, inertEffect: 0 },
-            { name: "Rieger-C3 (Passive)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive', windowEffect: -1, extractionEffect: 0, inertEffect: 0 },
-            { name: "Rieger-C2 (Passive)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0 },
-            { name: "Rieger (Passive)", multiplier: 1.15, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
-            { name: "Focus III (Passive)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 40, extractionEffect: 0, inertEffect: 0 },
-            { name: "Focus II (Passive)", multiplier: 0.90, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 37, extractionEffect: 0, inertEffect: 0 },
-            { name: "Focus (Passive)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 30, extractionEffect: 0, inertEffect: 0 },
-            { name: "Torrent III (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 40, activation: 'Passive', windowEffect: 0, extractionEffect: 25, inertEffect: 0 }, 
-            { name: "Torrent II (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 35, activation: 'Passive', windowEffect: 0, extractionEffect: 20, inertEffect: 0 }, 
-            { name: "Torrent (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 30, activation: 'Passive', windowEffect: 0, extractionEffect: 15, inertEffect: 0 }, 
-            { name: "XTR-XL (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 25, extractionEffect: 0, inertEffect: 24 },
-            { name: "XTR-L (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 22, extractionEffect: 0, inertEffect: 23 },
-            { name: "XTR (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 15, extractionEffect: 0, inertEffect: 20 },
-            { name: "FLTR-XL (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 24 },
-            { name: "FLTR-L (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 23 },
-            { name: "FLTR (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 20 },
-            { name: "Vaux-C3 (Passive)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Surge (+50% Pwr, -15% Res, +10% Inst)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Brandt (+35% Pwr, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Stampede (+35% Pwr, -10% Inst)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Forel (+60% Opt Win)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active', windowEffect: 60, extractionEffect: 0, inertEffect: 0 },
+            { name: "Lifeline (-15% Res, -20% Inst)", multiplier: 1.00, resistanceEffect: -15, instabilityEffect: -20.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Torpid (-40% Pwr)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 }, 
+            { name: "Rime (-15% Pwr, -25% Res, -10% Inst)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: -10.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Optimum (-15% Pwr, -10% Inst, +20% Win)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active', windowEffect: 20, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rieger-C3 (+25% Pwr, -1% Inst)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive', windowEffect: -1, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rieger-C2 (+20% Pwr, -3% Inst)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rieger (+15% Pwr, -10% Inst)", multiplier: 1.15, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Focus III (-5% Pwr, +40% Win)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 40, extractionEffect: 0, inertEffect: 0 },
+            { name: "Focus II (-10% Pwr, +37% Win)", multiplier: 0.90, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 37, extractionEffect: 0, inertEffect: 0 },
+            { name: "Focus (-15% Pwr, +30% Win)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 30, extractionEffect: 0, inertEffect: 0 },
+            { name: "Torrent III (+40% Inst, +25% Extr)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 40, activation: 'Passive', windowEffect: 0, extractionEffect: 25, inertEffect: 0 }, 
+            { name: "Torrent II (+35% Inst, +20% Extr)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 35, activation: 'Passive', windowEffect: 0, extractionEffect: 20, inertEffect: 0 }, 
+            { name: "Torrent (+30% Inst, +15% Extr)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 30, activation: 'Passive', windowEffect: 0, extractionEffect: 15, inertEffect: 0 }, 
+            { name: "XTR-XL (+25% Win, -24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 25, extractionEffect: 0, inertEffect: 24 },
+            { name: "XTR-L (+22% Win, -23% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 22, extractionEffect: 0, inertEffect: 23 },
+            { name: "XTR (+15% Win, -20% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 15, extractionEffect: 0, inertEffect: 20 },
+            { name: "FLTR-XL (-24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 24 },
+            { name: "FLTR-L (-23% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 23 },
+            { name: "FLTR (-20% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 20 },
+            { name: "Vaux-C3 (-50% Charge Rate)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "None", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Default', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
         ]; 
         
@@ -631,7 +699,6 @@
             { name: "Okunis (+100% Rate, +50% Win)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility', desc: "+100% Rate, +50% Window Size" },
             { name: "None", reduction: 0.0, instabilityEffect: 0.0, type: 'None', desc: "No Gadget Attached" }, 
         ].sort((a, b) => {
-            // Sort None to top, then by reduction
             if (a.name === "None") return -1;
             if (b.name === "None") return 1;
             return b.reduction - a.reduction;
@@ -708,7 +775,7 @@
             
             const activeModulesHtml = sortedModules.filter(m => m.activation === 'Active').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
             const passiveModulesHtml = sortedModules.filter(m => m.activation === 'Passive').map(mod => `<option value="${mod.name}">${mod.name}</option>`).join('');
-            const defaultOption = `<option value="None" selected>None</option>`;
+            const defaultOption = `<option value="None">None</option>`;
             const finalModuleOptions = `${defaultOption}<optgroup label="Active Modules">${activeModulesHtml}</optgroup><optgroup label="Passive Modules">${passiveModulesHtml}</optgroup>`;
 
             let moduleSlotsHtml = '<div id="module-slots-container-' + armUniqueId + '">';
@@ -813,7 +880,7 @@
             let newModuleSlotsHtml = '';
             for (let i = 1; i <= 3; i++) {
                 const isDisabled = i > newMaxSlots;
-                const slotText = isDisabled ? `--- SLOT DISABLED (${newMaxSlots} Slots Max) ---` : `Module Slot ${i}`;
+                const slotText = isDisabled ? `--- SLOT DISABLED (${actualMaxSlots} Slots Max) ---` : `Module Slot ${i}`;
                 const disabledClass = isDisabled ? 'opacity-50' : '';
                 const oldSelect = document.getElementById(`${armUniqueId}-mod${i}`);
                 const retainedValue = oldSelect && !isDisabled ? oldSelect.value : 'None'; 
@@ -1311,7 +1378,8 @@
             
             // New Card Design Function
             const renderNewCard = (rec, colorClass, badgeColor) => {
-                const mods = rec.modules.map(m => m.name.replace(/\(Active\)|\(Passive\)/g, '').trim()).join(' + ');
+                // MODIFIED: Split name by '(' to get only the name, avoiding the long stats text
+                const mods = rec.modules.map(m => m.name.split('(')[0].trim()).join(' + ');
                 // Calculate percentages for visual bars (arbitrary scaling for visual flair)
                 const powerPct = Math.min((rec.stats.power / 5000) * 100, 100);
                 const resPct = Math.min(Math.abs(rec.stats.resistanceRed) * 1.5, 100);
