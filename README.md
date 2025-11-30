@@ -3,7 +3,7 @@
     <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mfa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
   </a>
 
-  <h1 align="center">Mining Fracture Analyser (MFA) v3.6</h1>
+  <h1 align="center">Mining Fracture Analyser (MFA) v4.1</h1>
 
   <p align="center">
     <strong>A real-time cooperative mining calculator for Star Citizen.</strong>
