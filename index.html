@@ -1,3 +1,9 @@
+<!-- Mining Fracture Analyser v3.6 - Stable Build 
+     - AI Foreman Config Button relocated to AI Panel
+     - AI Panel always visible (Standby Mode)
+     - Charts Inverted (Power vs Margin on top)
+     - Cross-browser scrollbar optimization
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -1246,7 +1252,12 @@
             
             if (allArms.length === 0) {
                 displayResult('No mining laser heads added. Assemble your team above to begin the calculation.', 'text-[var(--text-muted)]');
-                if (aiSection) aiSection.classList.add('hidden');
+                
+                // --- FIXED AI SECTION VISIBILITY ---
+                // We no longer hide the AI section completely. Instead, we show a standby message.
+                if (aiSection) aiSection.classList.remove('hidden');
+                document.getElementById('ai-content').innerHTML = '<span class="text-gray-500 italic">// SYSTEMS STANDBY: Waiting for mining telemetry...</span>';
+                
                 if (configsContainer) configsContainer.innerHTML = `<p class="text-center text-[var(--text-muted)] italic">Max power configs will appear here.</p>`;
                 if (warningsContainer) warningsContainer.innerHTML = `<p class="text-center text-[var(--text-muted)] italic">Warnings will appear here.</p>`;
                 if (powerChart) { powerChart.destroy(); powerChart = null; }
@@ -1340,7 +1351,12 @@
             const isSuccess = breakableMassLimit >= rockMass;
 
             currentSimState = { mass: rockMass, resistance: finalEffectiveResistance, instability: finalModifiedInstability, power: totalEffectiveLaserPower, success: isSuccess, activeArms: activeArmsCount };
+            
+            // --- FIXED: Ensure AI Section is visible on calc ---
             if (aiSection) aiSection.classList.remove('hidden');
+            if (document.getElementById('ai-content').innerText.includes("STANDBY")) {
+                 document.getElementById('ai-content').innerHTML = '<span class="text-gray-500 italic">// AI System Online. Input Configured. Awaiting Query.</span>';
+            }
 
             const formattedEffectivePower = totalEffectiveLaserPower.toLocaleString(undefined, { maximumFractionDigits: 0 });
             const verdictClass = isSuccess ? 'bg-green-700/80' : 'bg-red-700/80';
