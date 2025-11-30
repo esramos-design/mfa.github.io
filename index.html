@@ -41,26 +41,26 @@
         }
 
         [data-theme="light"] {
-            /* Light Theme Overrides */
-            --bg-main: #f3f4f6;       
+            /* Light Theme Overrides - "Aerospace Platinum" */
+            --bg-main: #eef2f6;       
             --bg-panel: #ffffff;      
-            --bg-card: #f9fafb;       
+            --bg-card: #f8fafc;       
             --bg-input: #ffffff;
-            --border-main: #e5e7eb;   
-            --border-blue: rgba(59, 130, 246, 0.2);
-            --text-main: #374151;     
-            --text-muted: #4b5563;    
-            --text-strong: #111827;   
-            --chart-grid: #e5e7eb;
-            --chart-text: #374151;
-            --scrollbar-track: #f3f4f6;
-            --scrollbar-thumb: #d1d5db;
+            --border-main: #cbd5e1;   
+            --border-blue: rgba(59, 130, 246, 0.4); 
+            --text-main: #1e293b;     
+            --text-muted: #64748b;    
+            --text-strong: #0f172a;   
+            --chart-grid: #e2e8f0;
+            --chart-text: #475569;
+            --scrollbar-track: #eef2f6;
+            --scrollbar-thumb: #94a3b8;
             --scrollbar-hover: #3b82f6;
 
-            /* Neon Glows (Subtler for light mode) */
-            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.4);
-            --glow-purple: 0 0 15px rgba(147, 51, 234, 0.4);
-            --glow-yellow: 0 0 15px rgba(234, 179, 8, 0.4);
+            /* "Halo" Shadows for Light Mode */
+            --glow-blue: 0 10px 25px -5px rgba(59, 130, 246, 0.25), 0 0 4px rgba(59, 130, 246, 0.1);
+            --glow-purple: 0 10px 25px -5px rgba(147, 51, 234, 0.25), 0 0 4px rgba(147, 51, 234, 0.1);
+            --glow-yellow: 0 10px 25px -5px rgba(234, 179, 8, 0.35), 0 0 4px rgba(234, 179, 8, 0.1);
         }
 
         /* App-like behavior */
@@ -76,7 +76,7 @@
         }
 
         input, select, #results-wrapper, #warnings-wrapper, #configs-wrapper, #ai-response-area, h1, h2, h3, h4, p, span {
-            user-select: text; /* Allow selection for copy-pasting values */
+            user-select: text; 
         }
         
         /* Custom scrollbar */
@@ -211,7 +211,7 @@
         <div class="col-span-1 lg:col-span-4 w-full bg-[var(--bg-panel)] rounded-2xl shadow-2xl border border-[var(--border-blue)] p-6 flex flex-col md:flex-row items-center justify-between mb-2 gap-6 transition-colors duration-300">
              <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
                  <div class="flex-shrink-0 w-24"> 
-                    <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mfa.jpg?raw=true" 
+                    <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mpa.jpg?raw=true" 
                         alt="Mining Fracture Analyser Logo" 
                         class="w-full h-auto rounded-lg object-contain shadow-lg"
                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/161b22/e5e7eb?text=MFA';">
@@ -299,7 +299,8 @@
                     <div class="mt-6 p-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border-main)]">
                         <label class="block text-sm font-medium mb-3 text-[var(--text-muted)] border-b border-[var(--border-main)] pb-2">Select Active Gadget</label>
                         
-                        <div id="gadget-list-container" class="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar pr-1">
+                        <!-- INCREASED HEIGHT TO 600px TO SHOW ALL -->
+                        <div id="gadget-list-container" class="space-y-3 max-h-[600px] overflow-y-auto no-scrollbar pr-1">
                             <!-- Populated by JS -->
                         </div>
                         
@@ -586,10 +587,11 @@
             { name: "Forel (Active)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Active', windowEffect: 60, extractionEffect: 0, inertEffect: 0 },
             { name: "Lifeline (Active)", multiplier: 1.00, resistanceEffect: -15, instabilityEffect: -20.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Torpid (Active)", multiplier: 0.60, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 }, 
-            { name: "Rime (Active)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rime (Active)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: -10.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Optimum (Active)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active', windowEffect: 20, extractionEffect: 0, inertEffect: 0 },
             { name: "Rieger-C3 (Passive)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: -1, activation: 'Passive', windowEffect: -1, extractionEffect: 0, inertEffect: 0 },
             { name: "Rieger-C2 (Passive)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: -3, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0 },
+            { name: "Rieger (Passive)", multiplier: 1.15, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Passive', windowEffect: 0, extractionEffect: 0, inertEffect: 0 },
             { name: "Focus III (Passive)", multiplier: 0.95, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 40, extractionEffect: 0, inertEffect: 0 },
             { name: "Focus II (Passive)", multiplier: 0.90, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 37, extractionEffect: 0, inertEffect: 0 },
             { name: "Focus (Passive)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 30, extractionEffect: 0, inertEffect: 0 },
@@ -622,11 +624,11 @@
 
         const gadgets = [
             { name: "Sabir (-50% Res, +15% Inst)", reduction: -50.0, instabilityEffect: 15, type: 'Multiplicative', desc: "-50% Resistance, +15% Instability" }, 
-            { name: "OptiMax (-30% Resistance )", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative', desc: "-30% Resistance, -30% Window Size" },
-            { name: "BoreMax (+10% Resistance, -70% Instability )", reduction: 10.0, instabilityEffect: -70, type: 'Additive', desc: "+10% Resistance, -70% Instability" }, 
-            { name: "Waveshift (Stability/Charge Rate, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, +100% Window Size" }, 
-            { name: "Stalwart (Instability Reduction, -35% Instability)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, +50% Rate, -30% Window Size" }, 
-            { name: "Okunis (Optimal Window/Charge Rate)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility', desc: "+100% Rate, +50% Window Size" },
+            { name: "OptiMax (-30% Res, -30% Win)", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative', desc: "-30% Resistance, -30% Window Size" },
+            { name: "BoreMax (+10% Res, -70% Inst)", reduction: 10.0, instabilityEffect: -70, type: 'Additive', desc: "+10% Resistance, -70% Instability" }, 
+            { name: "Waveshift (-35% Inst, +100% Win)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, +100% Window Size" }, 
+            { name: "Stalwart (-35% Inst, -30% Res)", reduction: -30.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Instability, -30% Resistance" }, 
+            { name: "Okunis (+100% Rate, +50% Win)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility', desc: "+100% Rate, +50% Window Size" },
             { name: "None", reduction: 0.0, instabilityEffect: 0.0, type: 'None', desc: "No Gadget Attached" }, 
         ].sort((a, b) => {
             // Sort None to top, then by reduction
@@ -1158,12 +1160,12 @@
 
             return {
                 mole: [
-                    { role: "Laser 1: Breaker", ...breakerLoadout, desc: "Max Power & Fracture" },
-                    { role: "Laser 2: Surgeon", ...surgeonLoadout, desc: "Max Stability & Window" },
-                    { role: "Laser 3: Vacuum", ...vacuumLoadout, desc: "Max Extraction Speed" }
+                    { role: "ISOTOPE BREAKER", ...breakerLoadout, desc: "MAX POWER & FRACTURE" },
+                    { role: "STABILITY ANCHOR", ...surgeonLoadout, desc: "MAX WINDOW & SAFETY" },
+                    { role: "QUANTUM VACUUM", ...vacuumLoadout, desc: "MAX EXTRACTION SPEED" }
                 ],
-                prospector: { role: "Balanced Solo", ...soloLoadout, desc: "General Purpose" },
-                golem: { role: "Golem Optimized", ...golemLoadout, desc: "Fixed Head (Pitman)" }, 
+                prospector: { role: "SOLO VANGUARD", ...soloLoadout, desc: "BALANCED SOLO LOADOUT" },
+                golem: { role: "PITMAN SPECIAL", ...golemLoadout, desc: "OPTIMIZED FIXED HEAD" }, 
                 extra: extraShipRec
             };
         }
@@ -1307,115 +1309,133 @@
 
             const recommendations = generateSmartLoadouts(rockMass, baseResistance, initialInstability, requiredEffectivePower, totalEffectiveLaserPower);
             
-            const renderCard = (rec, colorClass) => {
+            // New Card Design Function
+            const renderNewCard = (rec, colorClass, badgeColor) => {
                 const mods = rec.modules.map(m => m.name.replace(/\(Active\)|\(Passive\)/g, '').trim()).join(' + ');
+                // Calculate percentages for visual bars (arbitrary scaling for visual flair)
+                const powerPct = Math.min((rec.stats.power / 5000) * 100, 100);
+                const resPct = Math.min(Math.abs(rec.stats.resistanceRed) * 1.5, 100);
+                const stabPct = Math.min(Math.abs(rec.stats.instability) * 2, 100);
+
                 return `
-                <div class="mb-4 p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-main)] shadow-md">
-                    <div class="flex justify-between items-center border-b border-[var(--border-main)] pb-2 mb-2">
+                <div class="group relative mb-4 p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-main)] hover:border-${badgeColor}-500 transition-all duration-300 shadow-lg overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-16 h-16 text-${badgeColor}-500" fill="currentColor" viewBox="0 0 20 20"><path d="M13 7h-6l-4 5.5 4 5.5h6l4-5.5-4-5.5z"/></svg>
+                    </div>
+                    
+                    <div class="flex justify-between items-start border-b border-[var(--border-main)] pb-3 mb-3 relative z-10">
                         <div>
-                            <h4 class="text-sm font-bold ${colorClass}">${rec.role}</h4>
-                            <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">${rec.desc}</p>
+                            <h4 class="text-xs font-black tracking-widest text-${badgeColor}-400 uppercase mb-1">${rec.role}</h4>
+                            <p class="text-[10px] text-[var(--text-muted)] font-mono">${rec.desc}</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-main)] text-[var(--text-main)] px-2 py-1 rounded">${rec.laser.name}</span>
+                        <span class="text-[10px] font-bold text-[var(--text-main)] bg-[var(--bg-panel)] px-2 py-1 rounded border border-[var(--border-main)] shadow-sm">
+                            ${rec.laser.name}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-3 relative z-10">
+                        <!-- Power Bar -->
+                        <div class="col-span-2">
+                            <div class="flex justify-between text-[10px] text-[var(--text-muted)] mb-1">
+                                <span>OUTPUT</span>
+                                <span class="text-yellow-500 font-bold">${(rec.stats.power/1000).toFixed(1)} kMW</span>
+                            </div>
+                            <div class="w-full bg-[var(--bg-input)] rounded-full h-1.5">
+                                <div class="bg-yellow-500 h-1.5 rounded-full" style="width: ${powerPct}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resistance Bar -->
+                        <div>
+                            <div class="flex justify-between text-[10px] text-[var(--text-muted)] mb-1">
+                                <span>RES RED</span>
+                                <span class="text-red-400 font-bold">${rec.stats.resistanceRed.toFixed(0)}%</span>
+                            </div>
+                            <div class="w-full bg-[var(--bg-input)] rounded-full h-1.5">
+                                <div class="bg-red-500 h-1.5 rounded-full" style="width: ${resPct}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stability Bar -->
+                        <div>
+                            <div class="flex justify-between text-[10px] text-[var(--text-muted)] mb-1">
+                                <span>STABILITY</span>
+                                <span class="text-purple-400 font-bold">${rec.stats.instability.toFixed(0)}%</span>
+                            </div>
+                            <div class="w-full bg-[var(--bg-input)] rounded-full h-1.5">
+                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: ${stabPct}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-[var(--text-muted)] font-mono mb-2">
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-yellow-500 font-bold text-xs">${(rec.stats.power/1000).toFixed(1)}k</div>
-                            <div>PWR</div>
-                        </div>
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-red-400 font-bold text-xs">${rec.stats.resistanceRed > 0 ? '+' : ''}${rec.stats.resistanceRed.toFixed(0)}%</div>
-                            <div>RES</div>
-                        </div>
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-purple-400 font-bold text-xs">${rec.stats.instability > 0 ? '+' : ''}${rec.stats.instability.toFixed(0)}%</div>
-                            <div>INST</div>
-                        </div>
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-blue-400 font-bold text-xs">${rec.stats.window.toFixed(1)}x</div>
-                            <div>WIN</div>
-                        </div>
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-green-400 font-bold text-xs">${rec.stats.extraction.toFixed(1)}x</div>
-                            <div>EXTR</div>
-                        </div>
-                        <div class="bg-[var(--bg-input)] border border-[var(--border-main)] rounded p-1">
-                            <div class="text-[var(--text-main)] font-bold text-xs">${(rec.stats.inert * 100).toFixed(0)}%</div>
-                            <div>INERT</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-[var(--text-muted)] border-t border-[var(--border-main)] pt-2 flex justify-between">
-                       <span>Modules: <span class="text-[var(--text-strong)] font-semibold">${mods}</span></span>
+
+                    <div class="flex items-center gap-2 text-[10px] text-[var(--text-muted)] pt-2 border-t border-[var(--border-main)] font-mono relative z-10">
+                        <span class="uppercase tracking-wide">Modules:</span>
+                        <span class="text-[var(--text-strong)] font-bold truncate" title="${mods}">${mods}</span>
                     </div>
                 </div>`;
             };
 
-            let recHtml = `<div class="space-y-2">`;
+            let recHtml = `<div class="space-y-4">`;
             
+            // --- REDESIGNED REINFORCEMENT BOX ---
             if (recommendations.extra) {
                 const deficit = (requiredEffectivePower - totalEffectiveLaserPower).toFixed(0);
                 recHtml += `
-                <div class="mb-6 p-5 rounded-xl border border-red-500/30 bg-red-500/10 relative overflow-hidden">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-                        <h4 class="text-sm font-black text-red-500 uppercase tracking-widest flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            Reinforcements Required
-                        </h4>
-                        <span class="text-xs font-mono font-bold text-red-600 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded border border-red-500/20">
-                            MISSING POWER: ${deficit} MW
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-2">
-                        <!-- Option A -->
-                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold">A</div>
-                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
-                            </div>
-                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.primary.count}x <span class="text-green-500">Prospector</span></span>
-                        </div>
+                <div class="mb-6 p-1 rounded-xl bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                    <div class="bg-[var(--bg-panel)] rounded-lg p-4 relative overflow-hidden">
+                        <!-- Striped Warning Background -->
+                        <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px);"></div>
                         
-                        <!-- Option B -->
-                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center text-xs font-bold">B</div>
-                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
-                            </div>
-                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.secondary.count}x <span class="text-orange-500">Golem</span></span>
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <h4 class="text-sm font-black text-red-500 uppercase tracking-widest flex items-center gap-2">
+                                <span class="animate-pulse">⚠️</span> INSUFFICIENT POWER
+                            </h4>
+                            <span class="text-xs font-mono font-bold text-red-400 bg-red-900/20 px-2 py-1 rounded border border-red-500/30">
+                                -${deficit} MW
+                            </span>
                         </div>
 
-                        <!-- Option C -->
-                        <div class="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center text-xs font-bold">C</div>
-                                <span class="text-xs text-[var(--text-strong)] font-semibold uppercase">Deploy</span>
+                        <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mb-2 text-center">Deploy Additional Assets:</p>
+                        
+                        <div class="grid grid-cols-3 gap-2 relative z-10">
+                            <div class="flex flex-col items-center bg-[var(--bg-input)] p-2 rounded border border-green-900/30">
+                                <span class="text-lg font-bold text-green-500">+${recommendations.extra.primary.count}</span>
+                                <span class="text-[8px] uppercase text-[var(--text-muted)]">Prospector</span>
                             </div>
-                            <span class="text-sm font-bold text-[var(--text-main)]">+${recommendations.extra.tertiary.count}x <span class="text-indigo-500">MOLE</span></span>
+                            <div class="flex flex-col items-center bg-[var(--bg-input)] p-2 rounded border border-orange-900/30">
+                                <span class="text-lg font-bold text-orange-500">+${recommendations.extra.secondary.count}</span>
+                                <span class="text-[8px] uppercase text-[var(--text-muted)]">Golem</span>
+                            </div>
+                            <div class="flex flex-col items-center bg-[var(--bg-input)] p-2 rounded border border-indigo-900/30">
+                                <span class="text-lg font-bold text-indigo-500">+${recommendations.extra.tertiary.count}</span>
+                                <span class="text-[8px] uppercase text-[var(--text-muted)]">MOLE</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 `;
             }
 
-            recHtml += `<h3 class="text-xs font-bold text-[var(--text-muted)] uppercase mb-2 text-center border-b border-[var(--border-main)] pb-1">Recommended Loadouts</h3>`;
-            recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
-            recHtml += `<h4 class="text-xs font-bold text-indigo-400 uppercase mb-2 text-center">MOLE (Size 2)</h4>`;
-            recHtml += renderCard(recommendations.mole[0], 'text-red-400');
-            recHtml += renderCard(recommendations.mole[1], 'text-blue-400');
-            recHtml += renderCard(recommendations.mole[2], 'text-green-500');
+            recHtml += `<div class="flex items-center gap-2 mb-4"><div class="h-px flex-1 bg-[var(--border-main)]"></div><span class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">OPTIMAL CONFIGURATIONS</span><div class="h-px flex-1 bg-[var(--border-main)]"></div></div>`;
+            
+            // MOLE SECTION
+            recHtml += `<div class="relative pl-3 border-l-2 border-indigo-500/30 mb-6">`;
+            recHtml += `<h4 class="text-xs font-black text-indigo-400 uppercase mb-3 flex items-center gap-2">ARGO MOLE <span class="text-[9px] text-[var(--text-muted)] font-normal ml-auto">Size 2 Hardpoints</span></h4>`;
+            recHtml += renderNewCard(recommendations.mole[0], 'text-red-400', 'indigo');
+            recHtml += renderNewCard(recommendations.mole[1], 'text-blue-400', 'indigo');
+            recHtml += renderNewCard(recommendations.mole[2], 'text-green-400', 'indigo');
             recHtml += `</div>`;
-            recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
-            recHtml += `<h4 class="text-xs font-bold text-green-500 uppercase mb-2 text-center">Prospector (Size 1)</h4>`;
-            recHtml += renderCard(recommendations.prospector, 'text-yellow-500');
+
+            // PROSPECTOR SECTION
+            recHtml += `<div class="relative pl-3 border-l-2 border-green-500/30 mb-6">`;
+            recHtml += `<h4 class="text-xs font-black text-green-400 uppercase mb-3 flex items-center gap-2">MISC PROSPECTOR <span class="text-[9px] text-[var(--text-muted)] font-normal ml-auto">Size 1 Hardpoint</span></h4>`;
+            recHtml += renderNewCard(recommendations.prospector, 'text-yellow-400', 'green');
             recHtml += `</div>`;
-             recHtml += `<div class="mb-4 border border-[var(--border-main)] rounded-xl p-2 bg-[var(--bg-main)]/50">`;
-             recHtml += `<h4 class="text-xs font-bold text-orange-400 uppercase mb-2 text-center">Golem (Fixed S0)</h4>`;
-             recHtml += renderCard(recommendations.golem, 'text-orange-400');
+            
+            // GOLEM SECTION
+             recHtml += `<div class="relative pl-3 border-l-2 border-orange-500/30">`;
+             recHtml += `<h4 class="text-xs font-black text-orange-400 uppercase mb-3 flex items-center gap-2">DRAKE GOLEM <span class="text-[9px] text-[var(--text-muted)] font-normal ml-auto">Fixed Size 0</span></h4>`;
+             recHtml += renderNewCard(recommendations.golem, 'text-orange-400', 'orange');
              recHtml += `</div></div>`;
 
             configsContainer.innerHTML = recHtml;
