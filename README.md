@@ -1,197 +1,118 @@
-<div align="center">
-  <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">
-    <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mfa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
-  </a>
+# Mining Fracture Analyser (MFA) - Star Citizen
 
-  <h1 align="center">Mining Fracture Analyser (MFA) v4.1</h1>
+![Version](https://img.shields.io/badge/Version-4.1-blue) ![Status](https://img.shields.io/badge/UEX%20Data-Verified-green) ![AI](https://img.shields.io/badge/Powered%20By-Google%20Gemini-purple)
 
-  <p align="center">
-    <strong>A real-time cooperative mining calculator for Star Citizen.</strong>
-    <br />
-    Stop Guessing. Start Fracturing.
-    <br />
-    <br />
-    <a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="_blank">
-      <img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" />
-    </a>
-    <img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" />
-    <img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" />
-    <br />
-    <br />
-    <a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">🔴 <strong>Launch Live Demo</strong></a>
-    |
-    <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">🐛 Report Bug</a>
-    |
-    <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">✨ Request Feature</a>
-  </p>
-</div>
+**The ultimate precision calculation engine for industrial mining crews.**
 
+The **Mining Fracture Analyser (MFA)** is a web-based tool designed for *Star Citizen* players to calculate real-time mining fracture power, assess risk, and optimize loadouts. Now updated with a holographic UI, live video OCR scanning, and an integrated AI Foreman powered by Google Gemini.
 
-## **📑 Table of Contents**
+---
 
-1. [About The Project](https://www.google.com/search?q=%23-about-the-project)  
-2. [Key Features](https://www.google.com/search?q=%23-key-features)  
-3. [User Guide: Windows App Installation](https://www.google.com/search?q=%23-user-guide-windows-app-installation)  
-4. [User Guide: Using the AI Foreman](https://www.google.com/search?q=%23-user-guide-using-the-ai-foreman)  
-5. [User Guide: OCR & Features](https://www.google.com/search?q=%23-user-guide-ocr--features)  
-6. [Technical: How It Works](https://www.google.com/search?q=%23-technical-how-it-works)  
-7. [Developer Guide: Local Setup](https://www.google.com/search?q=%23-developer-guide-local-setup)  
-8. [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)  
-9. [Disclaimer & License](https://www.google.com/search?q=%23-disclaimer--license)
+## 🚀 Key Features
 
-## **📖 About The Project**
+### 1. 🏭 Multi-Ship Fleet Configuration
+* **Dynamic Fleet Assembly:** Assemble a complex mining fleet including the **Argo MOLE**, **MISC Prospector**, and the new **Drake Golem**.
+* **Hardpoint Management:** Configure individual laser heads per ship arm.
+* **Module Stacking:** Add up to 3 modules per laser (Surge, Brandt, Torrent, etc.) with support for **Active/Passive toggles**.
+* **Drake Golem Support:** Includes specific logic for the Golem's fixed "Pitman" mining laser.
 
-The **Mining Fracture Analyser (MFA)** is a specialized calculation engine developed for Star Citizen industrial crews.
+### 2. 🧠 AI Foreman Uplink (New!)
+* **Powered by Google Gemini:** Connect your API key to unlock a senior mining AI.
+* **Real-time Strategy:** The AI analyzes your specific rock mass, resistance, and current fleet power to provide tactical advice.
+* **Capabilities:**
+    * **Strategy:** Safety assessments and approach vectors.
+    * **Risk Report:** Explosion probability analysis.
+    * **Loadout Optimization:** Mathematical suggestions for modules.
+    * **Crew Briefing:** Generates copy/paste orders for in-game chat.
 
-Star Citizen mining mechanics involve complex variables: Laser Power, Instability, Resistance, Distance, and Consumables. Guessing these values often results in **overheated rocks (catastrophic explosions)** or wasted time on rocks that are mathematically impossible to break.
+### 3. 👁️ Live OCR & Telemetry
+* **Live Video Scanning:** Uses `getDisplayMedia` to stream your Star Citizen window.
+    * **Loadout Scan (Left):** Automatically detects installed lasers and modules from your VMA/Mobiglas.
+    * **Mining Scan (Right):** Reads Rock Mass, Resistance, and Instability directly from the UI while you fly.
+* **Static Upload:** Drag and drop screenshots for instant data parsing.
+* **Privacy First:** All OCR processing is done client-side using **Tesseract.js**. No video leaves your browser.
 
-This tool solves that problem by calculating the **Total Combined Effective Laser Power** of your entire crew in real-time, providing a simple "Pass/Fail" verdict before you even activate your lasers.
+### 4. 📊 Advanced Analytics
+* **Power vs. Margin:** Visual bar charts comparing your output against the rock's requirement.
+* **Risk Profile:** Doughnut charts visualizing Resistance vs. Instability vs. Safe Margin.
+* **Resistance Curve:** A line graph projecting power requirements across various resistance levels.
 
-**Version 3.6** introduces a standalone Windows Application wrapper and an advanced **AI Senior Foreman** powered by Google Gemini to provide tactical advice, risk assessments, and roleplay orders.
+### 5. 🎨 Immersive UI
+* **Theme Engine:** Switch between "Deep Space Slate" (Dark Mode) and "Aerospace Platinum" (Light Mode).
+* **Glassmorphism:** Modern, translucent panels with neon glow effects.
+* **Reactive Layout:** Fully responsive grid system for desktops and tablets.
 
-## **✨ Key Features**
+---
 
-### **🤖 AI Senior Foreman (Powered by Gemini)**
+## 🛠️ How to Use
 
-Your virtual crew chief. Located in the **Requirements Panel**, the AI analyzes your specific situation to provide:
+### Setup
+1.  Open the application in a modern browser (Chrome/Edge/Firefox).
+2.  *(Optional for AI)* Click **"Auth Key"** in the AI section and paste your [Google Gemini API Key](https://aistudio.google.com/app/apikey). The key is stored locally in your browser.
 
-* **Strategic Assessments:** "Is this rock safe? What modules do I need?"  
-* **Risk Reports:** Detailed breakdown of explosion probability.  
-* **Optimization Tips:** Mathematical suggestions to improve yield.  
-* **Roleplay Orders:** Generates "Command Uplink" text blocks for in-game chat.
+### Manual Calculation
+1.  **Target Analysis:** Enter the Rock Mass, Resistance, and Instability manually.
+2.  **Deploy Fleet:** Select a ship (e.g., MOLE) and click `+ Deploy`.
+3.  **Configure Arms:**
+    * Select the Laser Head (e.g., Helix II).
+    * Add Modules (e.g., Surge, Rieger).
+    * Toggle modules "Active" if they are currently activated.
+4.  **Gadgets:** Select an active gadget (e.g., BoreMax) from the list.
+5.  **Results:** View the "Telemetry" column for Success/Failure status and optimal loadout suggestions.
 
-### **📸 OCR Auto-Scan (Tesseract.js)**
+### Live Scanning (OCR)
+1.  Click **Scan Mining (Right)** to track rock stats or **Scan Loadout (Left)** to track ship items.
+2.  Select your Star Citizen window when prompted by the browser.
+3.  The system will automatically parse text from the screen and update the input fields.
+    * *Note: Ensure the game UI is clearly visible for best results.*
 
-Don't waste time typing numbers while piloting.
+---
 
-* **Step 1:** Take a screenshot of your mining UI.  
-* **Step 2:** Press Ctrl+V (Paste) directly into the app.  
-* **Result:** The app automatically extracts Mass, Resistance, and Instability.
+## 📦 Installation / Deployment
 
-### **🚀 Multi-Crew Fleet Simulation**
+This is a client-side only application (HTML/JS/CSS). No backend server is required.
 
-Simulate any combination of ships currently in the game:
+**Option 1: GitHub Pages**
+Host directly from your repository settings.
 
-* **Argo MOLE** (3 Laser Heads) \- Configurable per head.  
-* **MISC Prospector** (1 Laser Head)  
-* **Drake Golem** (Mining Turret Support)  
-* *Heat Management:* Toggle individual heads on/off to simulate heat management strategies.
+**Option 2: Local Use**
+1.  Clone the repository.
+2.  Open `index.html` in your browser.
 
-### **📊 Advanced Visual Analytics**
+**Option 3: VS Code Live Server**
+1.  Open the folder in VS Code.
+2.  Right-click `index.html` -> "Open with Live Server".
 
-We don't just show numbers; we visualize the physics:
+---
 
-* **Power vs. Margin:** Visualizes your power surplus vs. the rock's requirement.  
-* **Risk Profile:** A Doughnut chart comparing Resistance, Instability, and your Safety Margin.  
-* **Resistance Curve:** A predictive line graph showing laser efficiency across the heating window.
+## 🧮 Data & Mechanics
 
-## **🛠 User Guide: Windows App Installation**
+* **Game Version:** Star Citizen Alpha 3.24+ (Verified UEX Data v4.1).
+* **Math:** Calculates `Total Effective Power` based on:
+    * Laser Base Power.
+    * Module Multipliers (Active/Passive).
+    * Resistance Reduction (Global & Per-Arm).
+    * Distance/Falloff (Simplified).
+    * Gadget Modifiers (Additive/Multiplicative).
 
-This section is for players who want to run the tool as a standalone program (App Mode) on their PC.
+---
 
-### **Step 1: Install Python**
+## 🤝 Contributing
 
-This app runs on Python. If you don't have it installed:
-
-1. Download Python from [python.org](https://www.python.org/downloads/).  
-2. **CRUCIAL:** During installation, check the box that says **"Add Python to PATH"**.
-
-### **Step 2: Save the Application Files**
-
-Create a new folder on your computer (e.g., Desktop\\MFA\_Tool) and save the following two files inside it:
-
-* index.html: The main application code.  
-* run\_app.py: The launcher script.
-
-### **Step 3: Install the Window Wrapper**
-
-Open your Command Prompt (search for cmd in Windows) and run this command:
-
-pip install pywebview
-
-*(This* library allows the HTML *tool to run as a native window instead of in a web browser tab, removing the address bar and adding desktop features)*
-
-### **Step 4: Run the App**
-
-Double-click run\_app.py (or run python run\_app.py in terminal). The application will launch in a dark-mode window.
-
-## **🤖 User Guide: Using the AI Foreman**
-
-The AI Foreman is located in the **bottom-right panel** (Column 4). It requires a one-time setup.
-
-### **1\. Activating the AI (API Key Setup)**
-
-1. **Get a Free Key:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and create a free API key.  
-2. **In the App:** Click the **"🔑 Config"** button in the AI Foreman header.  
-3. **Paste Key:** Enter your key into the popup modal and click **Save**.  
-   * *Note: Your key is saved locally on your computer. It is never sent to our servers.*
-
-### **2\. Available Modes**
-
-Once configured, you can use the following buttons:
-
-* **🧠 Strategy:** Provides a general assessment of the rock. Tells you if your current team can break it and suggests a general approach.  
-* **⚠️ Risk Report:** Focuses purely on safety. Analyzes the **Instability** value and warns you of explosion risks. Recommends safety distances or specific stability modules (like Stampede/Optimum).  
-* **🔧 Module Tips:** Acts as a loadout engineer. Suggests the mathematically optimal modules to equip for *this specific rock* (e.g., "Resistance is high, swap to a Brandt module").  
-* **📢 Orders:** Generates a short, roleplay-style text block (e.g., "/// COMMAND UPLINK /// Target Mass 23k...") that you can copy/paste into Star Citizen's in-game chat to coordinate your team.  
-* **Custom Query:** Type your own question (e.g., "How much is this rock worth?") into the text box and press Enter.
-
-## **📷 User Guide: OCR & Features**
-
-### **Using OCR (Auto-Scan)**
-
-1. While in-game, verify you are looking at the rock's scan data.  
-2. Take a screenshot (Print Screen) or use Snipping Tool.  
-3. **CTRL+V (Paste)** the image directly into the MFA App window.  
-4. *Alternatively:* Click the "Auto-Scan Rock" box to upload an image file.  
-5. The tool will automatically fill in Mass, Resistance, and Instability.
-
-### **Using Smart Recommendations**
-
-If your simulation fails (Power Insufficient), the **Recommended Loadouts** section (bottom right) will automatically suggest:
-
-* **Optimal Loadouts:** Specific laser/module combos for MOLEs, Prospectors, and Golems.  
-* **Reinforcements:** Exactly how many extra ships you need to invite to break the rock.
-
-## **🧠 Technical: How It Works**
-
-The application uses established community formulas (verified by SC-Trade-Tools and RedMonsterSC) to calculate:
-
-1. **Base Power:** Sum of all active laser heads.  
-2. **Module Modifiers:** Applies buffs/debuffs from Surges, Stampedes, Torrents, etc.  
-3. **Resistance Calculation:** Effective Power \= Total Power \* (1 \- Rock Resistance).  
-4. **Heat Transfer:** Determines if Effective Power \> Rock Heat Threshold.
-
-## **💻 Developer Guide: Local Setup**
-
-If you wish to contribute to the codebase or run the web version locally without Python.
-
-### **Local Web Server**
-
-Due to browser security policies (CORS) regarding Web Workers (used by Tesseract OCR), simply opening the index.html file in Chrome/Edge will **not** allow the OCR to work. You must run a local server:
-
-* **VS Code:** Right-click index.html \-\> "Open with Live Server".  
-* **Python:** Run python \-m http.server 8000 in the directory.
-
-## **⚠️ Troubleshooting**
-
-* **"The AI buttons do nothing":**  
-  * Did you click **"🔑 Config"** and save your API key?  
-  * Check your internet connection.  
-* **"ModuleNotFoundError: No module named 'webview'":**  
-  * You missed Step 3 in the Installation. Run pip install pywebview in your terminal.  
-* **OCR Not Picking up numbers:**  
-  * Ensure the screenshot is clear.  
-  * Try cropping the image closer to the stats on the right side of the UI.  
-  * OCR relies on visual contrast; darker backgrounds in screenshots help.
-
-## **⚠️ Disclaimer & License**
-
-**Disclaimer:** This application is a fan-made tool using empirical data. Star Citizen server tick rates (FPS), desync, and unannounced CIG balance changes can affect actual mining results. Use this tool as a guide, not a guarantee.
-
-**License:** Distributed under the GNU General Public License (GPL). See LICENSE for more information.
-
-**Credits:**
-* Data provided by [UEX Corp](https://www.google.com/search?q=https://uexcorp.space/).  
-* Images property of Cloud Imperium Games.  
-* Developer: CHIRONDRAGON.
+Contributions are welcome!
+1.  Fork the Project.
+2.  Create your Feature Branch.
+3.  Commit your Changes.
+4.  Open a Pull Request.
+
+---
+
+## 📄 Credits
+
+* **Design & Code:** [esramos-design](https://github.com/esramos-design)
+* **Mining Data:** Verified against [UEX Corp](https://uexcorp.space/) and in-game testing.
+* **Libraries:**
+    * [Tailwind CSS](https://tailwindcss.com/) - Styling.
+    * [Chart.js](https://www.chartjs.org/) - Graphs.
+    * [Tesseract.js](https://tesseract.projectnaptha.com/) - OCR.
+    * [Marked.js](https://marked.js.org/) - Markdown parsing.
