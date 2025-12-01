@@ -308,7 +308,7 @@
                     
                     <!-- NEW OCR SECTION WITH SEPARATE TOGGLES -->
                     <div class="mb-6">
-                         <div class="grid grid-cols-2 gap-3 mb-2">
+                         <div class="grid grid-cols-2 gap-3 mb-3">
                             <!-- Button 1: Loadout Data (Left) -->
                             <button id="btn-scan-loadout" onclick="toggleScan('loadout')" 
                                     class="p-4 rounded-xl border border-dashed border-[var(--border-main)] hover:border-purple-500 bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-white transition flex flex-col items-center justify-center gap-2 group relative overflow-hidden shadow-lg">
@@ -326,9 +326,17 @@
                             </button>
                         </div>
                         
-                        <div class="text-center">
-                             <span onclick="document.getElementById('fileInput').click()" class="text-[12px] uppercase tracking-widest text-[var(--text-muted)] cursor-pointer hover:text-blue-400 border-b border-transparent hover:border-blue-400 transition-all">Or Upload Static Screenshot</span>
+                        <!-- Manual Upload Zone (Replaces Text Link) -->
+                        <div class="relative flex flex-col items-center justify-center py-8 text-center cursor-pointer group border border-dashed border-[var(--border-main)] rounded-xl bg-[var(--bg-input)] hover:border-blue-400 transition-all duration-300" onclick="document.getElementById('fileInput').click()">
+                            <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[var(--text-muted)] mb-2 group-hover:text-blue-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <p class="text-sm text-[var(--text-main)] font-bold uppercase tracking-wide">Optical Scan (OCR)</p>
+                            <p class="text-[10px] text-[var(--text-muted)] mt-1 font-mono">UPLOAD OR <span class="text-blue-400 font-bold">CTRL+V</span></p>
                         </div>
+                        
                         <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
                         
                         <!-- Overlay for Processing (Only for manual upload) -->
