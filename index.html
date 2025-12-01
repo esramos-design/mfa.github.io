@@ -306,23 +306,28 @@
                 
                 <div class="p-6 space-y-6">
                     
-                    <!-- NEW OCR SECTION WITH LIVE STREAM -->
+                    <!-- NEW OCR SECTION WITH SEPARATE TOGGLES -->
                     <div class="mb-6">
                          <div class="grid grid-cols-2 gap-3 mb-2">
-                            <!-- Upload Button -->
-                            <button onclick="document.getElementById('fileInput').click()" 
-                                    class="p-4 rounded-xl border border-dashed border-[var(--border-main)] hover:border-blue-400 bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-blue-400 transition flex flex-col items-center justify-center gap-2 group shadow-lg">
-                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                <span class="text-[10px] font-bold uppercase tracking-wider">Upload Scan</span>
+                            <!-- Button 1: Loadout Data (Left) -->
+                            <button id="btn-scan-loadout" onclick="toggleScan('loadout')" 
+                                    class="p-4 rounded-xl border border-dashed border-[var(--border-main)] hover:border-purple-500 bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-white transition flex flex-col items-center justify-center gap-2 group relative overflow-hidden shadow-lg">
+                                <div id="indicator-loadout" class="hidden absolute top-2 right-2 w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_#a855f7]"></div>
+                                <svg class="w-6 h-6 group-hover:text-purple-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <span id="text-loadout" class="text-[10px] font-bold uppercase tracking-wider">Scan Loadout (Left)</span>
                             </button>
 
-                            <!-- Live Stream Button -->
-                            <button id="btn-start-stream" onclick="toggleLiveStream()" 
-                                    class="p-4 rounded-xl border border-dashed border-[var(--border-main)] hover:border-red-500 bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-white transition flex flex-col items-center justify-center gap-2 group relative overflow-hidden shadow-lg">
-                                <div id="recording-indicator" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]"></div>
-                                <svg class="w-6 h-6 group-hover:text-red-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.818v6.364a1 1 0 01-.947.947l-4.553-2.276A1 1 0 0115 14.955V9.045A1 1 0 0115 10zM5 18h6a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                <span id="stream-btn-text" class="text-[10px] font-bold uppercase tracking-wider">Start Live Feed</span>
+                            <!-- Button 2: Mining Data (Right) -->
+                            <button id="btn-scan-mining" onclick="toggleScan('mining')" 
+                                    class="p-4 rounded-xl border border-dashed border-[var(--border-main)] hover:border-blue-500 bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-white transition flex flex-col items-center justify-center gap-2 group relative overflow-hidden shadow-lg">
+                                <div id="indicator-mining" class="hidden absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_#3b82f6]"></div>
+                                <svg class="w-6 h-6 group-hover:text-blue-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span id="text-mining" class="text-[10px] font-bold uppercase tracking-wider">Scan Mining (Right)</span>
                             </button>
+                        </div>
+                        
+                        <div class="text-center">
+                             <span onclick="document.getElementById('fileInput').click()" class="text-[9px] uppercase tracking-widest text-[var(--text-muted)] cursor-pointer hover:text-blue-400 border-b border-transparent hover:border-blue-400 transition-all">Or Upload Static Screenshot</span>
                         </div>
                         <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
                         
@@ -337,9 +342,6 @@
                         <!-- Hidden Logic Elements -->
                         <video id="stream-video" autoplay playsinline class="hidden"></video>
                         <canvas id="stream-canvas" class="hidden"></canvas>
-                        
-                        <!-- Status Log for Debugging (Hidden generally, shows if needed) -->
-                        <div id="ocr-status" class="hidden text-[10px] font-mono text-gray-500 mt-1 text-center"></div>
                     </div>
 
                     <!-- Rock Parameters -->
@@ -715,7 +717,6 @@
             { name: "Lancet MH2", size: 2, power: 3600, moduleSlots: 2, resistanceEffect: 0, instabilityEffect: 0, optimalWindow: 3.0, shatterDamage: 30, extractionRate: 0.8, inertFiltering: 0.3, optimalChargeRate: 0.5, overchargeRate: 0.5 },
         ].sort((a, b) => {
             if (b.size !== a.size) return b.size - a.size;
-            // Prefer Size 2 for better default matching, then Size 1
             return b.power - a.power;
         });
 
@@ -1495,7 +1496,7 @@
                             <span class="text-[9px] text-blue-300 font-bold mb-1 leading-none uppercase tracking-wide">Active</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="${toggleId}" class="sr-only peer" ${wasChecked ? 'checked' : ''} onchange="calculate()">
-                                <div class="w-8 h-4 bg-slate-700/50 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
+                                <div class="w-8 h-4 bg-slate-700/50 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-500"></div>
                             </label>
                         </div>
                     </div>`;
@@ -1608,59 +1609,98 @@
             calculate();
         }
         
-        // --- OCR AND LIVE STREAM FUNCTIONALITY ---
+        // --- MULTI-MODE LIVE STREAM SCANNER ---
 
         let streamInterval = null;
         let streamTrack = null;
+        
+        // Scan State Object
+        let scanState = {
+            mining: false,  // Right Side
+            loadout: false  // Left Side
+        };
 
-        // Toggle Live Stream
-        async function toggleLiveStream() {
-            const videoElem = document.getElementById('stream-video');
-            const btnText = document.getElementById('stream-btn-text');
-            const indicator = document.getElementById('recording-indicator');
-            const btn = document.getElementById('btn-start-stream');
+        async function toggleScan(mode) {
+            const btnMining = document.getElementById('btn-scan-mining');
+            const btnLoadout = document.getElementById('btn-scan-loadout');
+            const indMining = document.getElementById('indicator-mining');
+            const indLoadout = document.getElementById('indicator-loadout');
+            const txtMining = document.getElementById('text-mining');
+            const txtLoadout = document.getElementById('text-loadout');
 
-            if (streamTrack) {
-                stopStream();
-                return;
+            // 1. Toggle State
+            scanState[mode] = !scanState[mode];
+            const isActive = scanState[mode];
+
+            // 2. Update UI Visuals immediately
+            if (mode === 'mining') {
+                if (isActive) {
+                    btnMining.classList.add('border-blue-500', 'bg-blue-900/10');
+                    indMining.classList.remove('hidden');
+                    txtMining.textContent = "STOP MINING SCAN";
+                } else {
+                    btnMining.classList.remove('border-blue-500', 'bg-blue-900/10');
+                    indMining.classList.add('hidden');
+                    txtMining.textContent = "SCAN MINING (RIGHT)";
+                }
+            } else if (mode === 'loadout') {
+                if (isActive) {
+                    btnLoadout.classList.add('border-purple-500', 'bg-purple-900/10');
+                    indLoadout.classList.remove('hidden');
+                    txtLoadout.textContent = "STOP LOADOUT SCAN";
+                } else {
+                    btnLoadout.classList.remove('border-purple-500', 'bg-purple-900/10');
+                    indLoadout.classList.add('hidden');
+                    txtLoadout.textContent = "SCAN LOADOUT (LEFT)";
+                }
             }
 
+            // 3. Manage Stream Logic
+            // If either is active, we need a stream
+            if (scanState.mining || scanState.loadout) {
+                if (!streamTrack) {
+                    await startStream();
+                } else if (!streamInterval) {
+                    // Resume interval if it was paused but stream was kept alive (edge case)
+                    streamInterval = setInterval(captureAndProcess, 3000);
+                }
+            } else {
+                // Both are off, kill stream to save resources
+                stopStream();
+            }
+        }
+
+        async function startStream() {
             try {
-                // Request Screen Share
+                const videoElem = document.getElementById('stream-video');
                 const captureStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: {
-                        cursor: "never",
-                        displaySurface: "window" // Encourage picking specific window
-                    },
+                    video: { cursor: "never", displaySurface: "window" },
                     audio: false
                 });
 
                 videoElem.srcObject = captureStream;
                 streamTrack = captureStream.getVideoTracks()[0];
 
-                // Update UI
-                btnText.textContent = "STOP FEED";
-                indicator.classList.remove('hidden');
-                btn.classList.add('border-red-500', 'bg-red-900/10');
+                // Handle external stop (user clicks browser 'Stop Sharing')
+                streamTrack.onended = () => {
+                    stopStream(true); // Force full reset
+                };
 
-                // Stop if user clicks browser 'Stop Sharing'
-                streamTrack.onended = () => stopStream();
-
-                // Start Loop (Every 3 seconds)
-                streamInterval = setInterval(captureAndScan, 3000);
+                // Start Processing Loop
+                streamInterval = setInterval(captureAndProcess, 3000);
 
             } catch (err) {
-                console.error("Error starting stream:", err);
+                console.error("Stream Error:", err);
                 alert("Could not start stream. Please select the Star Citizen window.");
+                // Reset states if failed
+                if(scanState.mining) toggleScan('mining');
+                if(scanState.loadout) toggleScan('loadout');
             }
         }
 
-        function stopStream() {
+        function stopStream(forceReset = false) {
             const videoElem = document.getElementById('stream-video');
-            const btnText = document.getElementById('stream-btn-text');
-            const indicator = document.getElementById('recording-indicator');
-            const btn = document.getElementById('btn-start-stream');
-
+            
             if (streamTrack) {
                 streamTrack.stop();
                 streamTrack = null;
@@ -1671,63 +1711,183 @@
             }
             videoElem.srcObject = null;
 
-            // Reset UI
-            btnText.textContent = "START LIVE FEED";
-            indicator.classList.add('hidden');
-            btn.classList.remove('border-red-500', 'bg-red-900/10');
+            if (forceReset) {
+                // If stream died externally, visually reset buttons
+                if(scanState.mining) toggleScan('mining');
+                if(scanState.loadout) toggleScan('loadout');
+            }
         }
 
-        // Capture Frame and Crop
-        async function captureAndScan() {
+        async function captureAndProcess() {
             const video = document.getElementById('stream-video');
             const canvas = document.getElementById('stream-canvas');
             const ctx = canvas.getContext('2d');
 
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
-                // CROP STRATEGY: 
-                // Capture the entire bottom 70% of the screen.
-                // Left side = Loadout info. Right side = Rock stats.
-                const sourceY = video.videoHeight * 0.30; // Start 30% down from top
-                const sourceH = video.videoHeight * 0.70; // Height is remaining 70%
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Strategy: We want to minimize OCR calls.
+            // If both are active, we might do 2 calls or 1 big call.
+            // Since Tesseract is heavy, let's prioritize correctness over raw speed.
+            // We will do sequential calls if both are active.
+
+            if (scanState.mining) {
+                // RIGHT SIDE CROP (Rock Stats)
+                // Width: Right 35% | Height: Middle-Bottom area (20% to 80%)
+                const w = video.videoWidth;
+                const h = video.videoHeight;
+                const cropX = w * 0.65; 
+                const cropY = h * 0.20;
+                const cropW = w * 0.35;
+                const cropH = h * 0.60;
+
+                ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
                 
-                // Draw Full Width to capture both Left (Ship) and Right (Rock)
-                ctx.drawImage(video, 0, sourceY, video.videoWidth, sourceH, 0, 0, video.videoWidth, sourceH);
+                // Convert to Blob for OCR
+                // Note: toBlob is async callback
+                canvas.toBlob((blob) => runSpecificOCR(blob, 'mining'), 'image/png');
+            }
 
-                canvas.toBlob((blob) => {
-                    runSilentOCR(blob);
-                });
+            // Small delay or just fire second promise? Tesseract queues them.
+            if (scanState.loadout) {
+                // LEFT SIDE CROP (Ship Loadout)
+                // Width: Left 35% | Height: Bottom area (30% to 100%)
+                const w = video.videoWidth;
+                const h = video.videoHeight;
+                const cropX = 0; 
+                const cropY = h * 0.30;
+                const cropW = w * 0.35;
+                const cropH = h * 0.70;
+
+                // We need to wait for the first draw/blob to finish or use a second canvas?
+                // Actually, since toBlob is async, we shouldn't overwrite canvas immediately.
+                // Safest bet in single-thread JS: Wait 1.5s for next tick? 
+                // OR: Just redraw. toBlob creates a snapshot.
+                // However, to ensure no race condition on the single canvas element:
+                // We will skip loadout this tick if mining is running, and alternate?
+                // Better: Just use the same canvas, redraw immediately. Browser handles sync drawing.
+                
+                ctx.clearRect(0,0,w,h); // Clear
+                ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+                
+                canvas.toBlob((blob) => runSpecificOCR(blob, 'loadout'), 'image/png');
             }
         }
 
-        // Silent OCR (No loading overlay)
-        async function runSilentOCR(imageBlob) {
+        async function runSpecificOCR(imageBlob, mode) {
             try {
                 const worker = await Tesseract.createWorker();
-                // REMOVED whitelist to allow reading letters for "Helix", "Surge", etc.
-                // This makes it slightly slower but enables loadout scanning.
+                
+                // Optimization: Whitelist based on mode
+                if (mode === 'mining') {
+                    await worker.setParameters({
+                        tessedit_char_whitelist: '0123456789.,MassResistanceInstability%kg '
+                    });
+                } 
+                // Loadout needs letters, so no heavy whitelist
                 
                 const ret = await worker.recognize(imageBlob);
                 const text = ret.data.text;
                 
-                // Debug log
-                if(text.length > 5) {
-                    // document.getElementById('ocr-status').innerText = "Last Scan: " + new Date().toLocaleTimeString();
-                    console.log("OCR Text:", text.substring(0, 100) + "..."); 
-                }
+                if (mode === 'mining') applyMiningData(text);
+                if (mode === 'loadout') applyLoadoutData(text);
 
-                // Use existing parsing logic + new Loadout logic
-                applyScannedData(text, true); 
-                
                 await worker.terminate();
             } catch (err) {
-                // Ignore empty frames
+                console.log("OCR Error/Skip");
             }
         }
 
-        // Original File Upload Handler
+        // --- SPECIFIC PARSING FUNCTIONS ---
+
+        function applyMiningData(text) {
+            let updated = false;
+            const parseValue = (str) => {
+                const cleaned = str.replace(/[^\d.]/g, '');
+                return parseFloat(cleaned);
+            };
+
+            const massMatch = text.match(/(?:Mass|Mas|M|Rock Mass)[\s:.]*([\d][\d\s,.]*)/i);
+            const resMatch = text.match(/(?:Resistance|Res|Resist)[\s:.]*([\d][\d\s,.]*)/i);
+            const instMatch = text.match(/(?:Instability|Inst|Stablity)[\s:.]*([\d][\d\s,.]*)/i);
+
+            if (massMatch && massMatch[1]) {
+                const val = parseValue(massMatch[1]);
+                if (!isNaN(val) && val > 0) { document.getElementById('rockMass').value = val; updated = true; }
+            }
+            if (resMatch && resMatch[1]) {
+                const val = parseValue(resMatch[1]);
+                if (!isNaN(val)) { document.getElementById('resistance').value = val; updated = true; }
+            }
+            if (instMatch && instMatch[1]) {
+                const val = parseValue(instMatch[1]);
+                if (!isNaN(val)) { document.getElementById('instability').value = val; updated = true; }
+            }
+
+            if (updated) {
+                calculate();
+                console.log("Mining Data Updated");
+            }
+        }
+
+        function applyLoadoutData(text) {
+            // 1. Detect Ship (optional, mostly manual, but can try)
+            // 2. Detect Laser Head
+            const detectLaser = allLaserHeads.sort((a,b) => b.name.length - a.name.length).find(head => text.toLowerCase().includes(head.name.toLowerCase()));
+            
+            // 3. Detect Modules
+            const detectModules = powerModules.filter(mod => {
+                const simpleName = mod.name.split('(')[0].trim().toLowerCase();
+                return simpleName.length > 3 && text.toLowerCase().includes(simpleName);
+            });
+
+            if (detectLaser || detectModules.length > 0) {
+                 const firstArm = document.querySelector('.ship-arm-card');
+                 if(firstArm) {
+                    const armId = firstArm.id;
+                    let loadoutUpdated = false;
+
+                    if(detectLaser) {
+                        const laserSelect = document.getElementById(`${armId}-laser`);
+                        if(laserSelect && !laserSelect.disabled && laserSelect.value != detectLaser.power) {
+                            for (let i = 0; i < laserSelect.options.length; i++) {
+                                if (laserSelect.options[i].text.includes(detectLaser.name)) {
+                                    laserSelect.selectedIndex = i;
+                                    updateLaserConfig(laserSelect, armId);
+                                    loadoutUpdated = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if(detectModules.length > 0) {
+                        for(let i=1; i<=3; i++) {
+                            const modSelect = document.getElementById(`${armId}-mod${i}`);
+                            if(modSelect && !modSelect.disabled) {
+                                // Try to match distinct detected modules to slots
+                                // Simple logic: fill slots sequentially with unique detected mods
+                                if(detectModules[i-1]) {
+                                     if(modSelect.value !== detectModules[i-1].name) {
+                                         modSelect.value = detectModules[i-1].name;
+                                         checkModuleActive(modSelect, `${armId}-mod${i}-toggle-container`);
+                                         loadoutUpdated = true;
+                                     }
+                                }
+                            }
+                        }
+                    }
+                    if(loadoutUpdated) {
+                        calculate();
+                        console.log("Loadout Updated");
+                    }
+                 }
+            }
+        }
+
+        // Original File Upload Handler (Legacy fallback)
         document.addEventListener('paste', function(e) {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let index in items) {
@@ -1754,131 +1914,16 @@
                 const worker = await Tesseract.createWorker();
                 const ret = await worker.recognize(imageBlob);
                 const text = ret.data.text;
-                applyScannedData(text, false);
+                // Try both parsers on static images
+                applyMiningData(text);
+                applyLoadoutData(text);
                 await worker.terminate();
+                alert("Scan Complete");
             } catch (err) {
                 console.error(err);
                 alert("Failed to scan image.");
             } finally {
                 loadingOverlay.classList.add('hidden');
-            }
-        }
-
-        function applyScannedData(text, silent = false) {
-            let updated = false;
-
-            // --- 1. ROCK STATS PARSING ---
-            const numberGroup = "([\\d][\\d\\s,.]*)"; 
-            const separators = "[\\s:.]*"; 
-            const massRegex = new RegExp("(?:Mass|Mas|M|Rock Mass)" + separators + numberGroup, "i");
-            const resRegex = new RegExp("(?:Resistance|Res|Resist)" + separators + numberGroup, "i");
-            const instRegex = new RegExp("(?:Instability|Inst|Stablity)" + separators + numberGroup, "i");
-
-            const massMatch = text.match(massRegex);
-            const resMatch = text.match(resRegex);
-            const instMatch = text.match(instRegex);
-
-            const parseValue = (str) => {
-                const cleaned = str.replace(/[^\d.]/g, '');
-                return parseFloat(cleaned);
-            };
-
-            if (massMatch && massMatch[1]) {
-                const val = parseValue(massMatch[1]);
-                if (!isNaN(val)) { document.getElementById('rockMass').value = val; updated = true; }
-            }
-            if (resMatch && resMatch[1]) {
-                const val = parseValue(resMatch[1]);
-                if (!isNaN(val)) { document.getElementById('resistance').value = val; updated = true; }
-            }
-            if (instMatch && instMatch[1]) {
-                const val = parseValue(instMatch[1]);
-                if (!isNaN(val)) { document.getElementById('instability').value = val; updated = true; }
-            }
-
-            // --- 2. LOADOUT DETECTION LOGIC ---
-            // If no ship is deployed, we deploy a Prospector by default if we find mining terms
-            const hasMiningTerms = /Mining|Laser|Fracture|Extraction/i.test(text);
-            const container = document.getElementById('multiShipContainer');
-            
-            // Auto-deploy if empty and mining detected
-            if (container.children.length === 0 && document.getElementById('empty-state-msg')) {
-                // Default to Prospector for auto-add
-                const selectElement = document.getElementById('shipSelectToAdd');
-                if(selectElement) {
-                     selectElement.value = 'prospector';
-                     addShipLoadout();
-                }
-            }
-
-            // Detect Laser Head
-            // Sort detection by length so "Helix II" is matched before "Helix"
-            const detectLaser = allLaserHeads.sort((a,b) => b.name.length - a.name.length).find(head => text.toLowerCase().includes(head.name.toLowerCase()));
-            
-            // Detect Modules (find all unique matches)
-            const detectModules = powerModules.filter(mod => {
-                // Match "Surge", "Brandt" etc ignoring the params in brackets
-                const simpleName = mod.name.split('(')[0].trim().toLowerCase();
-                return simpleName.length > 3 && text.toLowerCase().includes(simpleName);
-            });
-
-            // Update UI if we found something
-            if (detectLaser || detectModules.length > 0) {
-                 // Get first active arm (simplification for single-user/prospector)
-                 const firstArm = document.querySelector('.ship-arm-card');
-                 if(firstArm) {
-                    const armId = firstArm.id;
-                    let loadoutUpdated = false;
-
-                    // Update Laser
-                    if(detectLaser) {
-                        const laserSelect = document.getElementById(`${armId}-laser`);
-                        if(laserSelect && laserSelect.value != detectLaser.power) {
-                            // Find option with matching text content or value
-                            for (let i = 0; i < laserSelect.options.length; i++) {
-                                if (laserSelect.options[i].text.includes(detectLaser.name)) {
-                                    laserSelect.selectedIndex = i;
-                                    // Manually trigger update
-                                    updateLaserConfig(laserSelect, armId);
-                                    loadoutUpdated = true;
-                                    if(!silent) console.log("Auto-equipped Laser:", detectLaser.name);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    // Update Modules
-                    // Note: This is tricky because detecting which slot belongs to which module 
-                    // is hard without positional coordinates.
-                    // STRATEGY: Fill empty slots with detected modules.
-                    if(detectModules.length > 0) {
-                        // Get current modules in slots
-                        for(let i=1; i<=3; i++) {
-                            const modSelect = document.getElementById(`${armId}-mod${i}`);
-                            if(modSelect && !modSelect.disabled) {
-                                // If we have a detected module for this 'index'
-                                // This is loose logic: we just put detected modules in 1, 2, 3
-                                if(detectModules[i-1]) {
-                                     if(modSelect.value !== detectModules[i-1].name) {
-                                         modSelect.value = detectModules[i-1].name;
-                                         // Trigger active check
-                                         checkModuleActive(modSelect, `${armId}-mod${i}-toggle-container`);
-                                         loadoutUpdated = true;
-                                     }
-                                }
-                            }
-                        }
-                    }
-                    if(loadoutUpdated) updated = true;
-                 }
-            }
-
-            if (updated) {
-                calculate();
-                if(!silent) alert("Data Extracted Successfully");
-            } else if (!silent) {
-                alert("Could not detect Mass, Resistance, Instability, or Loadout info.");
             }
         }
 
