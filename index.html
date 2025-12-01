@@ -275,7 +275,7 @@
                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/02040a/38bdf8?text=MFA';">
                 </div>
                 <div class="max-w-4xl">
-                    <h1 class="text-3xl font-bold text-[var(--text-strong)] mb-1 tracking-tight text-glow">MINING FRACTURE ANALYSER  V4.1</h1>
+                    <h1 class="text-3xl font-bold text-[var(--text-strong)] mb-1 tracking-tight text-glow">MINING FRACTURE ANALYSER  v4.1</h1>
                     <p class="text-sm text-[var(--text-muted)] leading-relaxed mt-2 max-w-2xl opacity-90">
                         Precision calculation engine for industrial crews. Real-time Total Combined Effective Laser Power (MW) calculation accounting for distance, resistance, and module buffs. Updated for latest UEX data (Version 4.1).
                     </p>
@@ -764,13 +764,11 @@
             return a.name.localeCompare(b.name);
         });
 
-        // --- UPDATED MODULE DATA (UEX Verified v4.1) ---
-        // Added properties based on UEX data
+        // --- UPDATED MODULE DATA (REGOLITH Verified) ---
+        // Updated properties based on Regolith data
         const powerModules = [
-
-        // ACTIVE MODULES
-            { name: "Surge (+50% Pwr, -15% Res, +10% Inst)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: -10, duration: 15, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 150 },
-            { name: "Brandt (+35% Pwr, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: 0, duration: 60, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 135 },
+            { name: "Surge (+50% Pwr, -15% Res, +10% Inst)", multiplier: 1.50, resistanceEffect: -15, instabilityEffect: 10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: 0, duration: 15, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 150 },
+            { name: "Brandt (+35% Pwr, +15% Res)", multiplier: 1.35, resistanceEffect: 15, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: -30, duration: 60, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 135 },
             { name: "Stampede (+35% Pwr, -10% Inst)", multiplier: 1.35, resistanceEffect: 0.0, instabilityEffect: -10, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: -10, duration: 30, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 135 },
             // Forel: Col 3 (Extr) 150, Col 9 (Win) 15
             { name: "Forel (+50% Extr, +15% Win)", multiplier: 1.00, resistanceEffect: 15, instabilityEffect: 0, activation: 'Active', windowEffect: 15, extractionEffect: 50, inertEffect: 0, shatterDamage: 0, duration: 60, catastrophicChargeRate: -60, extractionLaserPower: 150, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 0 },
@@ -778,8 +776,6 @@
             { name: "Torpid (-40% Pwr, +40% Res)", multiplier: 0.60, resistanceEffect: 40.0, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: 40, duration: 60, catastrophicChargeRate: -60, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 60 }, 
             { name: "Rime (-15% Pwr, -25% Res)", multiplier: 0.85, resistanceEffect: -25, instabilityEffect: 0.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: -10, duration: 20, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 85 },
             { name: "Optimum (-15% Pwr, -10% Inst)", multiplier: 0.85, resistanceEffect: 0.0, instabilityEffect: -10.0, activation: 'Active', windowEffect: 0, extractionEffect: 0, inertEffect: 0, shatterDamage: 0, duration: 60, catastrophicChargeRate: -80, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: 0, miningLaserPower: 85 },
-
-            // ACTIVE MODULES
             // Rieger: C3 (25% Pwr, -1% Win), C2 (20% Pwr, -3% Win), C1 (15% Pwr, -10% Win)
             { name: "Rieger-C3 (+25% Pwr, -1% Win)", multiplier: 1.25, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Passive', windowEffect: -1, extractionEffect: 0, inertEffect: 0, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: -1, miningLaserPower: 125 },
             { name: "Rieger-C2 (+20% Pwr, -3% Win)", multiplier: 1.20, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 0, optimalChargeWindowSize: -3, miningLaserPower: 120 },
@@ -793,9 +789,9 @@
             { name: "Torrent II (+35% Chg Rate, -3% Win)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Passive', windowEffect: -3, extractionEffect: 0, inertEffect: 0, chargeRate: 35, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 35, optimalChargeWindowSize: -3, miningLaserPower: 0 }, 
             { name: "Torrent (+30% Chg Rate, -10% Win)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0, activation: 'Passive', windowEffect: -10, extractionEffect: 0, inertEffect: 0, chargeRate: 30, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 0, optimalChargeRate: 30, optimalChargeWindowSize: -10, miningLaserPower: 0 }, 
             // XTR: XL (+25% Win, -24% Inert, -5% Extr?), L (+22% Win, -23% Inert), Normal (+15% Win, -20% Inert)
-            { name: "XTR-XL (+25% Win, -24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 25, extractionEffect: -5, inertEffect: 24, inertMaterialLevel: -6, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 95, optimalChargeRate: 0, optimalChargeWindowSize: 25, miningLaserPower: 0 },
-            { name: "XTR-L (+22% Win, -23% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 22, extractionEffect: -4, inertEffect: 23, inertMaterialLevel: -5.7, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 90, optimalChargeRate: 0, optimalChargeWindowSize: 22, miningLaserPower: 0 }, 
-            { name: "XTR (+15% Win, -20% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 15, extractionEffect: 0, inertEffect: 20, inertMaterialLevel: -5, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 85, optimalChargeRate: 0, optimalChargeWindowSize: 15, miningLaserPower: 0 },
+            { name: "XTR-XL (+25% Win, -24% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 25, extractionEffect: -5, inertEffect: 6, inertMaterialLevel: -6, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 95, optimalChargeRate: 0, optimalChargeWindowSize: 25, miningLaserPower: 0 },
+            { name: "XTR-L (+22% Win, -23% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 22, extractionEffect: -10, inertEffect: 6, inertMaterialLevel: -5.7, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 90, optimalChargeRate: 0, optimalChargeWindowSize: 22, miningLaserPower: 0 }, 
+            { name: "XTR (+15% Win, -20% Inert)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 15, extractionEffect: -15, inertEffect: 5, inertMaterialLevel: -5, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 85, optimalChargeRate: 0, optimalChargeWindowSize: 15, miningLaserPower: 0 },
             // Vaux: C3 (+25% Extr, -5% Chg), C2 (+20% Extr, -15% Chg), C1 (+15% Extr, -20% Chg)
             { name: "Vaux-C3 (+25% Extr, -5% Chg Rate)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 25, inertEffect: 0, chargeRate: -5, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 125, optimalChargeRate: -5, optimalChargeWindowSize: 0, miningLaserPower: 0 },
             { name: "Vaux-C2 (+20% Extr, -15% Chg Rate)", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, extractionEffect: 20, inertEffect: 0, chargeRate: -15, shatterDamage: 0, duration: 0, catastrophicChargeRate: 0, extractionLaserPower: 120, optimalChargeRate: -15, optimalChargeWindowSize: 0, miningLaserPower: 0 },
@@ -824,14 +820,14 @@
         }
         const sortedModules = sortModules([...powerModules]); 
 
-        // --- UPDATED GADGET DATA (UEX Verified v4.1) ---
-        // Added properties: clusterModifier, laserInstability, optimalChargeWindowRate, optimalChargeWindowSize
+        // --- UPDATED GADGET DATA (REGOLITH Verified) ---
+        // Updated properties based on Regolith data
         const gadgets = [
             { name: "Sabir (-50% Res, +15% Inst)", reduction: -50.0, instabilityEffect: 15, type: 'Multiplicative', desc: "-50% Resistance, +15% Instability", clusterModifier: 0, laserInstability: 0, optimalChargeWindowRate: 0, optimalChargeWindowSize: 0, resistance: -50 }, 
             { name: "OptiMax (-30% Res, -30% Win)", reduction: -30.0, instabilityEffect: 0.0, type: 'Multiplicative', desc: "-30% Resistance, -30% Window Size", clusterModifier: 60, laserInstability: 0, optimalChargeWindowRate: 0, optimalChargeWindowSize: -30, resistance: -30 },
             { name: "BoreMax (+10% Res, -70% Inst)", reduction: 10.0, instabilityEffect: -70, type: 'Additive', desc: "+10% Resistance, -70% Laser Instability", clusterModifier: 30, laserInstability: -70, optimalChargeWindowRate: 0, optimalChargeWindowSize: 0, resistance: 10 }, 
             { name: "Waveshift (-35% Inst, +100% Win)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Laser Instability, +100% Window Size", clusterModifier: 0, laserInstability: -35, optimalChargeWindowRate: -30, optimalChargeWindowSize: 100, resistance: 0 }, 
-            { name: "Stalwart (-35% Inst, +50% Rate)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Laser Instability, +50% Charge Rate", clusterModifier: 30, laserInstability: -35, optimalChargeWindowRate: 50, optimalChargeWindowSize: -30, resistance: 0 }, 
+            { name: "Stalwart (-35% Inst, +50% Rate)", reduction: 0.0, instabilityEffect: -35, type: 'Utility', desc: "-35% Laser Instability, +50% Charge Rate", clusterModifier: 30, laserInstability: -35, optimalChargeWindowRate: 50, optimalChargeWindowSize: 50, resistance: 0 }, 
             { name: "Okunis (+100% Rate, +50% Win)", reduction: 0.0, instabilityEffect: 0.0, type: 'Utility', desc: "+100% Rate, +50% Window Size", clusterModifier: -20, laserInstability: 0, optimalChargeWindowRate: 100, optimalChargeWindowSize: 50, resistance: 0 },
             { name: "None", reduction: 0.0, instabilityEffect: 0.0, type: 'None', desc: "No Gadget Attached", clusterModifier: 0, laserInstability: 0, optimalChargeWindowRate: 0, optimalChargeWindowSize: 0, resistance: 0 }, 
         ].sort((a, b) => {
