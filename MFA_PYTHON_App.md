@@ -3,7 +3,7 @@
     <img src="https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mfa.jpg" alt="Mining Fracture Analyser Logo" width="50%">
   </a>
 
-  <h1 align="center">Mining Fracture Analyser (MFA) v3.6</h1>
+  <h1 align="center">Mining Fracture Analyser (MFA) v4.1</h1>
 
   <p align="center">
     <strong>A real-time cooperative mining calculator for Star Citizen.</strong>
@@ -27,85 +27,89 @@
 </div>
 
 
-# ** Mining Fracture Analyser (MFA) - PYTHON App Edition**
+# **Mining Fracture Analyser (MFA) \- PYTHON App Edition**
 
-The **Mining Fracture Analyser (MFA)** is a standalone Windows application designed for Star Citizen mining crews. It calculates whether your crew (MOLEs, Prospectors, etc.) has enough combined laser power to fracture a specific rock based on its Mass, Resistance, and Instability.
+The **Mining Fracture Analyser (MFA)** is a standalone Windows application designed for Star Citizen mining crews. It calculates whether your crew (MOLEs, Prospectors, Golems) has enough combined laser power to fracture a specific rock based on its Mass, Resistance, and Instability.
 
-Version 2.0 includes an **AI Senior Foreman** powered by Google Gemini, which provides tactical advice and generates roleplay-ready orders for your crew.
+**Version 4.1** introduces **Live OCR Scanning**, **Drake Golem Support**, and an enhanced **AI Senior Foreman** powered by Google Gemini.
 
 ## **🛠️ Phase 1: Installation & Setup**
 
-### **1. Install Python**
-This app runs on Python. If you don't have it installed:
-• Download Python from [https://www.python.org/downloads/](https://www.python.org/downloads/)
-• **Crucial:** During installation, check the box that says **"Add Python to PATH"**.
+### **1\. Install Python**
 
-### **2. Save the Application Files**
-Create a new folder on your computer (e.g., `Desktop\MFA_Tool`) and save the two files (`index.html` and `run_app.py`) inside it.
+This app runs on Python. If you don't have it installed:  
+• Download Python from https://www.python.org/downloads/  
+• Crucial: During installation, check the box that says "Add Python to PATH".
 
-### **3. Install the Window Wrapper**
-Open your Command Prompt (search for `cmd` in Windows) and run this command:
+### **2\. Save the Application Files**
 
-```bash
+Create a new folder on your computer (e.g., Desktop\\MFA\_Tool) and save the two files (index.html and run\_app.py) inside it.
+
+### **3\. Install the Window Wrapper**
+
+Open your Command Prompt (search for cmd in Windows) and run this command:
+
 pip install pywebview
-```
 
 *(This library allows the HTML tool to run as a native window instead of in a web browser tab)*
 
------
-
 ## **🔑 Phase 2: Activating the AI Foreman (Gemini API)**
 
-To use the "Analyze Strategy" and "Generate Orders" buttons, you need a free API key from Google.
+To unlock the AI strategy and risk analysis features, you need a free API key from Google.
 
-1.  **Get a Key:** Go to [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) and create a free API key.
-2.  **Edit the Code:**
-    • Right-click `index.html` and select **Open with Notepad** (or VS Code).
-    • Scroll down to the bottom script section (around line 430) to find this line:
-    `const apiKey = "";`
-    • Paste your key inside the quotes:
-    `const apiKey = "YOUR_COPIED_GOOGLE_API_KEY_HERE";`
-    • **Save** the file.
-
------
+1. **Get a Key:** Go to [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) and create a free API key.  
+2. **Launch the App:** Run run\_app.py to open the MFA tool.  
+3. Enter Key: • Look for the "Senior Foreman AI" section in the right-hand column.  
+   • Click the "AUTH KEY" button.  
+   • Paste your key starting with AIza... and click Initialize.  
+   • The key is saved locally within the app.
 
 ## **🚀 Phase 3: Running the App**
 
-1.  Open your folder.
-2.  Double-click `run_app.py`.
-    *(Alternatively, right-click inside the folder \> Open Terminal \> type `python run_app.py`)*
-3.  The application will launch in a dark-mode window.
-
------
+1. Open your folder.  
+2. Double-click run\_app.py.  
+   (Alternatively, right-click inside the folder \> Open Terminal \> type python run\_app.py)  
+3. The application will launch in a dedicated dark-mode window.
 
 ## **🤖 Phase 4: Working with the AI Senior Foreman**
 
-Once you have entered your rock parameters and set up your mining team, the **Analytics Column** (Column 3) will unlock the AI features.
+Once you have entered your rock parameters and set up your mining team, the **Analytics Column** (Column 4\) will unlock 4 specific AI modes:
 
-**Feature 1: ✨ Analyze Strategy**
-*Use this when: You are unsure if the rock is safe to mine or what modules to equip.*
-• Click the **Analyze Strategy** button (Purple).
-• The AI will read the current rock stats and your crew's loadout to output a **Strategic Assessment** (Risk Analysis & Loadout Advice).
+1\. 🧠 STRATEGY  
+Use this when: You need a general assessment.  
+• Analyzes the rock's mass/resistance against your current fleet power.  
+• Advises on whether the fracture is safe or if you need more lasers.  
+2\. ⚠️ RISK REPORT  
+Use this when: Dealing with High Instability.  
+• Calculates the probability of an explosion.  
+• Recommends safe distances and specific stability modules.  
+3\. 🔧 LOADOUT  
+Use this when: You want to optimize.  
+• Suggests the mathematically perfect module combinations (Surge, Brandt, Torrent) for the specific rock you are facing.  
+4\. 📢 ORDERS  
+Use this when: You are the Crew Commander.  
+• Generates a formatted "Command Uplink" text block to read aloud or paste into the game chat.
 
-**Feature 2: ✨ Generate Orders**
-*Use this when: You are the crew leader and need to give clear instructions.*
-• Click the **Generate Orders** button (Blue).
-• The AI will generate a formatted "Command Uplink" text block to read aloud or paste in-game.
+## **📷 Phase 5: Live OCR & Scanning**
 
-> **Example Order:**
-> "/// COMMAND UPLINK /// Target Mass 23k. Resistance Critical. MOLE 1, active Surge on my mark. Prospectors, hold laser power at 20% to stabilize. EXECUTE."
+MFA v4.1 can "see" your game screen to automatically input data.
 
------
+**Option A: Live Stream Scanning (Recommended)**
 
-## **📷 Extra Feature: OCR Scanning**
-Don't want to type numbers manually?
+1. Click **"Scan Mining (Right)"** or **"Scan Loadout (Left)"** in the app.  
+2. A window prompt will appear. Select your **Star Citizen game window**.  
+3. The app will now watch your screen:  
+   • Mining Scan: Reads Mass, Resistance, and Instability from the rock HUD.  
+   • Loadout Scan: Reads installed modules from your VMA/Mobiglas screen.
 
-1.  Take a screenshot of the rock's scan data in Star Citizen.
-2.  **CTRL+V (Paste)** the image directly into the app window.
-3.  The tool will automatically extract the Mass, Resistance, and Instability values.
+**Option B: Static Upload**
 
------
+1. Take a screenshot of the rock's scan data.  
+2. Click **"Or Upload Static Screenshot"** in the app (or paste the image with CTRL+V).  
+3. The tool extracts the values instantly.
 
 ## **⚠️ Troubleshooting**
-• **"The AI buttons do nothing":** Did you paste your API key into `index.html`?
-• **"ModuleNotFoundError: No module named 'webview'":** You missed Step 3 in Phase 1. Run `pip install pywebview` in your terminal.
+
+• "The AI buttons do nothing": Ensure you have clicked "AUTH KEY" and entered a valid Google Gemini key.  
+• "ModuleNotFoundError: No module named 'webview'": You missed Step 3 in Phase 1\. Run pip install pywebview in your terminal.  
+• "Live Scan shows a black screen": Ensure Star Citizen is running in Borderles Windowed mode for best compatibility with screen capture.
