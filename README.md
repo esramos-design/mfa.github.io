@@ -87,7 +87,7 @@ Host directly from your repository settings.
 
 ## 🧮 Data & Mechanics
 
-* **Game Version:** Star Citizen Alpha 3.24+ (Verified UEX Data v4.1).
+* **Game Version:** Star Citizen Alpha 4.4+ (Verified UEX Data v4.1).
 * **Math:** Calculates `Total Effective Power` based on:
     * Laser Base Power.
     * Module Multipliers (Active/Passive).
