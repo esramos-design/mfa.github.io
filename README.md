@@ -1,6 +1,6 @@
 # ⛏️ Mining Fracture Analyser (MFA)
 
-![Version](https://img.shields.io/badge/version-4.3%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
+![Version](https://img.shields.io/badge/version-5.2%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
 **Precision calculation engine for industrial mining crews in Star Citizen.**
 
