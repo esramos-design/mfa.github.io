@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.1 (Gadget Stats Expanded)
+ * Version: 5.2 (All Module Stats Visible)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
  */
 
@@ -81,7 +81,6 @@ async function askAI(mode) {
     const customInput = document.getElementById('ai-custom-input');
     
     // Check if simulation data exists
-    // FIX: Removed strict check for power > 0. Now allows analysis of just the rock.
     if (typeof currentSimState === 'undefined') {
         if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing... please wait.</span>`;
         return;
@@ -94,7 +93,6 @@ async function askAI(mode) {
     // Prompt Construction
     let prompt = "";
     
-    // Construct context based on whether ships are deployed or not
     const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
     
     let crewDetails = "";
@@ -143,7 +141,6 @@ async function askAI(mode) {
 }
 
 async function callGemini(key, prompt) {
-    // UPDATED: Using the correct gemini-2.5-flash model
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
     
     const payload = { 
@@ -315,7 +312,10 @@ function getFormattedStats(item, type) {
         if (item.windowEffect !== 0) stats.push(`Win${item.windowEffect}%`);
         if (item.shatterDamage !== 0) stats.push(`Shat${item.shatterDamage}%`);
         if (item.catastrophicChargeRate !== 0) stats.push(`Cat${item.catastrophicChargeRate}%`);
-        if (item.chargeRate && item.chargeRate !== 0) stats.push(`Chg${item.chargeRate}%`); 
+        if (item.chargeRate && item.chargeRate !== 0) stats.push(`Chg${item.chargeRate}%`);
+        if (item.extractionEffect && item.extractionEffect !== 0) stats.push(`Ext${item.extractionEffect}%`);
+        if (item.inertEffect && item.inertEffect !== 0) stats.push(`Inert${item.inertEffect}%`);
+        if (item.duration && item.duration > 0) stats.push(`Dur${item.duration}s`);
     } else if (type === 'gadget') {
         let r = item.reduction || item.resistance || 0;
         if (r !== 0) stats.push(`Res${r}%`);
