@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 4.7 (Consolidated & Fixed)
+ * Version: 4.9 (Fixed API Model)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
  */
 
@@ -81,8 +81,8 @@ async function askAI(mode) {
     const customInput = document.getElementById('ai-custom-input');
     
     // Check if simulation data exists
-    if (typeof currentSimState === 'undefined' || currentSimState.power === 0) {
-        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: No telemetry data found. Please run the simulation first.</span>`;
+    if (typeof currentSimState === 'undefined') {
+        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing... please wait.</span>`;
         return;
     }
 
@@ -92,14 +92,25 @@ async function askAI(mode) {
 
     // Prompt Construction
     let prompt = "";
+    
+    // Construct context based on whether ships are deployed or not
     const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
-    const crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
-    const status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
+    
+    let crewDetails = "";
+    let status = "";
 
-    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is it safe? 2. Modules?`;
+    if (currentSimState.power > 0) {
+        crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
+        status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
+    } else {
+        crewDetails = "Crew Status: No ships currently deployed.";
+        status = "AWAITING FLEET DEPLOYMENT";
+    }
+
+    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is the rock safe? 2. What modules or ships do we need?`;
     else if (mode === 'briefing') prompt = `You are a Commander. Generate a short tactical order for crew chat. Scenario: ${rockDetails} ${crewDetails}`;
     else if (mode === 'risk') prompt = `Safety Officer. Analyze risk for: ${rockDetails}. Assess explosion probability. Keep it brief.`;
-    else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules.`;
+    else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules and ship configuration.`;
     else if (mode === 'custom') {
         const query = customInput ? customInput.value : "";
         if (!query) { 
@@ -131,7 +142,8 @@ async function askAI(mode) {
 }
 
 async function callGemini(key, prompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+    // UPDATED: Using the correct model for the current environment
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
     
     const payload = { 
         contents: [{ parts: [{ text: prompt }] }] 
