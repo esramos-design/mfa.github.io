@@ -1,6 +1,6 @@
-# **⛏️  Mining Fracture Analyser v5.4**   Released\!**
+# **⛏️ Mining Fracture Analyser (MFA)**
+![Version](https://img.shields.io/badge/version-5.4%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
-![Version](https://img.shields.io/badge/version-5.2%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
 **The ultimate tactical dashboard and calculation engine for industrial mining crews in Star Citizen.**
 
@@ -8,7 +8,7 @@ The **Mining Fracture Analyser (MFA)** is a single-file, web-based tool designed
 
 Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash**, offering pre-deployment strategy, risk assessment, and tactical orders.
 
-## **🚀 Key Features (v5.2)**
+## **🚀 Key Features (v5.4)**
 
 ### **🤖 Senior Foreman AI 2.0**
 
@@ -16,6 +16,13 @@ Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash*
 * **Gemini 2.5 Flash Uplink:** Faster, more accurate tactical analysis with reduced hallucination rates.  
 * **Tactical Orders:** Generate roleplay-ready "Command Uplink" text blocks to copy/paste into in-game chat.  
 * **Robust Auth:** Includes memory fallback systems to keep your API session active even if browser local storage is restricted.
+
+### **🧠 Dynamic Loadout Strategy**
+
+* **Context-Aware Recommendations:** The **Optimized Fleet Loadouts** panel is no longer static. It dynamically adapts based on your scan data:  
+  * **High Instability:** Suggests stability-focused loadouts (e.g., *Lancet MH2 \+ Focus III*).  
+  * **High Resistance / Low Power:** Suggests power-focused loadouts (e.g., *Helix II \+ Surge*).  
+  * **Standard:** Suggests balanced "Meta" loadouts.
 
 ### **🎯 Target Analysis**
 
@@ -93,12 +100,12 @@ This project is a fan-made tool and is not affiliated with Cloud Imperium Games 
 
 *The "AI Foreman" provides advice based on probabilistic models; always use your own judgement when cracking high-instability rocks\!*
 
-## **👥 Contributors & Developers**
+### **👥 Contributors & Developers**
 
 * **Lead Developer:** [Esramos Design](https://github.com/esramos-design)  
 * **AI Co-Pilot:** Google Gemini
 
-## **📄 Credits**
+### **📄 Credits**
 
 * **Design & Code:** [esramos-design](https://github.com/esramos-design)  
 * **Mining Data:** Verified against [UEX Corp](https://uexcorp.space/), [regolith.rocks](https://regolith.rocks/) and in-game testing.  
