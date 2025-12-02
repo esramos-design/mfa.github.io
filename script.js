@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.2 (All Module Stats Visible)
+ * Version: 5.3 (Loadout Correction)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
  */
 
@@ -81,6 +81,7 @@ async function askAI(mode) {
     const customInput = document.getElementById('ai-custom-input');
     
     // Check if simulation data exists
+    // FIX: Removed strict check for power > 0. Now allows analysis of just the rock.
     if (typeof currentSimState === 'undefined') {
         if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing... please wait.</span>`;
         return;
@@ -93,6 +94,7 @@ async function askAI(mode) {
     // Prompt Construction
     let prompt = "";
     
+    // Construct context based on whether ships are deployed or not
     const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
     
     let crewDetails = "";
@@ -141,6 +143,7 @@ async function askAI(mode) {
 }
 
 async function callGemini(key, prompt) {
+    // UPDATED: Using the correct gemini-2.5-flash model
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
     
     const payload = { 
@@ -399,7 +402,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
                 <div class="flex justify-between items-center mb-2"><span class="text-xs font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
                 <div class="space-y-2">
                     <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-                    <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III x2</div>
+                    <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
                     <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
                 </div>
             </div>
