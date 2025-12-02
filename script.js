@@ -214,7 +214,7 @@ let resistanceChartInstance = null;
 const ships = [
     { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false }, 
     { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
-    { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~3150 MW)" } 
+    { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~3150 MW)" } 
 ];
 
 const allLaserHeads = [
@@ -361,15 +361,15 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
                 <div class="flex justify-center gap-4">
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-blue-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${mNeeded}</span>
-                        <span class="text-[9px] uppercase text-blue-300/70 tracking-widest mt-1">MOLEs</span>
+                        <span class="text-[10px] uppercase text-blue-300/70 tracking-widest mt-1">MOLEs</span>
                     </div>
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-green-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${pNeeded}</span>
-                        <span class="text-[9px] uppercase text-green-300/70 tracking-widest mt-1">Prospectors</span>
+                        <span class="text-[10px] uppercase text-green-300/70 tracking-widest mt-1">Prospectors</span>
                     </div>
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-orange-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${gNeeded}</span>
-                        <span class="text-[9px] uppercase text-orange-300/70 tracking-widest mt-1">Golems</span>
+                        <span class="text-[10px] uppercase text-orange-300/70 tracking-widest mt-1">Golems</span>
                     </div>
                 </div>
             </div>`;
@@ -407,9 +407,9 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         strategyName = "Critical Stability Protocol";
         strategyColor = "text-yellow-400";
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Hofstede-S1 + Focus III + Vaux-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Focus III + Rieger-C3`;
@@ -417,18 +417,18 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         strategyName = "Resistance Breaker Protocol";
         strategyColor = "text-red-400";
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
     } else {
         // Standard (Balanced)
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
@@ -438,7 +438,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         <div class="space-y-4 mt-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
                 <h4 class="text-sm font-bold text-white uppercase tracking-wider">Optimized Fleet Loadouts</h4>
-                <span class="text-[9px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
+                <span class="text-[12px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
             </div>
             <div class="p-3 bg-black/40 rounded border border-indigo-500/30">
                 <div class="flex justify-between items-center mb-2"><span class="text-xs font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
@@ -448,11 +448,11 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
             </div>
             <div class="p-3 bg-black/40 rounded border border-green-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-green-400 uppercase">MISC PROSPECTOR (S1)</span><span class="text-[9px] bg-green-900/40 text-green-200 px-2 py-0.5 rounded">Solo</span></div>
-                <div class="text-[10px] text-gray-300 font-mono">${prosL}</div>
+                <div class="text-[14px] text-gray-300 font-mono">${prosL}</div>
             </div>
             <div class="p-3 bg-black/40 rounded border border-orange-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-orange-400 uppercase">DRAKE GOLEM (Fixed)</span><span class="text-[9px] bg-orange-900/40 text-orange-200 px-2 py-0.5 rounded">Ground</span></div>
-                <div class="text-[10px] text-gray-300 font-mono">${golemL}</div>
+                <div class="text-[14px] text-gray-300 font-mono">${golemL}</div>
             </div>
         </div>`;
     // --- DYNAMIC LOADOUT GENERATION END ---
@@ -716,9 +716,9 @@ function updateShipImage() {
     const shipId = document.getElementById('shipSelectToAdd').value;
     const img = document.getElementById('selectedShipImage');
     if(img) {
-        if(shipId === 'mole') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/mole.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/mole.jpg?raw=true)";
-        else if(shipId === 'prospector') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/prospector.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/prospector.jpg?raw=true)";
-        else if(shipId === 'golem') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/golem.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/golem.jpg?raw=true)";
+        if(shipId === 'mole') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true)";
+        else if(shipId === 'prospector') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true)";
+        else if(shipId === 'golem') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true)";
         img.classList.remove('hidden');
     }
 }
