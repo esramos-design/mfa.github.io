@@ -1,27 +1,9 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 4.3 (Fail-Safe Stable)
+ * Version: 4.4 (Core Logic)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts
+ * Note: AI Logic moved to ai-foreman.js
  */
-
-// --- API KEY MANAGEMENT ---
-function openApiModal() {
-    const modal = document.getElementById('api-modal');
-    const input = document.getElementById('api-key-input');
-    const currentKey = localStorage.getItem('gemini_api_key');
-    if(currentKey) input.value = currentKey;
-    modal.style.display = 'flex';
-    setTimeout(() => modal.classList.add('show'), 10);
-}
-function closeApiModal() {
-    const m = document.getElementById('api-modal');
-    m.classList.remove('show');
-    setTimeout(() => m.style.display = 'none', 200);
-}
-function saveApiKey() {
-    const key = document.getElementById('api-key-input').value.trim();
-    if(key) { localStorage.setItem('gemini_api_key', key); closeApiModal(); alert("API Key Saved!"); }
-}
 
 // --- THEME MANAGEMENT ---
 function initTheme() {
@@ -139,54 +121,7 @@ const gadgets = [
 
 let currentSimState = { mass: 0, resistance: 0, instability: 0, power: 0, success: false, activeArms: 0 };
 
-async function askAI(mode) {
-    const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) { openApiModal(); return; }
-    const aiLoading = document.getElementById('ai-loading');
-    const aiContent = document.getElementById('ai-content');
-    const customInput = document.getElementById('ai-custom-input');
-    
-    if (currentSimState.power === 0) {
-        aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: No simulation data. Please run the simulation first.</span>`;
-        return;
-    }
-    aiLoading.classList.remove('hidden');
-    aiContent.innerHTML = ''; 
-
-    let prompt = "";
-    const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
-    const crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
-    const status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
-
-    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is it safe? 2. Modules?`;
-    else if (mode === 'briefing') prompt = `You are a Commander. Generate a short tactical order for crew chat. Scenario: ${rockDetails} ${crewDetails}`;
-    else if (mode === 'risk') prompt = `Safety Officer. Analyze risk for: ${rockDetails}. Assess explosion probability. Keep it brief.`;
-    else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules.`;
-    else if (mode === 'custom') {
-        const query = customInput.value;
-        if (!query) { aiLoading.classList.add('hidden'); return; }
-        prompt = `Context: Mining. Rock: ${rockDetails} Crew: ${crewDetails} Question: "${query}"`;
-    }
-
-    try {
-        const response = await callGemini(apiKey, prompt);
-        aiContent.innerHTML = marked.parse(response);
-    } catch (error) {
-        aiContent.innerHTML = `<span class="text-red-500">// COMM LINK FAILURE: ${error.message}</span>`;
-    } finally {
-        aiLoading.classList.add('hidden');
-        if(mode === 'custom') customInput.value = '';
-    }
-}
-
-async function callGemini(key, prompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
-    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
-}
+// Note: askAI and callGemini moved to ai-foreman.js
 
 function getFormattedStats(item, type) {
     let stats = [];
@@ -370,6 +305,9 @@ function calculate() {
     const success = totalPwr >= reqPwr && reqPwr > 0;
     const formattedPwr = totalPwr.toLocaleString(undefined, { maximumFractionDigits: 0 });
     const diff = assessDifficulty(finalInst, finalRes);
+
+    // UPDATE GLOBAL STATE FOR AI
+    currentSimState = { mass: rockMass, resistance: finalRes, instability: finalInst, power: totalPwr, success: success, activeArms: activeArms };
 
     generateAdvancedTelemetry(rockMass, finalRes, finalInst, reqPwr, totalPwr);
 

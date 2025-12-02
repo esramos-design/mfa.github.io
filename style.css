@@ -127,8 +127,9 @@ input, select {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
     z-index: 100; display: none; justify-content: center; align-items: center;
+    opacity: 0; transition: opacity 0.2s ease-in-out;
 }
-.modal-backdrop.show { display: flex; }
+.modal-backdrop.show { display: flex; opacity: 1; }
 .modal-content {
     background: rgba(13, 17, 23, 0.95); border: 1px solid rgba(56, 189, 248, 0.3);
     padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px;
