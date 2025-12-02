@@ -1,111 +1,102 @@
-# Mining Fracture Analyser (MFA) - Star Citizen
+# ⛏️ Mining Fracture Analyser (MFA)
 
-![Version](https://img.shields.io/badge/Version-4.1-blue) ![Status](https://img.shields.io/badge/UEX%20Data-Verified-green) ![AI](https://img.shields.io/badge/Powered%20By-Google%20Gemini-purple)
+![Version](https://img.shields.io/badge/version-4.3%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
-**The ultimate precision calculation engine for industrial mining crews.**
+**Precision calculation engine for industrial mining crews in Star Citizen.**
 
-The **Mining Fracture Analyser (MFA)** is a web-based tool designed for *Star Citizen* players to calculate real-time mining fracture power, assess risk, and optimize loadouts. Now updated with a holographic UI, live video OCR scanning, and an integrated AI Foreman powered by Google Gemini.
+The **Mining Fracture Analyser (MFA)** is a web-based tactical dashboard designed for multi-crew mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for laser heads, active/passive modules, gadgets, and rock resistance.
 
----
+It features an integrated **AI Foreman** (powered by Google Gemini) to provide real-time strategic advice, risk assessments, and loadout optimizations.
 
-## 🚀 Key Features
+## 🚀 Features
 
-### 1. 🏭 Multi-Ship Fleet Configuration
-* **Dynamic Fleet Assembly:** Assemble a complex mining fleet including the **Argo MOLE**, **MISC Prospector**, and the new **Drake Golem**.
-* **Hardpoint Management:** Configure individual laser heads per ship arm.
-* **Module Stacking:** Add up to 3 modules per laser (Surge, Brandt, Torrent, etc.) with support for **Active/Passive toggles**.
-* **Drake Golem Support:** Includes specific logic for the Golem's fixed "Pitman" mining laser.
+### 🎯 Target Analysis
+* **Manual Input:** Input Rock Mass, Resistance, and Instability directly from your scanning UI.
+* **Active Gadgetry:** Toggle switches for all mining gadgets (BoreMax, Sabir, Optimax, etc.) with verified stat modifiers (Regolith/UEXCorp verified).
+* **Optical Scan (OCR):** *Experimental* feature to scan game screenshots and auto-fill rock parameters.
 
-### 2. 🧠 AI Foreman Uplink (New!)
-* **Powered by Google Gemini:** Connect your API key to unlock a senior mining AI.
-* **Real-time Strategy:** The AI analyzes your specific rock mass, resistance, and current fleet power to provide tactical advice.
-* **Capabilities:**
-    * **Strategy:** Safety assessments and approach vectors.
-    * **Risk Report:** Explosion probability analysis.
-    * **Loadout Optimization:** Mathematical suggestions for modules.
-    * **Crew Briefing:** Generates copy/paste orders for in-game chat.
+### 🚢 Fleet Configuration
+* **Multi-Ship Support:** Deploy **Argo MOLEs**, **MISC Prospectors**, and **Drake Golems**.
+* **Hardpoint Management:** Configure individual laser heads (Size 1 & 2) with up to 3 module slots.
+* **Visual Toggles:** Instantly enable/disable specific arms to see how losing a laser affects the fracture.
+* **Rich UI:** Card-based interface with toggle switches for Active Modules.
 
-### 3. 👁️ Live OCR & Telemetry
-* **Live Video Scanning:** Uses `getDisplayMedia` to stream your Star Citizen window.
-    * **Loadout Scan (Left):** Automatically detects installed lasers and modules from your VMA/Mobiglas.
-    * **Mining Scan (Right):** Reads Rock Mass, Resistance, and Instability directly from the UI while you fly.
-* **Static Upload:** Drag and drop screenshots for instant data parsing.
-* **Privacy First:** All OCR processing is done client-side using **Tesseract.js**. No video leaves your browser.
+### 📊 Advanced Telemetry (Column 3)
+* **Real-Time Charts:**
+    * **Power vs. Margin:** Visual bar graph comparing your team's output against the rock's requirement.
+    * **Risk Profile:** Doughnut chart visualizing Resistance vs. Instability vs. Safe Zone.
+    * **Resistance Curve:** Line graph showing power requirements across the heating phase.
+* **Success/Failure Prediction:** Instant visual feedback on whether your current setup can break the rock.
 
-### 4. 📊 Advanced Analytics
-* **Power vs. Margin:** Visual bar charts comparing your output against the rock's requirement.
-* **Risk Profile:** Doughnut charts visualizing Resistance vs. Instability vs. Safe Margin.
-* **Resistance Curve:** A line graph projecting power requirements across various resistance levels.
+### 🧠 Tactical Command (Column 4)
+* **Minimum Crew Calculator:** Automatically calculates exactly how many extra MOLEs, Prospectors, or Golems are needed if your power is short.
+* **Gadget Strategy:** Dynamic recommendation engine that suggests the best gadget based on the rock's specific resistance/instability profile.
+* **Optimized Loadouts:** Reference guide for "Meta" loadouts (Breaker, Stabilizer, Extraction).
 
-### 5. 🎨 Immersive UI
-* **Theme Engine:** Switch between "Deep Space Slate" (Dark Mode) and "Aerospace Platinum" (Light Mode).
-* **Glassmorphism:** Modern, translucent panels with neon glow effects.
-* **Reactive Layout:** Fully responsive grid system for desktops and tablets.
+### 🤖 AI Foreman
+* **Strategic Advice:** Ask the AI for a "Go/No-Go" assessment.
+* **Risk Reports:** Get a safety briefing on explosion probability.
+* **Crew Orders:** Generate roleplay-ready tactical orders to paste into in-game chat.
 
----
+## 📖 How to Use
 
-## 🛠️ How to Use
+### **Step 1: Initialization**
+1.  Open the dashboard.
+2.  Click the **"AUTH KEY"** button in the top-right "Senior Foreman AI" panel.
+3.  Paste your **Google Gemini API Key**. (This is stored locally in your browser for the AI features to work).
 
-### Setup
-1.  Open the application in a modern browser (Chrome/Edge/Firefox).
-2.  *(Optional for AI)* Click **"Auth Key"** in the AI section and paste your [Google Gemini API Key](https://aistudio.google.com/app/apikey). The key is stored locally in your browser.
+### **Step 2: Input Rock Data**
+1.  Scan a rock in-game.
+2.  Enter the **Resistance**, **Instability**, and **Rock Mass** into the "Target Analysis" column (Col 1).
+3.  *(Optional)* Select an **Active Gadget** if you plan to attach one.
 
-### Manual Calculation
-1.  **Target Analysis:** Enter the Rock Mass, Resistance, and Instability manually.
-2.  **Deploy Fleet:** Select a ship (e.g., MOLE) and click `+ Deploy`.
-3.  **Configure Arms:**
-    * Select the Laser Head (e.g., Helix II).
-    * Add Modules (e.g., Surge, Rieger).
-    * Toggle modules "Active" if they are currently activated.
-4.  **Gadgets:** Select an active gadget (e.g., BoreMax) from the list.
-5.  **Results:** View the "Telemetry" column for Success/Failure status and optimal loadout suggestions.
+### **Step 3: Deploy Fleet**
+1.  Go to the "Fleet Config" column (Col 2).
+2.  Select a ship (e.g., **Argo MOLE**) from the dropdown.
+3.  Click **+ DEPLOY**.
+4.  Configure the **Laser Head** (e.g., Helix II) and **Modules**.
+5.  *Tip:* Use the toggle switches to turn Active Modules (like Surge/Stampede) on or off to simulate cooldowns.
 
-### Live Scanning (OCR)
-1.  Click **Scan Mining (Right)** to track rock stats or **Scan Loadout (Left)** to track ship items.
-2.  Select your Star Citizen window when prompted by the browser.
-3.  The system will automatically parse text from the screen and update the input fields.
-    * *Note: Ensure the game UI is clearly visible for best results.*
+### **Step 4: Analyze**
+1.  Check the **Telemetry** column (Col 3).
+    * **Green Banner:** Fracture is possible.
+    * **Red Banner:** Power is insufficient.
+2.  Review the **Tactical Command** column (Col 4).
+    * See exactly how many more ships you need.
+    * Check the "Gadget Strategy" for the best gadget to apply.
 
----
+## 🛠️ Installation
 
-## 📦 Installation / Deployment
+### **Option 1: Live Version (Recommended)**
+Access the latest stable build here:
+👉 **[Launch MFA Dashboard](https://esramos-design.github.io/mfa.github.io/)**
 
-This is a client-side only application (HTML/JS/CSS). No backend server is required.
+### **Option 2: Run Locally**
+1.  Clone this repository:
+    ```bash
+    git clone [https://github.com/esramos-design/mfa.github.io.git](https://github.com/esramos-design/mfa.github.io.git)
+    ```
+2.  Navigate to the folder.
+3.  Open `index.html` in any modern web browser (Chrome, Firefox, Edge).
+    * *Note: The OCR Scanner feature requires HTTPS or Localhost to work due to browser security.*
 
-**Option 1: GitHub Pages**
-Host directly from your repository settings.
+## 🤝 Credits & Data Sources
 
-**Option 2: Local Use**
-1.  Clone the repository.
-2.  Open `index.html` in your browser.
+* **Mining Data:** All laser, module, and gadget statistics are verified against **[Regolith.rocks](https://regolith.rocks/)** and **[UEXCorp](https://uexcorp.space/)** (v3.24+ Data Standards).
+* **UI Design:** Glassmorphism interface inspired by Star Citizen's MFDs (Multi-Function Displays).
+* **OCR Engine:** Powered by [Tesseract.js](https://tesseract.projectnaptha.com/).
+* **AI Backend:** Powered by Google Gemini Pro.
 
-**Option 3: VS Code Live Server**
-1.  Open the folder in VS Code.
-2.  Right-click `index.html` -> "Open with Live Server".
+## ⚠️ Disclaimer
 
----
+This project is a fan-made tool and is not affiliated with Cloud Imperium Games (CIG) or Roberts Space Industries (RSI). Star Citizen®, Squadron 42®, and related trademarks are property of Cloud Imperium Games.
 
-## 🧮 Data & Mechanics
+The "AI Foreman" provides advice based on prompts and game data; always use your own judgement when cracking high-instability rocks!
 
-* **Game Version:** Star Citizen Alpha 4.4+ (Verified UEX Data v4.1).
-* **Math:** Calculates `Total Effective Power` based on:
-    * Laser Base Power.
-    * Module Multipliers (Active/Passive).
-    * Resistance Reduction (Global & Per-Arm).
-    * Distance/Falloff (Simplified).
-    * Gadget Modifiers (Additive/Multiplicative).
+## 👥 Contributors & Developers
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-1.  Fork the Project.
-2.  Create your Feature Branch.
-3.  Commit your Changes.
-4.  Open a Pull Request.
-
----
+* **Lead Developer:** [Esramos Design](https://github.com/esramos-design)
+* **AI Co-Pilot:** Google Gemini
 
 ## 📄 Credits
 
@@ -116,3 +107,8 @@ Contributions are welcome!
     * [Chart.js](https://www.chartjs.org/) - Graphs.
     * [Tesseract.js](https://tesseract.projectnaptha.com/) - OCR.
     * [Marked.js](https://marked.js.org/) - Markdown parsing.
+ 
+
+*Pull requests and feature suggestions are welcome! Please open an issue to discuss proposed changes.*
+
+![Version](https://img.shields.io/badge/version-4.3%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
