@@ -1,4 +1,4 @@
-# **⛏️  Mining Fracture Analyser v5.2**   Released\!**
+# **⛏️  Mining Fracture Analyser v5.4**   Released\!**
 
 ![Version](https://img.shields.io/badge/version-5.2%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
