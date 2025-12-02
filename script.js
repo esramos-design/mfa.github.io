@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 4.9 (Fixed API Model)
+ * Version: 5.1 (Gadget Stats Expanded)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
  */
 
@@ -81,6 +81,7 @@ async function askAI(mode) {
     const customInput = document.getElementById('ai-custom-input');
     
     // Check if simulation data exists
+    // FIX: Removed strict check for power > 0. Now allows analysis of just the rock.
     if (typeof currentSimState === 'undefined') {
         if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing... please wait.</span>`;
         return;
@@ -142,7 +143,7 @@ async function askAI(mode) {
 }
 
 async function callGemini(key, prompt) {
-    // UPDATED: Using the correct model for the current environment
+    // UPDATED: Using the correct gemini-2.5-flash model
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
     
     const payload = { 
@@ -314,10 +315,15 @@ function getFormattedStats(item, type) {
         if (item.windowEffect !== 0) stats.push(`Win${item.windowEffect}%`);
         if (item.shatterDamage !== 0) stats.push(`Shat${item.shatterDamage}%`);
         if (item.catastrophicChargeRate !== 0) stats.push(`Cat${item.catastrophicChargeRate}%`);
+        if (item.chargeRate && item.chargeRate !== 0) stats.push(`Chg${item.chargeRate}%`); 
     } else if (type === 'gadget') {
         let r = item.reduction || item.resistance || 0;
         if (r !== 0) stats.push(`Res${r}%`);
+        if (item.instabilityEffect !== 0) stats.push(`Inst${item.instabilityEffect}%`);
         if (item.clusterModifier !== 0) stats.push(`Clust${item.clusterModifier}%`);
+        if (item.laserInstability !== 0) stats.push(`LsrInst${item.laserInstability}%`);
+        if (item.optimalChargeWindowRate !== 0) stats.push(`WinRate${item.optimalChargeWindowRate}%`);
+        if (item.optimalChargeWindowSize !== 0) stats.push(`WinSize${item.optimalChargeWindowSize}%`);
     }
     if (stats.length === 0) return "";
     return ` (${stats.join(' ')})`; 
