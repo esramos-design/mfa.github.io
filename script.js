@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.3 (Loadout Correction)
+ * Version: 5.4 (Dynamic Loadout Strategy)
  * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
  */
 
@@ -395,26 +395,67 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
             </div>
         </div>`;
 
+    // --- DYNAMIC LOADOUT GENERATION START ---
+    let strategyName = "Standard Extraction Protocol";
+    let strategyColor = "text-green-400";
+    let moleL = "";
+    let prosL = "";
+    let golemL = "";
+
+    // LOGIC: High Instability vs High Resistance/Deficit
+    if (inst > 50) {
+        strategyName = "Critical Stability Protocol";
+        strategyColor = "text-yellow-400";
+        moleL = `
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+        `;
+        prosL = `<span class="text-white font-bold">Loadout:</span> Hofstede-S1 + Focus III + Vaux-C3`;
+        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Focus III + Rieger-C3`;
+    } else if (res > 40 || deficit > 0) {
+        strategyName = "Resistance Breaker Protocol";
+        strategyColor = "text-red-400";
+        moleL = `
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+        `;
+        prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
+        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
+    } else {
+        // Standard (Balanced)
+        moleL = `
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+        `;
+        prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
+        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
+    }
+
     const shipLoadouts = `
         <div class="space-y-4 mt-4">
-            <h4 class="text-sm font-bold text-white uppercase border-b border-gray-700 pb-2 mb-3 tracking-wider">Optimized Fleet Loadouts</h4>
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
+                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Optimized Fleet Loadouts</h4>
+                <span class="text-[9px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
+            </div>
             <div class="p-3 bg-black/40 rounded border border-indigo-500/30">
                 <div class="flex justify-between items-center mb-2"><span class="text-xs font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
                 <div class="space-y-2">
-                    <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-                    <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-                    <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+                    ${moleL}
                 </div>
             </div>
             <div class="p-3 bg-black/40 rounded border border-green-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-green-400 uppercase">MISC PROSPECTOR (S1)</span><span class="text-[9px] bg-green-900/40 text-green-200 px-2 py-0.5 rounded">Solo</span></div>
-                <div class="text-[10px] text-gray-300 font-mono"><span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3</div>
+                <div class="text-[10px] text-gray-300 font-mono">${prosL}</div>
             </div>
             <div class="p-3 bg-black/40 rounded border border-orange-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-orange-400 uppercase">DRAKE GOLEM (Fixed)</span><span class="text-[9px] bg-orange-900/40 text-orange-200 px-2 py-0.5 rounded">Ground</span></div>
-                <div class="text-[10px] text-gray-300 font-mono"><span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3</div>
+                <div class="text-[10px] text-gray-300 font-mono">${golemL}</div>
             </div>
         </div>`;
+    // --- DYNAMIC LOADOUT GENERATION END ---
 
     configs.innerHTML = crewHtml + gadgHtml + shipLoadouts;
 }
@@ -675,9 +716,9 @@ function updateShipImage() {
     const shipId = document.getElementById('shipSelectToAdd').value;
     const img = document.getElementById('selectedShipImage');
     if(img) {
-        if(shipId === 'mole') img.src = "https://github.com/esramos-design/mfa.github.io/blob/alpha/mole.jpg?raw=true";
-        else if(shipId === 'prospector') img.src = "https://github.com/esramos-design/mfa.github.io/blob/alpha/prospector.jpg?raw=true";
-        else if(shipId === 'golem') img.src = "https://github.com/esramos-design/mfa.github.io/blob/alpha/golem.jpg?raw=true";
+        if(shipId === 'mole') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/mole.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/mole.jpg?raw=true)";
+        else if(shipId === 'prospector') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/prospector.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/prospector.jpg?raw=true)";
+        else if(shipId === 'golem') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/alpha/golem.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/alpha/golem.jpg?raw=true)";
         img.classList.remove('hidden');
     }
 }
