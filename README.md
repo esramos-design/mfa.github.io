@@ -1,27 +1,49 @@
-# **⛏️ Mining Fracture Analyser (MFA)**
-![Version](https://img.shields.io/badge/version-5.10%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
+<div align="center">
+<h1 align="center">Mining Fracture Analyser v5.12</h1>
+<p align="center">
+<strong>A real-time cooperative mining calculator for Star Citizen.</strong>
+<br />
+Stop Guessing. Start Fracturing.
+<br />
+<br />
+<a href="https://github.com/esramos-design/mfa.github.io/blob/main/LICENSE" target="_blank">
+<img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" />
+</a>
+<img alt="Status: Active" src="https://img.shields.io/badge/status-active-success.svg" />
+<img alt="Game: Star Citizen" src="https://img.shields.io/badge/Star%20Citizen-4.4+-orange" />
+<br />
+<br />
+<a href="https://esramos-design.github.io/mfa.github.io/" target="_blank">🔴 <strong>Launch Live Demo</strong></a>
+|
+<a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">🐛 Report Bug</a>
+|
+<a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">✨ Request Feature</a>
+</p>
+</div>
 
+
+# **⛏️ Mining Fracture Analyser (MFA)**
 
 **The ultimate tactical dashboard and calculation engine for industrial mining crews in Star Citizen.**
 
 The **Mining Fracture Analyser (MFA)** is a single-file, web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
 
-Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash**, offering pre-deployment strategy, risk assessment, and tactical orders.
+Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash**, offering pre-deployment strategy, risk assessment, and dynamic tactical orders.
 
-## **🚀 Key Features (v5.10)**
+## **🚀 Key Features (v5.12)**
 
 ### **🤖 Senior Foreman AI 2.0**
 
-* **Pre-Deployment Strategy:** Query the AI before you even undock. Input a rock's Mass/Resistance/Instability to get optimal ship and module recommendations.  
-* **Gemini 2.5 Flash Uplink:** Faster, more accurate tactical analysis with reduced hallucination rates.  
+* **Pre-Deployment Strategy:** Query the AI before you even undock. Input a rock's Mass/Resistance/Instability to get optimal ship and module recommendations without needing to deploy a fleet first.  
+* **Gemini 2.5 Flash Uplink:** Upgraded neural model for faster, more accurate tactical analysis with reduced hallucination rates.  
 * **Tactical Orders:** Generate roleplay-ready "Command Uplink" text blocks to copy/paste into in-game chat.  
 * **Robust Auth:** Includes memory fallback systems to keep your API session active even if browser local storage is restricted.
 
 ### **🧠 Dynamic Loadout Strategy**
 
-* **Context-Aware Recommendations:** The **Optimized Fleet Loadouts** panel is no longer static. It dynamically adapts based on your scan data:  
-  * **High Instability:** Suggests stability-focused loadouts (e.g., *Lancet MH2 \+ Focus III*).  
-  * **High Resistance / Low Power:** Suggests power-focused loadouts (e.g., *Helix II \+ Surge*).  
+* **Context-Aware Recommendations:** The **Optimized Fleet Loadouts** panel is no longer static. It dynamically adapts based on your specific scan data:  
+  * **High Instability:** Automatically suggests stability-focused loadouts (e.g., *Lancet MH2 \+ Focus III*).  
+  * **High Resistance / Low Power:** Automatically suggests power-focused loadouts (e.g., *Helix II \+ Surge*).  
   * **Standard:** Suggests balanced "Meta" loadouts.
 
 ### **🎯 Target Analysis**
