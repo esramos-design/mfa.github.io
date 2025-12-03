@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">Mining Fracture Analyser v5.12</h1>
+<h1 align="center">Mining Fracture Analyser (MFA) v5.15</h1>
 <p align="center">
 <strong>A real-time cooperative mining calculator for Star Citizen.</strong>
 <br />
@@ -21,45 +21,44 @@ Stop Guessing. Start Fracturing.
 </p>
 </div>
 
-
 # **⛏️ Mining Fracture Analyser (MFA)**
 
 **The ultimate tactical dashboard and calculation engine for industrial mining crews in Star Citizen.**
 
-The **Mining Fracture Analyser (MFA)** is a single-file, web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
+The **Mining Fracture Analyser (MFA)** is a web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
 
-Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash**, offering pre-deployment strategy, risk assessment, and dynamic tactical orders.
+**Version 5.15** introduces a split-code architecture for better performance, **Reactive Loadout Strategies**, and **OCR 4.0** with high-resolution scaling.
 
-## **🚀 Key Features (v5.12)**
+## **🚀 Key Features (v5.15)**
 
-### **🤖 Senior Foreman AI 2.0**
+### **🧠 Reactive Dynamic Loadouts**
 
-* **Pre-Deployment Strategy:** Query the AI before you even undock. Input a rock's Mass/Resistance/Instability to get optimal ship and module recommendations without needing to deploy a fleet first.  
-* **Gemini 2.5 Flash Uplink:** Upgraded neural model for faster, more accurate tactical analysis with reduced hallucination rates.  
-* **Tactical Orders:** Generate roleplay-ready "Command Uplink" text blocks to copy/paste into in-game chat.  
-* **Robust Auth:** Includes memory fallback systems to keep your API session active even if browser local storage is restricted.
+The **Optimized Fleet Loadouts** panel (Column 4\) is no longer static. It reacts instantly to changes in Mass, Resistance, or Instability:
 
-### **🧠 Dynamic Loadout Strategy**
+* **Granular MOLE Configs:** Automatically assigns specific loadouts for **Head 1 (Break)**, **Head 2 (Stability)**, and **Head 3 (Extraction)** based on rock difficulty.  
+* **Hazard Protocols:** Automatically suggests "BoreMax" or "Lancet" builds if **Instability exceeds 60%**.  
+* **Power Protocols:** Switches to "Surge" patterns if **Resistance exceeds 40%** or fleet power is insufficient.  
+* **Eco / Standard:** Suggests balanced loadouts for standard rocks.
 
-* **Context-Aware Recommendations:** The **Optimized Fleet Loadouts** panel is no longer static. It dynamically adapts based on your specific scan data:  
-  * **High Instability:** Automatically suggests stability-focused loadouts (e.g., *Lancet MH2 \+ Focus III*).  
-  * **High Resistance / Low Power:** Automatically suggests power-focused loadouts (e.g., *Helix II \+ Surge*).  
-  * **Standard:** Suggests balanced "Meta" loadouts.
+### **📷 OCR 4.0 & Live Scanning**
 
-### **🎯 Target Analysis**
+* **High-Res Scaling:** The scanner now applies a **2.5x upscale filter** and high-contrast binarization to accurately read pixelated, glowing UI text from Star Citizen HUDs.  
+* **Context Aware:** Automatically detects if you are scanning a **Rock** (Mass/Res/Inst) or a **Ship Loadout**.  
+* **Smart Regex:** Intelligently handles OCR errors (e.g., correcting "l" or "I" to "1" in numbers) and reads full values including spaces.
 
-* **Full Gadget Telemetry:** Toggle switches for all mining gadgets (BoreMax, Sabir, Optimax, etc.) are now fully visible without scrolling.  
-* **Deep-Dive Stats:** Gadget stats include verified modifiers for Cluster, Laser Instability, and Charge Window Rates.  
-* **Optical Scan (OCR):** *Experimental* feature to scan game screenshots and auto-fill rock parameters directly from your HUD.
+### **🤖 AI Foreman 2.0**
 
-### **🚢 Fleet Configuration**
+* **Gemini 2.5 Flash Uplink:** Powered by Google's latest model for faster, more accurate tactical reasoning with reduced hallucination rates.  
+* **Pre-Deployment Strategy:** Query the AI before you even undock. Input a rock's stats to get optimal ship/module recommendations.  
+* **Command Uplink:** Generates roleplay-ready tactical orders for in-game chat.  
+* **Robust Auth:** Includes memory fallback systems to keep your API session active.
 
-* **Detailed Module Specs:** Dropdowns now display **ALL** technical specifications for modules, including:  
-  * **Duration** (for active modules)  
-  * **Extraction Rate** & **Inert Filtering**  
-  * **Charge Rate** & **Catastrophic Charge Rate**  
-* **Multi-Ship Support:** Coordinate fleets mixing **Argo MOLEs**, **MISC Prospectors**, and **Drake Golems**.  
-* **Visual Toggles:** Instantly enable/disable specific laser arms to simulate component failure or repositioning.
+### **🎯 Target Analysis & Fleet Config**
+
+* **Full Database:** Includes **800+ lines** of verified data for every laser, module, and gadget in the game (Verified against Regolith/UEXCorp).  
+* **Full Gadget Telemetry:** Toggle switches for all mining gadgets are now fully visible.  
+* **Detailed Module Specs:** Dropdowns display **ALL** technical specifications (Duration, Extraction Rate, Charge Rate, etc.).  
+* **Multi-Ship Support:** Coordinate fleets mixing **Argo MOLEs**, **MISC Prospectors**, and **Drake Golems**.
 
 ### **📊 Advanced Telemetry**
 
@@ -76,10 +75,11 @@ Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash*
 2. Click **"AUTH KEY"** in the AI Foreman panel (Col 4).  
 3. Paste your free **Google Gemini API Key** (Get one directly via the link in the modal).
 
-### **2\. Input Data**
+### **2\. Input Data (Manual or Scan)**
 
-* **Scan the Rock:** Enter Mass, Resistance, and Instability in the **Target Analysis** panel.  
-* **Select Gadgets:** Toggle any active gadgets attached to the rock.
+* **Manual:** Enter Mass, Resistance, and Instability in the **Target Analysis** panel.  
+* **Scan:** Click **"SCAN MINING ROCK"** and select your game window to auto-fill data. Alternatively, upload a screenshot.  
+* **Gadgets:** Toggle any active gadgets attached to the rock.
 
 ### **3\. Deploy Fleet**
 
@@ -104,7 +104,7 @@ The tool is a Progressive Web App (PWA) compatible with any modern browser.
 Run MFA as a native desktop application to avoid browser clutter.
 
 1. **Install Python:** Download from [python.org](https://www.python.org/).  
-2. **Clone/Download:** Get the index.html, style.css, script.js and run\_app.py files.  
+2. **Clone/Download:** Get the index.html, style.css, script.js, scanner.js, and run\_app.py files.  
 3. **Install Dependency:**  
    pip install pywebview
 
@@ -112,8 +112,9 @@ Run MFA as a native desktop application to avoid browser clutter.
 
 ## **🤝 Credits & Data Sources**
 
-* **Mining Data:** All laser, module, and gadget statistics are verified against [**Regolith.rocks**](https://regolith.rocks/) and [**UEXCorp**](https://uexcorp.space/) (v3.24+ Data Standards).  
-* **UI Design:** Glassmorphism interface inspired by Star Citizen's MFDs (Multi-Function Displays).  
+* **Lead Developer:** [Esramos Design](https://github.com/esramos-design)  
+* **Mining Data:** Verified against [**Regolith.rocks**](https://regolith.rocks/) and [**UEXCorp**](https://uexcorp.space/) (v3.24+ Data Standards).  
+* **UI Design:** Glassmorphism interface inspired by Star Citizen's MFDs.  
 * **AI Backend:** Powered by Google Gemini 2.5 Flash.
 
 ## **⚠️ Disclaimer**
@@ -122,15 +123,9 @@ This project is a fan-made tool and is not affiliated with Cloud Imperium Games 
 
 *The "AI Foreman" provides advice based on probabilistic models; always use your own judgement when cracking high-instability rocks\!*
 
-### **👥 Contributors & Developers**
-
-* **Lead Developer:** [Esramos Design](https://github.com/esramos-design)  
-* **AI Co-Pilot:** Google Gemini
-
 ### **📄 Credits**
 
 * **Design & Code:** [esramos-design](https://github.com/esramos-design)  
-* **Mining Data:** Verified against [UEX Corp](https://uexcorp.space/), [regolith.rocks](https://regolith.rocks/) and in-game testing.  
 * **Libraries:**  
   * [Tailwind CSS](https://tailwindcss.com/) \- Styling.  
   * [Chart.js](https://www.chartjs.org/) \- Graphs.  
