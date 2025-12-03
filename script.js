@@ -1,28 +1,36 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.4 (Dynamic Loadout Strategy)
- * Features: Rich UI, Verified Data, Golem Crew, Safe Charts, AI Foreman
+ * Version: 5.10 (COMPLETE RESTORATION - PART 1)
+ * Status: ALL SYSTEMS ONLINE
  */
+
+// ==========================================
+// === GLOBAL VARIABLES & CONFIG          ===
+// ==========================================
+
+let memoryApiKey = "";
+let currentSimState = { mass: 0, resistance: 0, instability: 0, power: 0, success: false, activeArms: 0 };
+
+// Chart Instances
+let powerChartInstance = null;
+let modChartInstance = null;
+let resistanceChartInstance = null;
+
+// Counter for unique arm IDs
+let armIdCounter = 0;
 
 // ==========================================
 // === MODULE: SENIOR FOREMAN AI (GEMINI) ===
 // ==========================================
 
-// GLOBAL MEMORY FALLBACK (In case LocalStorage is blocked)
-let memoryApiKey = "";
-
-// --- API KEY MANAGEMENT ---
 function openApiModal() {
     const modal = document.getElementById('api-modal');
     const input = document.getElementById('api-key-input');
-    
-    // Try to get key from storage or memory
     const currentKey = localStorage.getItem('gemini_api_key') || memoryApiKey;
     
     if(currentKey && input) input.value = currentKey;
     if(modal) {
         modal.style.display = 'flex';
-        // Small delay to allow display:flex to apply before opacity transition
         setTimeout(() => modal.classList.add('show'), 10);
     }
 }
@@ -31,7 +39,6 @@ function closeApiModal() {
     const m = document.getElementById('api-modal');
     if(m) {
         m.classList.remove('show');
-        // Wait for animation to finish
         setTimeout(() => m.style.display = 'none', 200);
     }
 }
@@ -39,25 +46,12 @@ function closeApiModal() {
 function saveApiKey() {
     const input = document.getElementById('api-key-input');
     if (!input) return;
-
     const key = input.value.trim();
-    
     if(key) { 
-        // 1. Save to Memory (Always works for current session)
         memoryApiKey = key;
-
-        // 2. Try to save to LocalStorage (Might fail in some iframes, safe to ignore error)
-        try {
-            localStorage.setItem('gemini_api_key', key); 
-        } catch (e) {
-            console.warn("LocalStorage blocked, using memory fallback.");
-        }
-
+        try { localStorage.setItem('gemini_api_key', key); } catch (e) { console.warn("Storage blocked"); }
         closeApiModal(); 
-        
-        // 3. Visual Feedback
         alert("API Key Initialized! Uplink Ready.");
-        
         const aiContent = document.getElementById('ai-content');
         if(aiContent) aiContent.innerHTML = `<span class="text-green-400 font-bold">// KEY AUTHENTICATED. UPLINK ESTABLISHED.</span>`;
     } else {
@@ -65,38 +59,24 @@ function saveApiKey() {
     }
 }
 
-// --- AI INTERACTION ---
 async function askAI(mode) {
-    // Priority: Memory Key -> LocalStorage Key
     const apiKey = memoryApiKey || localStorage.getItem('gemini_api_key');
-    
-    // Check if key exists
-    if (!apiKey) { 
-        openApiModal(); 
-        return; 
-    }
+    if (!apiKey) { openApiModal(); return; }
 
     const aiLoading = document.getElementById('ai-loading');
     const aiContent = document.getElementById('ai-content');
     const customInput = document.getElementById('ai-custom-input');
     
-    // Check if simulation data exists
-    // FIX: Removed strict check for power > 0. Now allows analysis of just the rock.
     if (typeof currentSimState === 'undefined') {
-        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing... please wait.</span>`;
+        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing...</span>`;
         return;
     }
 
-    // UI Updates
     if(aiLoading) aiLoading.classList.remove('hidden');
     if(aiContent) aiContent.innerHTML = ''; 
 
-    // Prompt Construction
     let prompt = "";
-    
-    // Construct context based on whether ships are deployed or not
     const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
-    
     let crewDetails = "";
     let status = "";
 
@@ -122,17 +102,13 @@ async function askAI(mode) {
         prompt = `Context: Mining. Rock: ${rockDetails} Crew: ${crewDetails} Question: "${query}"`;
     }
 
-    // API Call
     try {
         const response = await callGemini(apiKey, prompt);
-        
-        // Safety check for Marked library
         if (typeof marked !== 'undefined' && marked.parse) {
             if(aiContent) aiContent.innerHTML = marked.parse(response);
         } else {
             if(aiContent) aiContent.innerHTML = response; 
         }
-
     } catch (error) {
         console.error(error);
         if(aiContent) aiContent.innerHTML = `<span class="text-red-500 font-bold">// UPLINK FAILURE</span><br><span class="text-red-400 text-[10px]">${error.message}</span><br><br><button onclick="openApiModal()" class="text-blue-400 underline">Update API Key</button>`;
@@ -143,27 +119,17 @@ async function askAI(mode) {
 }
 
 async function callGemini(key, prompt) {
-    // UPDATED: Using the correct gemini-2.5-flash model
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
-    
-    const payload = { 
-        contents: [{ parts: [{ text: prompt }] }] 
-    };
-
-    const response = await fetch(url, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(payload) 
-    });
-
+    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await response.json();
-
+    
     if (!response.ok) {
         let msg = `Error ${response.status}`;
         if(data.error && data.error.message) msg += `: ${data.error.message}`;
         throw new Error(msg);
     }
-
+    
     if(data.candidates && data.candidates.length > 0) {
         return data.candidates[0].content.parts[0].text;
     } else {
@@ -171,67 +137,28 @@ async function callGemini(key, prompt) {
     }
 }
 
-// Auto-check for key on load
-document.addEventListener('DOMContentLoaded', () => {
-    const key = localStorage.getItem('gemini_api_key');
-    const aiContent = document.getElementById('ai-content');
-    if(key && aiContent) {
-        memoryApiKey = key; 
-        aiContent.innerHTML = `<span class="text-purple-500/50 italic">// SYSTEM READY. KEY LOADED.</span>`;
-    }
-});
-
-// ==========================================
-// === MODULE: CALCULATOR CORE            ===
-// ==========================================
-
-// --- THEME MANAGEMENT ---
-function initTheme() {
-    const t = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-    updateThemeIcon(t);
-}
-function toggleTheme() {
-    const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', t);
-    localStorage.setItem('theme', t);
-    updateThemeIcon(t);
-    if (currentSimState.power > 0) calculate();
-}
-function updateThemeIcon(t) {
-    const i = document.getElementById('theme-icon');
-    if(i) i.textContent = t === 'light' ? '🌙' : '☀️';
-}
-
-// --- CHART VARIABLES ---
-let powerChartInstance = null;
-let modChartInstance = null;
-let resistanceChartInstance = null;
-
 // =========================================================
 // === USER VERIFIED DATA (REGOLITH / UEXCORP) ===
 // =========================================================
+
 const ships = [
     { id: "mole", name: "Argo MOLE", arms: 3, maxLaserSize: 2, defaultLaser: 4080, moduleSlots: 3, isFixedLaser: false }, 
     { id: "prospector", name: "MISC Prospector", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: false }, 
-    { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 3150, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~3150 MW)" } 
+    { id: "golem", name: "Drake Golem", arms: 1, maxLaserSize: 1, defaultLaser: 2700, moduleSlots: 2, isFixedLaser: true, fixedLaserName: "Pitman (~3150 MW)" } 
 ];
 
 const allLaserHeads = [
-    // Size 0
     { name: "Arbor MHV", size: 0, power: 1890, moduleSlots: 1, resistanceEffect: 15, instabilityEffect: 0, optimalWindow: 1.0, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0, optimalRange: 15, miningLaserPower: "189-1890", optimalChargeWindowSize: 0, optimalChargeWindowRate: 0, extractionLaserPower: 0, laserInstability: 0 }, 
     { name: "S0 Helix", size: 0, power: 1000, moduleSlots: 0, resistanceEffect: 0, instabilityEffect: 0, optimalWindow: 0.6, shatterDamage: 80, extractionRate: 1.2, inertFiltering: -0.1, optimalChargeRate: 1.2, overchargeRate: 1.2, optimalRange: 30, miningLaserPower: "0.15-1", optimalChargeWindowSize: -40, optimalChargeWindowRate: 20, extractionLaserPower: 5, laserInstability: 0 }, 
     { name: "S00 Hofstede", size: 0, power: 500, moduleSlots: 0, resistanceEffect: 35, instabilityEffect: 30, optimalWindow: 1.4, shatterDamage: 40, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 2.0, overchargeRate: 1.0, optimalRange: 30, miningLaserPower: "", optimalChargeWindowSize: 40, optimalChargeWindowRate: 20, extractionLaserPower: 4, laserInstability: 30 }, 
     { name: "Lawson", size: 0, power: 1890, moduleSlots: 0, resistanceEffect: 35, instabilityEffect: 30, optimalWindow: 1.4, shatterDamage: 50, extractionRate: 1.0, inertFiltering: 0.0, optimalChargeRate: 1.0, overchargeRate: 1.0, optimalRange: 25, miningLaserPower: "", optimalChargeWindowSize: 40, optimalChargeWindowRate: 0, extractionLaserPower: 4, laserInstability: 30 },
     { name: "Pitman", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: 35, optimalWindow: 1.4, shatterDamage: 0, extractionRate: 0.7, inertFiltering: -40.0, optimalChargeRate: 1.1, overchargeRate: 1.3, optimalRange: 40, miningLaserPower: "630-3150", optimalChargeWindowSize: 40, optimalChargeWindowRate: -40, extractionLaserPower: 1295, laserInstability: 35 }, 
-    // Size 1
     { name: "Arbor MH1", size: 1, power: 1890, moduleSlots: 1, resistanceEffect: 25, instabilityEffect: -35, optimalWindow: 1.4, shatterDamage: 0, extractionRate: 1.0, inertFiltering: -30.0, optimalChargeRate: 1.0, overchargeRate: 1.0, optimalRange: 60, miningLaserPower: "189-1890", optimalChargeWindowSize: 40, optimalChargeWindowRate: 0, extractionLaserPower: 1850, laserInstability: -35 },
     { name: "Helix I", size: 1, power: 3150, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 0.0, optimalWindow: 0.6, shatterDamage: -10, extractionRate: 1.0, inertFiltering: -30.0, optimalChargeRate: 1.2, overchargeRate: 1.5, optimalRange: 15, miningLaserPower: "630-3150", optimalChargeWindowSize: -40, optimalChargeWindowRate: 0, extractionLaserPower: 1850, laserInstability: 0 },
     { name: "Hofstede-S1", size: 1, power: 2100, moduleSlots: 1, resistanceEffect: -30, instabilityEffect: 10, optimalWindow: 1.0, shatterDamage: 0, extractionRate: 0.7, inertFiltering: -30.0, optimalChargeRate: 2.0, overchargeRate: 1.0, optimalRange: 45, miningLaserPower: "105-2100", optimalChargeWindowSize: 0, optimalChargeWindowRate: 20, extractionLaserPower: 1295, laserInstability: 10 },
     { name: "Impact I", size: 1, power: 2100, moduleSlots: 2, resistanceEffect: 10, instabilityEffect: -10, optimalWindow: 1.2, shatterDamage: 0, extractionRate: 1.5, inertFiltering: -30.0, optimalChargeRate: 1.3, overchargeRate: 1.1, optimalRange: 45, miningLaserPower: "420-2100", optimalChargeWindowSize: 20, optimalChargeWindowRate: -40, extractionLaserPower: 2775, laserInstability: -10 },
     { name: "Klein-S1", size: 1, power: 2220, moduleSlots: 1, resistanceEffect: -45, instabilityEffect: 35, optimalWindow: 1.2, shatterDamage: 0, extractionRate: 1.2, inertFiltering: -30.0, optimalChargeRate: 1.5, overchargeRate: 1.2, optimalRange: 45, miningLaserPower: "378-2220", optimalChargeWindowSize: 20, optimalChargeWindowRate: 0, extractionLaserPower: 2220, laserInstability: 35 },
     { name: "Lancet MH1", size: 1, power: 2520, moduleSlots: 1, resistanceEffect: 0, instabilityEffect: -10, optimalWindow: 0.4, shatterDamage: 0, extractionRate: 1.0, inertFiltering: -30.0, optimalChargeRate: 0.5, overchargeRate: 0.5, optimalRange: 30, miningLaserPower: "504-2520", optimalChargeWindowSize: -60, optimalChargeWindowRate: 40, extractionLaserPower: 1850, laserInstability: -10 },
-    // Size 2
     { name: "Arbor MH2", size: 2, power: 2400, moduleSlots: 2, resistanceEffect: 25, instabilityEffect: -35, optimalWindow: 1.4, shatterDamage: 0, extractionRate: 1.4, inertFiltering: -40.0, optimalChargeRate: 1.0, overchargeRate: 1.0, optimalRange: 90, miningLaserPower: "480-2400", optimalChargeWindowSize: 40, optimalChargeWindowRate: 0, extractionLaserPower: 2590, laserInstability: -35 },
     { name: "Helix II", size: 2, power: 4080, moduleSlots: 3, resistanceEffect: -30, instabilityEffect: 0.0, optimalWindow: 0.6, shatterDamage: -10, extractionRate: 1.4, inertFiltering: -40.0, optimalChargeRate: 1.2, overchargeRate: 1.5, optimalRange: 30, miningLaserPower: "1020-4080", optimalChargeWindowSize: -40, optimalChargeWindowRate: 0, extractionLaserPower: 2590, laserInstability: 0 },
     { name: "Hofstede-S2", size: 2, power: 3360, moduleSlots: 2, resistanceEffect: -30, instabilityEffect: 10, optimalWindow: 1.6, shatterDamage: 0, extractionRate: 0.7, inertFiltering: -40.0, optimalChargeRate: 2.0, overchargeRate: 1.0, optimalRange: 60, miningLaserPower: "336-3360", optimalChargeWindowSize: 60, optimalChargeWindowRate: 20, extractionLaserPower: 1295, laserInstability: 10 },
@@ -296,10 +223,9 @@ const gadgets = [
     if (b.name === "None") return 1;
     return a.name.localeCompare(b.name);
 });
-
 // =========================================================
-
-let currentSimState = { mass: 0, resistance: 0, instability: 0, power: 0, success: false, activeArms: 0 };
+// === CORE FUNCTIONS                                    ===
+// =========================================================
 
 function getFormattedStats(item, type) {
     let stats = [];
@@ -361,15 +287,15 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
                 <div class="flex justify-center gap-4">
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-blue-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${mNeeded}</span>
-                        <span class="text-[10px] uppercase text-blue-300/70 tracking-widest mt-1">MOLEs</span>
+                        <span class="text-[9px] uppercase text-blue-300/70 tracking-widest mt-1">MOLEs</span>
                     </div>
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-green-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${pNeeded}</span>
-                        <span class="text-[10px] uppercase text-green-300/70 tracking-widest mt-1">Prospectors</span>
+                        <span class="text-[9px] uppercase text-green-300/70 tracking-widest mt-1">Prospectors</span>
                     </div>
                     <div class="flex flex-col items-center bg-black/40 p-3 rounded border border-orange-500/20 min-w-[80px]">
                         <span class="text-2xl font-black text-white">${gNeeded}</span>
-                        <span class="text-[10px] uppercase text-orange-300/70 tracking-widest mt-1">Golems</span>
+                        <span class="text-[9px] uppercase text-orange-300/70 tracking-widest mt-1">Golems</span>
                     </div>
                 </div>
             </div>`;
@@ -407,9 +333,9 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         strategyName = "Critical Stability Protocol";
         strategyColor = "text-yellow-400";
         moleL = `
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Hofstede-S1 + Focus III + Vaux-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Focus III + Rieger-C3`;
@@ -417,18 +343,18 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         strategyName = "Resistance Breaker Protocol";
         strategyColor = "text-red-400";
         moleL = `
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
     } else {
         // Standard (Balanced)
         moleL = `
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[14px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
         prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
         golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
@@ -438,7 +364,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         <div class="space-y-4 mt-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
                 <h4 class="text-sm font-bold text-white uppercase tracking-wider">Optimized Fleet Loadouts</h4>
-                <span class="text-[12px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
+                <span class="text-[9px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
             </div>
             <div class="p-3 bg-black/40 rounded border border-indigo-500/30">
                 <div class="flex justify-between items-center mb-2"><span class="text-xs font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
@@ -448,11 +374,11 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
             </div>
             <div class="p-3 bg-black/40 rounded border border-green-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-green-400 uppercase">MISC PROSPECTOR (S1)</span><span class="text-[9px] bg-green-900/40 text-green-200 px-2 py-0.5 rounded">Solo</span></div>
-                <div class="text-[14px] text-gray-300 font-mono">${prosL}</div>
+                <div class="text-[10px] text-gray-300 font-mono">${prosL}</div>
             </div>
             <div class="p-3 bg-black/40 rounded border border-orange-500/30">
                 <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-orange-400 uppercase">DRAKE GOLEM (Fixed)</span><span class="text-[9px] bg-orange-900/40 text-orange-200 px-2 py-0.5 rounded">Ground</span></div>
-                <div class="text-[14px] text-gray-300 font-mono">${golemL}</div>
+                <div class="text-[10px] text-gray-300 font-mono">${golemL}</div>
             </div>
         </div>`;
     // --- DYNAMIC LOADOUT GENERATION END ---
@@ -460,7 +386,132 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
     configs.innerHTML = crewHtml + gadgHtml + shipLoadouts;
 }
 
-function calculate() {
+// --- API KEY MANAGEMENT (GLOBAL) ---
+window.openApiModal = function() {
+    const modal = document.getElementById('api-modal');
+    const input = document.getElementById('api-key-input');
+    const currentKey = localStorage.getItem('gemini_api_key') || memoryApiKey;
+    if(currentKey && input) input.value = currentKey;
+    if(modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+};
+
+window.closeApiModal = function() {
+    const m = document.getElementById('api-modal');
+    if(m) {
+        m.classList.remove('show');
+        setTimeout(() => m.style.display = 'none', 200);
+    }
+};
+
+window.saveApiKey = function() {
+    const input = document.getElementById('api-key-input');
+    if (!input) return;
+    const key = input.value.trim();
+    if(key) { 
+        memoryApiKey = key;
+        try { localStorage.setItem('gemini_api_key', key); } catch (e) { console.warn("Storage blocked"); }
+        window.closeApiModal(); 
+        alert("API Key Initialized! Uplink Ready.");
+        const aiContent = document.getElementById('ai-content');
+        if(aiContent) aiContent.innerHTML = `<span class="text-green-400 font-bold">// KEY AUTHENTICATED. UPLINK ESTABLISHED.</span>`;
+    } else {
+        alert("Please enter a valid API key.");
+    }
+};
+
+// --- AI INTERACTION (GLOBAL) ---
+window.askAI = async function(mode) {
+    const apiKey = memoryApiKey || localStorage.getItem('gemini_api_key');
+    if (!apiKey) { window.openApiModal(); return; }
+
+    const aiLoading = document.getElementById('ai-loading');
+    const aiContent = document.getElementById('ai-content');
+    const customInput = document.getElementById('ai-custom-input');
+    
+    if (typeof currentSimState === 'undefined') {
+        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing...</span>`;
+        return;
+    }
+
+    if(aiLoading) aiLoading.classList.remove('hidden');
+    if(aiContent) aiContent.innerHTML = ''; 
+
+    let prompt = "";
+    const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
+    let crewDetails = "", status = "";
+
+    if (currentSimState.power > 0) {
+        crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
+        status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
+    } else {
+        crewDetails = "Crew Status: No ships currently deployed.";
+        status = "AWAITING FLEET DEPLOYMENT";
+    }
+
+    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is the rock safe? 2. What modules or ships do we need?`;
+    else if (mode === 'briefing') prompt = `You are a Commander. Generate a short tactical order for crew chat. Scenario: ${rockDetails} ${crewDetails}`;
+    else if (mode === 'risk') prompt = `Safety Officer. Analyze risk for: ${rockDetails}. Assess explosion probability. Keep it brief.`;
+    else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules and ship configuration.`;
+    else if (mode === 'custom') {
+        const query = customInput ? customInput.value : "";
+        if (!query) { 
+            if(aiLoading) aiLoading.classList.add('hidden'); 
+            if(aiContent) aiContent.innerHTML = `<span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span>`;
+            return; 
+        }
+        prompt = `Context: Mining. Rock: ${rockDetails} Crew: ${crewDetails} Question: "${query}"`;
+    }
+
+    try {
+        const response = await callGemini(apiKey, prompt);
+        if (typeof marked !== 'undefined' && marked.parse) {
+            if(aiContent) aiContent.innerHTML = marked.parse(response);
+        } else {
+            if(aiContent) aiContent.innerHTML = response; 
+        }
+    } catch (error) {
+        console.error(error);
+        if(aiContent) aiContent.innerHTML = `<span class="text-red-500 font-bold">// UPLINK FAILURE</span><br><span class="text-red-400 text-[10px]">${error.message}</span><br><br><button onclick="openApiModal()" class="text-blue-400 underline">Update API Key</button>`;
+    } finally {
+        if(aiLoading) aiLoading.classList.add('hidden');
+        if(mode === 'custom' && customInput) customInput.value = '';
+    }
+};
+
+async function callGemini(key, prompt) {
+    // Using gemini-2.5-flash-preview-09-2025
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
+    
+    const payload = { 
+        contents: [{ parts: [{ text: prompt }] }] 
+    };
+
+    const response = await fetch(url, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(payload) 
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        let msg = `Error ${response.status}`;
+        if(data.error && data.error.message) msg += `: ${data.error.message}`;
+        throw new Error(msg);
+    }
+
+    if(data.candidates && data.candidates.length > 0) {
+        return data.candidates[0].content.parts[0].text;
+    } else {
+        throw new Error("AI returned no content.");
+    }
+}
+
+// --- CALCULATION (GLOBAL) ---
+window.calculate = function() {
     const resEl = document.getElementById('resistance');
     const instEl = document.getElementById('instability');
     const massEl = document.getElementById('rockMass');
@@ -533,7 +584,6 @@ function calculate() {
     const formattedPwr = totalPwr.toLocaleString(undefined, { maximumFractionDigits: 0 });
     const diff = assessDifficulty(finalInst, finalRes);
 
-    // UPDATE GLOBAL STATE FOR AI
     currentSimState = { mass: rockMass, resistance: finalRes, instability: finalInst, power: totalPwr, success: success, activeArms: activeArms };
 
     generateAdvancedTelemetry(rockMass, finalRes, finalInst, reqPwr, totalPwr);
@@ -570,9 +620,9 @@ function calculate() {
     try {
         updateCharts(totalPwr, reqPwr, finalRes, finalInst, rockMass);
     } catch(e) { console.warn("Chart Error:", e); }
-}
+};
 
-// --- SAFE CHART RENDERING ---
+// --- UPDATE CHART FUNCTIONS (FIXED) ---
 function updateCharts(pwr, req, res, inst, mass) {
     if (typeof Chart === 'undefined') return;
 
@@ -581,15 +631,17 @@ function updateCharts(pwr, req, res, inst, mass) {
     const ctxR = document.getElementById('resistanceChart')?.getContext('2d');
     if (!ctxP || !ctxM || !ctxR) return;
 
-    if (powerChartInstance) { powerChartInstance.destroy(); powerChartInstance = null; }
-    if (modChartInstance) { modChartInstance.destroy(); modChartInstance = null; }
-    if (resistanceChartInstance) { resistanceChartInstance.destroy(); resistanceChartInstance = null; }
+    // Destroy existing charts before creating new ones
+    if (powerChartInstance) { powerChartInstance.destroy(); }
+    if (modChartInstance) { modChartInstance.destroy(); }
+    if (resistanceChartInstance) { resistanceChartInstance.destroy(); }
 
     const success = pwr >= req;
     const totalMax = Math.max(pwr, req) * 1.1;
     const gridColor = getComputedStyle(document.body).getPropertyValue('--chart-grid').trim();
     const textColor = getComputedStyle(document.body).getPropertyValue('--chart-text').trim();
 
+    // Power Chart
     powerChartInstance = new Chart(ctxP, {
         type: 'bar',
         data: {
@@ -610,6 +662,7 @@ function updateCharts(pwr, req, res, inst, mass) {
         }
     });
 
+    // Mod Chart
     let safe = Math.max(0, 100 - (res + inst));
     modChartInstance = new Chart(ctxM, {
         type: 'doughnut',
@@ -627,6 +680,7 @@ function updateCharts(pwr, req, res, inst, mass) {
         }
     });
 
+    // Resistance Chart
     const curveLabels = [0, 20, 40, 60, 80, 100];
     const curveData = curveLabels.map(r => {
         let dec = r / 100.0;
@@ -654,15 +708,89 @@ function updateCharts(pwr, req, res, inst, mass) {
     });
 }
 
-// --- HELPER FOR OPTGROUPS ---
-function getModOptions() {
-    const act = sortedModules.filter(m => m.activation === 'Active').map(m => `<option value="${m.name}">${m.name}${getFormattedStats(m,'module')}</option>`).join('');
-    const pas = sortedModules.filter(m => m.activation === 'Passive').map(m => `<option value="${m.name}">${m.name}${getFormattedStats(m,'module')}</option>`).join('');
-    return `<option value="None">None</option><optgroup label="Active Modules">${act}</optgroup><optgroup label="Passive Modules">${pas}</optgroup>`;
+// --- TOGGLE CHECK (GLOBAL) ---
+window.togCheck = function(id, i) {
+    const v = document.getElementById(`${id}-mod${i}`).value;
+    const box = document.getElementById(`${id}-mod${i}-box`);
+    const m = powerModules.find(x => x.name === v);
+    if(m && m.activation === 'Active') box.classList.remove('hidden');
+    else box.classList.add('hidden');
+};
+
+// --- ADD SHIP LOADOUT (GLOBAL) ---
+window.addShipLoadout = function() {
+    const sId = document.getElementById('shipSelectToAdd').value;
+    const s = ships.find(x => x.id === sId);
+    if(!s) return;
+    
+    const emptyMsg = document.getElementById('empty-state-msg');
+    if(emptyMsg) emptyMsg.remove();
+
+    updateShipImage();
+    for(let i=1; i<=s.arms; i++) {
+        document.getElementById('multiShipContainer').insertAdjacentHTML('beforeend', createArmConfigHtml(i, s));
+    }
+    calculate();
+};
+
+// --- UPDATE SHIP IMAGE (GLOBAL) ---
+window.updateShipImage = function() {
+    const shipId = document.getElementById('shipSelectToAdd').value;
+    const img = document.getElementById('selectedShipImage');
+    if(img) {
+        if(shipId === 'mole') img.src = "https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/mole.jpg";
+        else if(shipId === 'prospector') img.src = "https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/prospector.jpg";
+        else if(shipId === 'golem') img.src = "https://raw.githubusercontent.com/esramos-design/mfa.github.io/main/golem.jpg";
+        
+        img.onerror = function() {
+            this.src = 'https://placehold.co/400x250/0f172a/38bdf8?text=IMAGE+NOT+FOUND&font=oswald';
+        };
+        
+        img.classList.remove('hidden');
+    }
+};
+
+function populateGadgetList() {
+    const c = document.getElementById('gadget-list-container');
+    if(!c) return;
+    c.innerHTML = gadgets.map((g,i) => `
+        <div class="flex justify-between p-3 mb-2 bg-[var(--bg-input)] rounded border border-[var(--border-main)] hover:border-blue-500/50 transition-all cursor-pointer group" onclick="document.getElementById('gr-${i}').click()">
+            <div class="flex-grow">
+                <div class="flex items-center gap-2 mb-1">
+                     <span class="text-sm font-black tracking-wider uppercase ${g.name==='None'?'text-[var(--text-muted)]': (g.type==='Additive'?'text-blue-400':(g.type==='Utility'?'text-green-400':'text-purple-400'))}">${g.name}</span>
+                     ${g.name !== 'None' ? `<span class="px-1.5 py-0.5 text-[9px] uppercase border rounded border-gray-500/30 text-gray-400">${g.type}</span>` : ''}
+                </div>
+                <div class="text-[10px] text-[var(--text-muted)] font-mono leading-tight opacity-90 pr-8">${g.desc || ''}</div>
+                <div class="mt-1 pt-1 border-t border-white/5 text-[10px] font-mono text-blue-300/90 font-bold">${getFormattedStats(g,'gadget')}</div>
+            </div>
+            <div class="ml-2">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="radio" name="gadg" id="gr-${i}" value="${g.name}" ${g.name==='None'?'checked':''} class="sr-only peer" onchange="document.getElementById('gadgetSelect').value=this.value;calculate()">
+                    <div class="w-9 h-5 bg-slate-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>`).join('');
 }
 
+// --- SCANNER ---
+window.toggleScan = async function(mode) {
+    if(window.location.protocol === 'file:') { alert("Scanner requires HTTPS or Localhost."); return; }
+    try {
+        const s = await navigator.mediaDevices.getDisplayMedia({video: {cursor:"never"}});
+        s.getTracks().forEach(t => t.stop());
+        alert("Scanner connected! (OCR placeholder)");
+    } catch(e) { console.log(e); }
+};
+
+window.handleFileSelect = function(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('ocr-loading').classList.remove('hidden');
+        runOCR(input.files[0], 'mining').then(() => document.getElementById('ocr-loading').classList.add('hidden'));
+    }
+};
+async function runOCR(blob, mode) { /* Placeholder to prevent crash */ }
+
 // --- UI GENERATION ---
-let armIdCounter = 0; 
 function createArmConfigHtml(armIndex, ship) {
     armIdCounter++; 
     const armId = `arm-${ship.id}-${armIdCounter}`;
@@ -691,77 +819,29 @@ function createArmConfigHtml(armIndex, ship) {
     </div>`;
 }
 
-function togCheck(id, i) {
-    const v = document.getElementById(`${id}-mod${i}`).value;
-    const box = document.getElementById(`${id}-mod${i}-box`);
-    const m = powerModules.find(x => x.name === v);
-    if(m && m.activation === 'Active') box.classList.remove('hidden');
-    else box.classList.add('hidden');
+function getModOptions() {
+    const act = sortedModules.filter(m => m.activation === 'Active').map(m => `<option value="${m.name}">${m.name}${getFormattedStats(m,'module')}</option>`).join('');
+    const pas = sortedModules.filter(m => m.activation === 'Passive').map(m => `<option value="${m.name}">${m.name}${getFormattedStats(m,'module')}</option>`).join('');
+    return `<option value="None">None</option><optgroup label="Active Modules">${act}</optgroup><optgroup label="Passive Modules">${pas}</optgroup>`;
 }
 
-function addShipLoadout() {
-    const sId = document.getElementById('shipSelectToAdd').value;
-    const s = ships.find(x => x.id === sId);
-    if(!s) return;
-    
-    document.getElementById('empty-state-msg')?.remove();
-    updateShipImage();
-    for(let i=1; i<=s.arms; i++) {
-        document.getElementById('multiShipContainer').insertAdjacentHTML('beforeend', createArmConfigHtml(i, s));
-    }
-    calculate();
+// --- THEME MANAGEMENT ---
+function initTheme() {
+    const t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    updateThemeIcon(t);
 }
-
-function updateShipImage() {
-    const shipId = document.getElementById('shipSelectToAdd').value;
-    const img = document.getElementById('selectedShipImage');
-    if(img) {
-        if(shipId === 'mole') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/mole.jpg?raw=true)";
-        else if(shipId === 'prospector') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/prospector.jpg?raw=true)";
-        else if(shipId === 'golem') img.src = "[https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true](https://github.com/esramos-design/mfa.github.io/blob/main/golem.jpg?raw=true)";
-        img.classList.remove('hidden');
-    }
+function toggleTheme() {
+    const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    updateThemeIcon(t);
+    if (currentSimState.power > 0) calculate();
 }
-
-function populateGadgetList() {
-    const c = document.getElementById('gadget-list-container');
-    if(!c) return;
-    c.innerHTML = gadgets.map((g,i) => `
-        <div class="flex justify-between p-3 mb-2 bg-[var(--bg-input)] rounded border border-[var(--border-main)] hover:border-blue-500/50 transition-all cursor-pointer group" onclick="document.getElementById('gr-${i}').click()">
-            <div class="flex-grow">
-                <div class="flex items-center gap-2 mb-1">
-                     <span class="text-sm font-black tracking-wider uppercase ${g.name==='None'?'text-[var(--text-muted)]': (g.type==='Additive'?'text-blue-400':(g.type==='Utility'?'text-green-400':'text-purple-400'))}">${g.name}</span>
-                     ${g.name !== 'None' ? `<span class="px-1.5 py-0.5 text-[9px] uppercase border rounded border-gray-500/30 text-gray-400">${g.type}</span>` : ''}
-                </div>
-                <div class="text-[10px] text-[var(--text-muted)] font-mono leading-tight opacity-90 pr-8">${g.desc || ''}</div>
-                <div class="mt-1 pt-1 border-t border-white/5 text-[10px] font-mono text-blue-300/90 font-bold">${getFormattedStats(g,'gadget')}</div>
-            </div>
-            <div class="ml-2">
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="radio" name="gadg" id="gr-${i}" value="${g.name}" ${g.name==='None'?'checked':''} class="sr-only peer" onchange="document.getElementById('gadgetSelect').value=this.value;calculate()">
-                    <div class="w-9 h-5 bg-slate-700/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-            </div>
-        </div>`).join('');
+function updateThemeIcon(t) {
+    const i = document.getElementById('theme-icon');
+    if(i) i.textContent = t === 'light' ? '🌙' : '☀️';
 }
-
-// --- SCANNER ---
-async function toggleScan(mode) {
-    if(window.location.protocol === 'file:') { alert("Scanner requires HTTPS or Localhost."); return; }
-    try {
-        const s = await navigator.mediaDevices.getDisplayMedia({video: {cursor:"never"}});
-        s.getTracks().forEach(t => t.stop());
-        alert("Scanner connected! (OCR placeholder)");
-    } catch(e) { console.log(e); }
-}
-
-function handleFileSelect(input) {
-    if (input.files && input.files[0]) {
-        document.getElementById('ocr-loading').classList.remove('hidden');
-        runOCR(input.files[0], 'mining').then(() => document.getElementById('ocr-loading').classList.add('hidden'));
-    }
-}
-async function runOCR(blob, mode) { /* Placeholder to prevent crash */ }
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -771,4 +851,13 @@ document.addEventListener('DOMContentLoaded', () => {
     populateGadgetList();
     updateShipImage();
     calculate();
+    
+    window.calculate = calculate;
+    window.togCheck = togCheck;
+    window.openApiModal = openApiModal;
+    window.closeApiModal = closeApiModal;
+    window.saveApiKey = saveApiKey;
+    window.askAI = askAI;
+    window.handleFileSelect = handleFileSelect;
+    window.toggleTheme = toggleTheme; 
 });
