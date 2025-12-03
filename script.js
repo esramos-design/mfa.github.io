@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.10 (COMPLETE RESTORATION - PART 1)
+ * Version: 5.15 (v5.10 RESTORED + REACTIVE FIX)
  * Status: ALL SYSTEMS ONLINE
  */
 
@@ -266,14 +266,19 @@ function assessDifficulty(instability, resistance) {
     return { text: "EASY: Low difficulty.", color: "text-green-500" };
 }
 
-// --- COL 4 LOGIC: TACTICAL ---
+// --- COL 4 LOGIC: TACTICAL (REACTIVE FIX APPLIED HERE) ---
 function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
     const configs = document.getElementById('configs');
     if(!configs) return;
     
+    // Add visual feedback (flash) to show it updated
+    configs.style.opacity = '0.5';
+    setTimeout(() => configs.style.opacity = '1', 150);
+
     const deficit = Math.max(0, reqPwr - currentPwr);
     const soloPwr = 4700; const molePwr = 12000; const golemPwr = 5900;
     
+    // 1. Crew Requirements
     let crewHtml = '';
     if (deficit > 0) {
         const pNeeded = Math.ceil(deficit / soloPwr);
@@ -300,14 +305,16 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
                 </div>
             </div>`;
     } else {
-         crewHtml = `<div class="p-4 mb-6 rounded-lg bg-green-900/20 border border-green-500/30 text-center"><h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Status: Operational</h4><p class="text-xs text-green-200/80 mt-1">Power sufficient.</p></div>`;
+         crewHtml = `<div class="p-4 mb-6 rounded-lg bg-green-900/20 border border-green-500/30 text-center"><h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Status: Operational</h4><p class="text-xs text-green-200/80 mt-1">Fleet power sufficient.</p></div>`;
     }
 
+    // 2. Gadget Logic (Reactive)
     let gName = "None"; let gDesc = "Standard Rock";
-    if (res > 50) { gName="Sabir"; gDesc="Critical Resistance"; }
-    else if (inst > 50) { gName="BoreMax"; gDesc="Critical Instability"; }
-    else if (res > 30) { gName="OptiMax"; gDesc="High Resistance"; }
-    else if (inst > 30) { gName="Stalwart"; gDesc="Unstable"; }
+    if (res > 50) { gName="Sabir"; gDesc="Critical Resistance (>50%)"; }
+    else if (res > 30) { gName="OptiMax"; gDesc="High Resistance (>30%)"; }
+    else if (inst > 50) { gName="BoreMax"; gDesc="Critical Instability (>50%)"; }
+    else if (inst > 30) { gName="Stalwart"; gDesc="High Instability (>30%)"; }
+    else if (mass > 20000) { gName="Waveshift"; gDesc="Mass Stabilizer"; }
     
     const gadgHtml = `
         <div class="p-4 mb-6 rounded-lg bg-purple-900/20 border border-purple-500/30 shadow-lg">
@@ -321,195 +328,94 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
             </div>
         </div>`;
 
-    // --- DYNAMIC LOADOUT GENERATION START ---
+    // 3. Loadout Logic (Reactive / Granular) - BIGGER TEXT + 3 HEADS
     let strategyName = "Standard Extraction Protocol";
     let strategyColor = "text-green-400";
     let moleL = "";
     let prosL = "";
     let golemL = "";
 
-    // LOGIC: High Instability vs High Resistance/Deficit
-    if (inst > 50) {
-        strategyName = "Critical Stability Protocol";
-        strategyColor = "text-yellow-400";
+    if (inst > 60) {
+        // EXTREME INSTABILITY
+        strategyName = "Hazard Protocol (Inst > 60%)";
+        strategyColor = "text-red-500";
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III + Rieger-C3</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III + Brandt</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Lancet MH2 + Focus III x3</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x3</div>
+            <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
         `;
-        prosL = `<span class="text-white font-bold">Loadout:</span> Hofstede-S1 + Focus III + Vaux-C3`;
-        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Focus III + Rieger-C3`;
+        prosL = `<span class="text-gray-300">Lancet MH1 + Focus III x2</span>`;
+        golemL = `<span class="text-gray-300">Pitman + Focus III + BoreMax</span>`;
     } else if (res > 40 || deficit > 0) {
-        strategyName = "Resistance Breaker Protocol";
+        // RESISTANCE BREAKER
+        strategyName = "Resistance Breaker (Res > 40%)";
         strategyColor = "text-red-400";
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
-        prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
-        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
-    } else {
-        // Standard (Balanced)
+        prosL = `<span class="text-gray-300">Helix I + Surge + Rieger-C3</span>`;
+        golemL = `<span class="text-gray-300">Pitman + Surge + Rieger-C3</span>`;
+    } else if (inst > 30) {
+        // HIGH INSTABILITY
+        strategyName = "Stabilization Focus";
+        strategyColor = "text-yellow-400";
         moleL = `
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
-            <div class="text-[10px] text-gray-300 font-mono"><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III x2</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
+            <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
         `;
-        prosL = `<span class="text-white font-bold">Loadout:</span> Helix I + Surge + Rieger-C3`;
-        golemL = `<span class="text-white font-bold">Loadout:</span> Pitman + Surge + Rieger-C3`;
+        prosL = `<span class="text-gray-300">Hofstede-S1 + Focus III + Vaux-C3</span>`;
+        golemL = `<span class="text-gray-300">Pitman + Focus III + Rieger-C3</span>`;
+    } else if (mass > 25000) {
+        // HIGH MASS / LOW DIFF
+        strategyName = "Cluster Extraction";
+        strategyColor = "text-blue-400";
+        moleL = `
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Impact II + Surge + Torrent III</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div>
+            <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
+        `;
+        prosL = `<span class="text-gray-300">Impact I + Torrent III + FLTR-XL</span>`;
+        golemL = `<span class="text-gray-300">Pitman + Torrent III x2</span>`;
+    } else {
+        // ECO / EASY ROCK
+        strategyName = "Eco / Standard";
+        strategyColor = "text-gray-400";
+        moleL = `
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Rieger-C3 x2</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div>
+            <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
+        `;
+        prosL = `<span class="text-gray-300">Standard Lasers + FLTR-XL</span>`;
+        golemL = `<span class="text-gray-300">Pitman + FLTR-XL</span>`;
     }
 
     const shipLoadouts = `
         <div class="space-y-4 mt-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
                 <h4 class="text-sm font-bold text-white uppercase tracking-wider">Optimized Fleet Loadouts</h4>
-                <span class="text-[9px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
+                <span class="text-[10px] font-bold uppercase ${strategyColor} tracking-widest border border-white/10 px-2 py-1 rounded bg-black/40">${strategyName}</span>
             </div>
-            <div class="p-3 bg-black/40 rounded border border-indigo-500/30">
-                <div class="flex justify-between items-center mb-2"><span class="text-xs font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
+            <div class="p-4 bg-black/40 rounded border border-indigo-500/30">
+                <div class="flex justify-between items-center mb-3"><span class="text-sm font-black text-indigo-400 uppercase">ARGO MOLE (S2)</span><span class="text-[9px] bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">3 Heads</span></div>
                 <div class="space-y-2">
-                    ${moleL}
+                    <div class="text-xs font-mono leading-relaxed">${moleL}</div>
                 </div>
             </div>
-            <div class="p-3 bg-black/40 rounded border border-green-500/30">
-                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-green-400 uppercase">MISC PROSPECTOR (S1)</span><span class="text-[9px] bg-green-900/40 text-green-200 px-2 py-0.5 rounded">Solo</span></div>
-                <div class="text-[10px] text-gray-300 font-mono">${prosL}</div>
+            <div class="p-4 bg-black/40 rounded border border-green-500/30">
+                <div class="flex justify-between items-center mb-2"><span class="text-sm font-black text-green-400 uppercase">MISC PROSPECTOR (S1)</span><span class="text-[9px] bg-green-900/40 text-green-200 px-2 py-0.5 rounded">Solo</span></div>
+                <div class="text-xs text-gray-300 font-mono">${prosL}</div>
             </div>
-            <div class="p-3 bg-black/40 rounded border border-orange-500/30">
-                <div class="flex justify-between items-center mb-1"><span class="text-xs font-black text-orange-400 uppercase">DRAKE GOLEM (Fixed)</span><span class="text-[9px] bg-orange-900/40 text-orange-200 px-2 py-0.5 rounded">Ground</span></div>
-                <div class="text-[10px] text-gray-300 font-mono">${golemL}</div>
+            <div class="p-4 bg-black/40 rounded border border-orange-500/30">
+                <div class="flex justify-between items-center mb-2"><span class="text-sm font-black text-orange-400 uppercase">DRAKE GOLEM (Fixed)</span><span class="text-[9px] bg-orange-900/40 text-orange-200 px-2 py-0.5 rounded">Ground</span></div>
+                <div class="text-xs text-gray-300 font-mono">${golemL}</div>
             </div>
         </div>`;
-    // --- DYNAMIC LOADOUT GENERATION END ---
 
     configs.innerHTML = crewHtml + gadgHtml + shipLoadouts;
 }
-
-// --- API KEY MANAGEMENT (GLOBAL) ---
-window.openApiModal = function() {
-    const modal = document.getElementById('api-modal');
-    const input = document.getElementById('api-key-input');
-    const currentKey = localStorage.getItem('gemini_api_key') || memoryApiKey;
-    if(currentKey && input) input.value = currentKey;
-    if(modal) {
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-    }
-};
-
-window.closeApiModal = function() {
-    const m = document.getElementById('api-modal');
-    if(m) {
-        m.classList.remove('show');
-        setTimeout(() => m.style.display = 'none', 200);
-    }
-};
-
-window.saveApiKey = function() {
-    const input = document.getElementById('api-key-input');
-    if (!input) return;
-    const key = input.value.trim();
-    if(key) { 
-        memoryApiKey = key;
-        try { localStorage.setItem('gemini_api_key', key); } catch (e) { console.warn("Storage blocked"); }
-        window.closeApiModal(); 
-        alert("API Key Initialized! Uplink Ready.");
-        const aiContent = document.getElementById('ai-content');
-        if(aiContent) aiContent.innerHTML = `<span class="text-green-400 font-bold">// KEY AUTHENTICATED. UPLINK ESTABLISHED.</span>`;
-    } else {
-        alert("Please enter a valid API key.");
-    }
-};
-
-// --- AI INTERACTION (GLOBAL) ---
-window.askAI = async function(mode) {
-    const apiKey = memoryApiKey || localStorage.getItem('gemini_api_key');
-    if (!apiKey) { window.openApiModal(); return; }
-
-    const aiLoading = document.getElementById('ai-loading');
-    const aiContent = document.getElementById('ai-content');
-    const customInput = document.getElementById('ai-custom-input');
-    
-    if (typeof currentSimState === 'undefined') {
-        if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: System initializing...</span>`;
-        return;
-    }
-
-    if(aiLoading) aiLoading.classList.remove('hidden');
-    if(aiContent) aiContent.innerHTML = ''; 
-
-    let prompt = "";
-    const rockDetails = `Rock Mass: ${currentSimState.mass}kg, Resistance: ${currentSimState.resistance.toFixed(1)}%, Instability: ${currentSimState.instability.toFixed(1)}%.`;
-    let crewDetails = "", status = "";
-
-    if (currentSimState.power > 0) {
-        crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
-        status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
-    } else {
-        crewDetails = "Crew Status: No ships currently deployed.";
-        status = "AWAITING FLEET DEPLOYMENT";
-    }
-
-    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is the rock safe? 2. What modules or ships do we need?`;
-    else if (mode === 'briefing') prompt = `You are a Commander. Generate a short tactical order for crew chat. Scenario: ${rockDetails} ${crewDetails}`;
-    else if (mode === 'risk') prompt = `Safety Officer. Analyze risk for: ${rockDetails}. Assess explosion probability. Keep it brief.`;
-    else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules and ship configuration.`;
-    else if (mode === 'custom') {
-        const query = customInput ? customInput.value : "";
-        if (!query) { 
-            if(aiLoading) aiLoading.classList.add('hidden'); 
-            if(aiContent) aiContent.innerHTML = `<span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span>`;
-            return; 
-        }
-        prompt = `Context: Mining. Rock: ${rockDetails} Crew: ${crewDetails} Question: "${query}"`;
-    }
-
-    try {
-        const response = await callGemini(apiKey, prompt);
-        if (typeof marked !== 'undefined' && marked.parse) {
-            if(aiContent) aiContent.innerHTML = marked.parse(response);
-        } else {
-            if(aiContent) aiContent.innerHTML = response; 
-        }
-    } catch (error) {
-        console.error(error);
-        if(aiContent) aiContent.innerHTML = `<span class="text-red-500 font-bold">// UPLINK FAILURE</span><br><span class="text-red-400 text-[10px]">${error.message}</span><br><br><button onclick="openApiModal()" class="text-blue-400 underline">Update API Key</button>`;
-    } finally {
-        if(aiLoading) aiLoading.classList.add('hidden');
-        if(mode === 'custom' && customInput) customInput.value = '';
-    }
-};
-
-async function callGemini(key, prompt) {
-    // Using gemini-2.5-flash-preview-09-2025
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`;
-    
-    const payload = { 
-        contents: [{ parts: [{ text: prompt }] }] 
-    };
-
-    const response = await fetch(url, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(payload) 
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        let msg = `Error ${response.status}`;
-        if(data.error && data.error.message) msg += `: ${data.error.message}`;
-        throw new Error(msg);
-    }
-
-    if(data.candidates && data.candidates.length > 0) {
-        return data.candidates[0].content.parts[0].text;
-    } else {
-        throw new Error("AI returned no content.");
-    }
-}
-
 // --- CALCULATION (GLOBAL) ---
 window.calculate = function() {
     const resEl = document.getElementById('resistance');
@@ -586,7 +492,8 @@ window.calculate = function() {
 
     currentSimState = { mass: rockMass, resistance: finalRes, instability: finalInst, power: totalPwr, success: success, activeArms: activeArms };
 
-    generateAdvancedTelemetry(rockMass, finalRes, finalInst, reqPwr, totalPwr);
+    // --- TRIGGER REACTIVE TELEMETRY WITH RAW VALUES ---
+    generateAdvancedTelemetry(rockMass, baseRes, baseInst, reqPwr, totalPwr);
 
     let banner = '';
     if(success) {
@@ -772,7 +679,9 @@ function populateGadgetList() {
         </div>`).join('');
 }
 
-// --- SCANNER ---
+// --- SCANNER (ORIGINAL 5.10 PLACEHOLDERS) ---
+// Note: If you have scanner.js included in index.html, these might conflict or be redundant.
+// But we are restoring 5.10 logic here as requested.
 window.toggleScan = async function(mode) {
     if(window.location.protocol === 'file:') { alert("Scanner requires HTTPS or Localhost."); return; }
     try {
