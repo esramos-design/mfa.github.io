@@ -1,5 +1,5 @@
 # **⛏️ Mining Fracture Analyser (MFA)**
-![Version](https://img.shields.io/badge/version-5.4%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
+![Version](https://img.shields.io/badge/version-5.10%20Stable-blue) ![Game](https://img.shields.io/badge/Star%20Citizen-Mining%20Tool-orange) ![Status](https://img.shields.io/badge/System-Operational-green)
 
 
 **The ultimate tactical dashboard and calculation engine for industrial mining crews in Star Citizen.**
@@ -8,7 +8,7 @@ The **Mining Fracture Analyser (MFA)** is a single-file, web-based tool designed
 
 Now featuring **Senior Foreman AI 2.0**, powered by Google's **Gemini 2.5 Flash**, offering pre-deployment strategy, risk assessment, and tactical orders.
 
-## **🚀 Key Features (v5.4)**
+## **🚀 Key Features (v5.10)**
 
 ### **🤖 Senior Foreman AI 2.0**
 
