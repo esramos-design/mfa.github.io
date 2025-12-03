@@ -18,7 +18,7 @@ Stop Guessing. Start Fracturing.
 <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">🐛 Report Bug</a>
 |
 <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">✨ Request Feature</a>
-</p>
+</p><br />
 </div>
 
 </div>
