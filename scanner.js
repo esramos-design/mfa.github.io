@@ -1,12 +1,12 @@
 /**
  * MODULE: OPTICAL SCANNER & OCR
- * Version: 4.0 (Logic Repair & UI Consistency)
- * Handles: Screen Capture, Image Processing, and Tesseract.js interaction
+ * Version: 5.5 (ISOLATED PIPELINES)
+ * Strategy: Separates Mining (Low Threshold) from Loadout (High Threshold)
  */
 
 let scannerStream = null;
 
-// --- SCREEN CAPTURE (Live Stream) ---
+// --- 1. SCREEN CAPTURE (Common for all) ---
 window.toggleScan = async function(mode) {
     if (window.location.protocol === 'file:') {
         alert("Security Block: Scanner requires HTTPS or Localhost.");
@@ -29,17 +29,24 @@ window.toggleScan = async function(mode) {
         });
 
         video.srcObject = scannerStream;
+        await video.play(); // Force play to ensure metadata
         
+        // UI Feedback
         if(indicator) indicator.classList.remove('hidden');
         if(btn) btn.classList.add('border-blue-500', 'bg-blue-900/20');
 
-        // Wait for stream to stabilize
-        setTimeout(async () => {
-            // Pass 'stream' as origin to know which button to update
-            await captureAndProcess(mode, 'stream');
-            stopScanner();
-        }, 1000);
+        // Wait for dimensions
+        const checkReady = setInterval(async () => {
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                clearInterval(checkReady);
+                setTimeout(async () => {
+                    await captureAndProcess(mode, 'stream');
+                    stopScanner();
+                }, 500);
+            }
+        }, 100);
 
+        // Auto-stop handler
         scannerStream.getVideoTracks()[0].onended = () => {
             stopScanner();
         };
@@ -69,16 +76,19 @@ async function captureAndProcess(mode, origin) {
     const video = document.getElementById('stream-video');
     const canvas = document.getElementById('stream-canvas');
     if (!video || !canvas) return;
+    if (video.videoWidth === 0) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
 
-    runOCR(canvas, mode, origin);
+    // Route to specific isolated logic
+    if (mode === 'mining') runMiningOCR(canvas, origin);
+    else if (mode === 'loadout') runLoadoutOCR(canvas, origin);
+    else runAutoOCR(canvas, origin); // For file uploads
 }
 
-// --- FILE INPUT HANDLER ---
 window.handleFileSelect = function(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -90,9 +100,8 @@ window.handleFileSelect = function(input) {
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-                
-                // Pass 'file' as origin to update the Upload Box instead of the buttons
-                runOCR(canvas, 'auto', 'file');
+                // Static file defaults to Auto
+                runAutoOCR(canvas, 'file');
             }
             img.src = event.target.result;
         }
@@ -100,193 +109,280 @@ window.handleFileSelect = function(input) {
     }
 };
 
-// --- IMAGE PRE-PROCESSING ---
-function preprocessImage(originalCanvas) {
-    // 1. SCALE UP (2.0x is usually enough, 2.5x for safety)
-    const scaleFactor = 2.0; 
-    const w = originalCanvas.width * scaleFactor;
-    const h = originalCanvas.height * scaleFactor;
+// =======================================================
+// === 2. ISOLATED PIPELINE: MINING (Colored Text)     ===
+// =======================================================
 
-    const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = w;
-    scaledCanvas.height = h;
-    const ctx = scaledCanvas.getContext('2d');
+async function runMiningOCR(sourceCanvas, origin) {
+    const loading = document.getElementById('ocr-loading');
+    if(loading) loading.classList.remove('hidden');
+
+    try {
+        // Mining Specific Pre-process (Low Threshold for Colors)
+        const processedImg = processForMining(sourceCanvas);
+        
+        const worker = await Tesseract.createWorker('eng');
+        await worker.setParameters({
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:%- '
+        });
+
+        const ret = await worker.recognize(processedImg);
+        const text = ret.data.text;
+        console.log("[MINING OCR] Raw:", text);
+        await worker.terminate();
+
+        parseMiningStats(text, origin);
+
+    } catch (e) {
+        console.error(e);
+        triggerFeedback(origin, 'mining', false);
+    } finally {
+        if(loading) loading.classList.add('hidden');
+    }
+}
+
+function processForMining(originalCanvas) {
+    const w = originalCanvas.width;
+    const h = originalCanvas.height;
     
-    ctx.drawImage(originalCanvas, 0, 0, originalCanvas.width, originalCanvas.height, 0, 0, w, h);
+    // Crop Right Side (Mining HUD)
+    const cropX = w * 0.40; 
+    const cropW = w * 0.60; 
+    const cropY = h * 0.20; 
+    const cropH = h * 0.70;
 
-    // 2. CONTRAST FILTER (Invert Dark Mode to Light Mode)
-    const imageData = ctx.getImageData(0, 0, w, h);
+    const scale = 2.5;
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = cropW * scale;
+    finalCanvas.height = cropH * scale;
+    const ctx = finalCanvas.getContext('2d');
+
+    ctx.drawImage(originalCanvas, cropX, cropY, cropW, cropH, 0, 0, finalCanvas.width, finalCanvas.height);
+
+    const imageData = ctx.getImageData(0, 0, finalCanvas.width, finalCanvas.height);
     const data = imageData.data;
 
     for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
-
         const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        
-        // Threshold adjusted for glowing UI text
-        const val = gray > 90 ? 0 : 255; 
+
+        // **CRITICAL FIX**: Threshold = 85. 
+        // This keeps Red/Green/Orange text visible.
+        // If we go higher (like 140), colored text disappears.
+        const val = gray > 85 ? 0 : 255; 
 
         data[i] = val;
         data[i + 1] = val;
         data[i + 2] = val;
     }
-
     ctx.putImageData(imageData, 0, 0);
-    return scaledCanvas.toDataURL('image/jpeg', 0.9);
+    return finalCanvas.toDataURL('image/jpeg', 1.0);
 }
 
-// --- CORE OCR LOGIC ---
-async function runOCR(sourceCanvas, mode, origin) {
+function parseMiningStats(text, origin) {
+    // Clean common typos
+    let cleanText = text
+        .replace(/O/g, '0').replace(/[lI|]/g, '1')
+        .replace(/S/g, '5').replace(/B/g, '8');
+
+    // Robust Extractor (Handles "1 3" -> "13")
+    const extract = (labels) => {
+        const regex = new RegExp(`(?:${labels})[^0-9]*([0-9\\s\\.,]+)`, 'i');
+        const match = cleanText.match(regex);
+        if (match && match[1]) {
+            // Remove spaces, fix commas
+            let num = match[1].replace(/\s/g, '').replace(/,/g, '.');
+            if(num.endsWith('.')) num = num.slice(0, -1);
+            return parseFloat(num);
+        }
+        return null;
+    };
+
+    const mass = extract('Mass|Mss|Weight|M4ss');
+    const res = extract('Resistance|Res|Rest|Rcs');
+    const inst = extract('Instability|Inst|Stab|1nst');
+
+    let updated = false;
+
+    if (mass !== null && !isNaN(mass)) {
+        document.getElementById('rockMass').value = mass;
+        updated = true;
+    }
+    if (res !== null && !isNaN(res)) {
+        if(res <= 100) { document.getElementById('resistance').value = res; updated = true; }
+    }
+    if (inst !== null && !isNaN(inst)) {
+        if(inst <= 100) { document.getElementById('instability').value = inst; updated = true; }
+    }
+
+    if(updated && window.calculate) window.calculate();
+    triggerFeedback(origin, 'mining', updated);
+}
+
+// =======================================================
+// === 3. ISOLATED PIPELINE: LOADOUT (White Text)      ===
+// =======================================================
+
+async function runLoadoutOCR(sourceCanvas, origin) {
     const loading = document.getElementById('ocr-loading');
     if(loading) loading.classList.remove('hidden');
 
     try {
-        const processedImageIdx = preprocessImage(sourceCanvas);
+        // Loadout Specific Pre-process (High Threshold for Crisp White Text)
+        const processedImg = processForLoadout(sourceCanvas);
+
         const worker = await Tesseract.createWorker('eng');
-        
         await worker.setParameters({
             tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:%- '
         });
 
-        const ret = await worker.recognize(processedImageIdx);
+        const ret = await worker.recognize(processedImg);
         const text = ret.data.text;
-        console.log("OCR Raw:", text);
-        
+        console.log("[LOADOUT OCR] Raw:", text);
         await worker.terminate();
 
-        // Routing Logic
-        if (mode === 'mining') parseMiningStats(text, origin);
-        else if (mode === 'loadout') parseLoadoutStats(text, origin);
-        else if (mode === 'auto') {
-            // Check keywords to decide parser
-            if (text.match(/Mass|Res|Inst/i)) parseMiningStats(text, origin);
-            else parseLoadoutStats(text, origin);
-        }
+        parseLoadoutStats(text, origin);
 
     } catch (e) {
-        console.error("OCR Failed:", e);
-        alert("Scan Error: " + e.message);
+        console.error(e);
+        triggerFeedback(origin, 'loadout', false);
     } finally {
         if(loading) loading.classList.add('hidden');
     }
 }
 
-// --- UI FEEDBACK HELPER ---
-function triggerFeedback(origin, mode, success = true) {
-    let targetId = "";
-    
-    if (origin === 'file') {
-        // Find the upload box (using the h3 text as reference or the parent of input)
-        const uploadBox = document.getElementById('fileInput').parentElement;
-        const originalHtml = uploadBox.innerHTML;
-        
-        if(success) {
-            uploadBox.classList.add('border-green-500', 'bg-green-900/20');
-            uploadBox.querySelector('h3').innerText = "✅ FILE PROCESSED";
-        } else {
-            uploadBox.classList.add('border-red-500', 'bg-red-900/20');
-            uploadBox.querySelector('h3').innerText = "❌ SCAN FAILED";
-        }
+function processForLoadout(originalCanvas) {
+    const w = originalCanvas.width;
+    const h = originalCanvas.height;
 
-        setTimeout(() => {
-            uploadBox.innerHTML = originalHtml;
-            uploadBox.classList.remove('border-green-500', 'bg-green-900/20', 'border-red-500', 'bg-red-900/20');
-        }, 2500);
+    // Loadouts can be anywhere, scan center 80%
+    const cropX = w * 0.10; 
+    const cropW = w * 0.80; 
+    const cropY = h * 0.10; 
+    const cropH = h * 0.80;
 
-    } else {
-        // Stream Buttons
-        if (mode === 'mining' || (mode === 'auto' && origin !== 'file')) targetId = 'btn-scan-mining';
-        else if (mode === 'loadout') targetId = 'btn-scan-loadout';
+    const scale = 2.0;
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = cropW * scale;
+    finalCanvas.height = cropH * scale;
+    const ctx = finalCanvas.getContext('2d');
 
-        const btn = document.getElementById(targetId);
-        if(btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = success ? 
-                `<span class='text-green-400 font-bold animate-pulse'>✔ DATA SYNCED</span>` : 
-                `<span class='text-red-400 font-bold'>❌ NO DATA</span>`;
-            
-            setTimeout(() => btn.innerHTML = originalText, 2500);
-        }
+    ctx.drawImage(originalCanvas, cropX, cropY, cropW, cropH, 0, 0, finalCanvas.width, finalCanvas.height);
+
+    const imageData = ctx.getImageData(0, 0, finalCanvas.width, finalCanvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+        // **CRITICAL**: Threshold = 140.
+        // This ignores background noise and captures bright white text perfectly.
+        const val = gray > 140 ? 0 : 255; 
+
+        data[i] = val;
+        data[i + 1] = val;
+        data[i + 2] = val;
     }
+    ctx.putImageData(imageData, 0, 0);
+    return finalCanvas.toDataURL('image/jpeg', 1.0);
 }
 
-// --- PARSER: MINING ROCK ---
-function parseMiningStats(text, origin) {
-    // 1. Sanitize: Convert O->0, l/I->1, fix spaced dots " . "
-    const cleanText = text.replace(/(\d)\s+\.\s+(\d)/g, '$1.$2') // "201 . 25" -> "201.25"
-                          .replace(/O/g, '0')
-                          .replace(/[lI]/g, '1');
-
-    // 2. Robust Regex: Capture EVERYTHING after the label until a newline or letter
-    // This fixes the "4 digit truncation" by grabbing spaces/commas too: ([\d,\. ]+)
-    const massRegex = /(?:MASS|MSS)[\s:.]*([\d,\. ]+)/i;
-    const resRegex = /(?:RES|REST|RESISTANCE)[\s:.]*([\d\.]+)/i;
-    const instRegex = /(?:INST|STAB|ABILITY)[\s:.]*([\d\.]+)/i;
-
-    const massMatch = cleanText.match(massRegex);
-    const resMatch = cleanText.match(resRegex);
-    const instMatch = cleanText.match(instRegex);
-
-    let updated = false;
-
-    // Process Mass: Remove non-digits to fix "28 952" -> "28952"
-    if (massMatch && massMatch[1]) {
-        const rawMass = massMatch[1].replace(/[^0-9.]/g, ''); 
-        if(rawMass.length > 0) {
-            document.getElementById('rockMass').value = parseFloat(rawMass);
-            updated = true;
-        }
-    }
-
-    if (resMatch && resMatch[1]) {
-        document.getElementById('resistance').value = parseFloat(resMatch[1]);
-        updated = true;
-    }
-
-    if (instMatch && instMatch[1]) {
-        document.getElementById('instability').value = parseFloat(instMatch[1]);
-        updated = true;
-    }
-
-    if (updated) {
-        if (typeof window.calculate === 'function') window.calculate();
-        triggerFeedback(origin, 'mining', true);
-    } else {
-        alert("Scan finished but no clear data found.\nDetected: " + text.substring(0, 100));
-        triggerFeedback(origin, 'mining', false);
-    }
-}
-
-// --- PARSER: SHIP LOADOUT ---
 function parseLoadoutStats(text, origin) {
-    let detectedLasers = [];
-    let detectedModules = [];
-    let detectedGadgets = [];
+    const foundItems = [];
+    const lowerText = text.toLowerCase();
 
-    const findIn = (arr, txt) => arr.filter(item => item.name !== "None" && txt.toLowerCase().includes(item.name.toLowerCase()));
+    // Helper to search DB
+    const searchDB = (db) => {
+        db.forEach(item => {
+            if (item.name !== "None" && lowerText.includes(item.name.toLowerCase())) {
+                foundItems.push(item.name);
+            }
+        });
+    };
 
-    // Ensure databases exist (from script.js)
-    if (typeof allLaserHeads !== 'undefined') detectedLasers = findIn(allLaserHeads, text);
-    if (typeof powerModules !== 'undefined') detectedModules = findIn(powerModules, text);
-    if (typeof gadgets !== 'undefined') detectedGadgets = findIn(gadgets, text);
+    if (typeof allLaserHeads !== 'undefined') searchDB(allLaserHeads);
+    if (typeof powerModules !== 'undefined') searchDB(powerModules);
+    if (typeof gadgets !== 'undefined') searchDB(gadgets);
 
-    if (detectedLasers.length === 0 && detectedModules.length === 0 && detectedGadgets.length === 0) {
-        // Silent fail or alert depending on preference
-        if(origin === 'file') alert("No loadout items found in image.");
+    if (foundItems.length > 0) {
+        const uniqueItems = [...new Set(foundItems)];
+        alert("Loadout Found: " + uniqueItems.join(", "));
+        
+        // Auto-Equip to first available ship
+        const container = document.getElementById('multiShipContainer');
+        if (container) {
+            const card = container.querySelector('.ship-arm-card');
+            if (card) {
+                // Equip Laser
+                const laser = uniqueItems.find(n => allLaserHeads.some(lh => lh.name === n));
+                if (laser) {
+                    const sel = card.querySelector('select[id$="-laser"]');
+                    for(let i=0; i<sel.options.length; i++) {
+                        if(sel.options[i].text.includes(laser)) sel.selectedIndex = i;
+                    }
+                }
+                // Equip Modules
+                const mods = uniqueItems.filter(n => n !== laser);
+                const modSels = card.querySelectorAll('select[id*="-mod"]');
+                mods.forEach((m, i) => {
+                    if (modSels[i]) {
+                        for(let k=0; k<modSels[i].options.length; k++) {
+                            if(modSels[i].options[k].text.includes(m)) modSels[i].selectedIndex = k;
+                        }
+                    }
+                });
+                if (window.calculate) window.calculate();
+            }
+        }
+        triggerFeedback(origin, 'loadout', true);
+    } else {
         triggerFeedback(origin, 'loadout', false);
-        return;
     }
+}
 
-    // Since we don't auto-equip loadouts (too complex/risky), we just confirm scan
-    let msg = "SCANNED ITEMS:\n";
-    if(detectedLasers.length) msg += "Lasers: " + detectedLasers.map(x=>x.name).join(", ") + "\n";
-    if(detectedModules.length) msg += "Modules: " + detectedModules.map(x=>x.name).join(", ") + "\n";
+// =======================================================
+// === 4. AUTO (For File Uploads)                      ===
+// =======================================================
+
+async function runAutoOCR(canvas, origin) {
+    // Try Mining logic first (low threshold)
+    const processedImg = processForMining(canvas); 
+    const worker = await Tesseract.createWorker('eng');
+    await worker.setParameters({ tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:%- ' });
     
-    console.log(msg); // Log to console for debugging
-    triggerFeedback(origin, 'loadout', true);
-    
-    // Optional: Alert the user what was found
-    // alert(msg); 
+    const ret = await worker.recognize(processedImg);
+    const text = ret.data.text;
+    await worker.terminate();
+
+    if (text.match(/Mass|Resistance|Instability/i)) {
+        console.log("Auto-detected: Mining");
+        parseMiningStats(text, origin);
+    } else {
+        console.log("Auto-detected: Loadout (Falling back)");
+        // If mining failed, try loadout processing
+        runLoadoutOCR(canvas, origin);
+    }
+}
+
+// --- UTILS ---
+function triggerFeedback(origin, mode, success) {
+    if (origin === 'file') {
+        const box = document.getElementById('fileInput').parentElement;
+        const txt = box.querySelector('h3');
+        const old = txt.innerText;
+        txt.innerText = success ? "✅ DONE" : "❌ FAIL";
+        setTimeout(() => txt.innerText = old, 2000);
+    } else {
+        const btn = document.getElementById(`btn-scan-${mode}`);
+        if(btn) {
+            const old = btn.innerHTML;
+            btn.innerHTML = success ? "<span class='text-green-400'>✔ OK</span>" : "<span class='text-red-400'>❌ FAIL</span>";
+            setTimeout(() => btn.innerHTML = old, 2000);
+        }
+    }
 }

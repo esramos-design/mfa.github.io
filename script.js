@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.15 (v5.10 RESTORED + REACTIVE FIX)
+ * Version: 5.15 (Final Clean)
  * Status: ALL SYSTEMS ONLINE
  */
 
@@ -223,6 +223,7 @@ const gadgets = [
     if (b.name === "None") return 1;
     return a.name.localeCompare(b.name);
 });
+
 // =========================================================
 // === CORE FUNCTIONS                                    ===
 // =========================================================
@@ -266,12 +267,11 @@ function assessDifficulty(instability, resistance) {
     return { text: "EASY: Low difficulty.", color: "text-green-500" };
 }
 
-// --- COL 4 LOGIC: TACTICAL (REACTIVE FIX APPLIED HERE) ---
+// --- COL 4 LOGIC: TACTICAL (FIXED SLOT COUNTS) ---
 function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
     const configs = document.getElementById('configs');
     if(!configs) return;
     
-    // Add visual feedback (flash) to show it updated
     configs.style.opacity = '0.5';
     setTimeout(() => configs.style.opacity = '1', 150);
 
@@ -308,7 +308,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
          crewHtml = `<div class="p-4 mb-6 rounded-lg bg-green-900/20 border border-green-500/30 text-center"><h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Status: Operational</h4><p class="text-xs text-green-200/80 mt-1">Fleet power sufficient.</p></div>`;
     }
 
-    // 2. Gadget Logic (Reactive)
+    // 2. Gadget Logic
     let gName = "None"; let gDesc = "Standard Rock";
     if (res > 50) { gName="Sabir"; gDesc="Critical Resistance (>50%)"; }
     else if (res > 30) { gName="OptiMax"; gDesc="High Resistance (>30%)"; }
@@ -328,7 +328,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
             </div>
         </div>`;
 
-    // 3. Loadout Logic (Reactive / Granular) - BIGGER TEXT + 3 HEADS
+    // 3. Loadout Logic (FIXED SLOT COUNTS)
     let strategyName = "Standard Extraction Protocol";
     let strategyColor = "text-green-400";
     let moleL = "";
@@ -339,55 +339,67 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         // EXTREME INSTABILITY
         strategyName = "Hazard Protocol (Inst > 60%)";
         strategyColor = "text-red-500";
+        // Fixed: Lancet MH2 has 2 slots. Lancet MH1 has 1 slot.
         moleL = `
-            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Lancet MH2 + Focus III x3</div>
-            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x3</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Lancet MH2 + Focus III x2</div>
+            <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div>
             <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
         `;
-        prosL = `<span class="text-gray-300">Lancet MH1 + Focus III x2</span>`;
+        // Fixed: Lancet MH1 has 1 slot (Focus III x1)
+        prosL = `<span class="text-gray-300">Lancet MH1 + Focus III</span>`;
+        // Fixed: Pitman has 2 slots
         golemL = `<span class="text-gray-300">Pitman + Focus III + BoreMax</span>`;
     } else if (res > 40 || deficit > 0) {
         // RESISTANCE BREAKER
         strategyName = "Resistance Breaker (Res > 40%)";
         strategyColor = "text-red-400";
+        // Fixed: Helix II has 3 slots. Lancet MH2 has 2 slots. Impact II has 3 slots.
         moleL = `
             <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div>
             <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
             <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
+        // Fixed: Helix I has 2 slots
         prosL = `<span class="text-gray-300">Helix I + Surge + Rieger-C3</span>`;
+        // Fixed: Pitman has 2 slots
         golemL = `<span class="text-gray-300">Pitman + Surge + Rieger-C3</span>`;
     } else if (inst > 30) {
         // HIGH INSTABILITY
         strategyName = "Stabilization Focus";
         strategyColor = "text-yellow-400";
+        // Fixed: Helix II (3 slots), Lancet MH2 (2 slots)
         moleL = `
-            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III x2</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III x3</div>
             <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div>
             <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
         `;
-        prosL = `<span class="text-gray-300">Hofstede-S1 + Focus III + Vaux-C3</span>`;
+        // Fixed: Hofstede S1 has 1 slot
+        prosL = `<span class="text-gray-300">Hofstede-S1 + Focus III</span>`;
         golemL = `<span class="text-gray-300">Pitman + Focus III + Rieger-C3</span>`;
     } else if (mass > 25000) {
         // HIGH MASS / LOW DIFF
         strategyName = "Cluster Extraction";
         strategyColor = "text-blue-400";
+        // Fixed: Impact II has 3 slots. Lancet MH2 has 2 slots.
         moleL = `
-            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Impact II + Surge + Torrent III</div>
+            <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Impact II + Surge + Torrent III x2</div>
             <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div>
             <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>
         `;
+        // Fixed: Impact I has 2 slots
         prosL = `<span class="text-gray-300">Impact I + Torrent III + FLTR-XL</span>`;
         golemL = `<span class="text-gray-300">Pitman + Torrent III x2</span>`;
     } else {
         // ECO / EASY ROCK
         strategyName = "Eco / Standard";
         strategyColor = "text-gray-400";
+        // Fixed: Helix II (3 slots), Lancet MH2 (2 slots)
         moleL = `
             <div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Rieger-C3 x2</div>
             <div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div>
             <div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>
         `;
+        // Fixed: Standard S1 laser usually has 1 or 2 slots. Assuming 1 for safety on Eco.
         prosL = `<span class="text-gray-300">Standard Lasers + FLTR-XL</span>`;
         golemL = `<span class="text-gray-300">Pitman + FLTR-XL</span>`;
     }
@@ -416,6 +428,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
 
     configs.innerHTML = crewHtml + gadgHtml + shipLoadouts;
 }
+
 // --- CALCULATION (GLOBAL) ---
 window.calculate = function() {
     const resEl = document.getElementById('resistance');
@@ -678,26 +691,6 @@ function populateGadgetList() {
             </div>
         </div>`).join('');
 }
-
-// --- SCANNER (ORIGINAL 5.10 PLACEHOLDERS) ---
-// Note: If you have scanner.js included in index.html, these might conflict or be redundant.
-// But we are restoring 5.10 logic here as requested.
-window.toggleScan = async function(mode) {
-    if(window.location.protocol === 'file:') { alert("Scanner requires HTTPS or Localhost."); return; }
-    try {
-        const s = await navigator.mediaDevices.getDisplayMedia({video: {cursor:"never"}});
-        s.getTracks().forEach(t => t.stop());
-        alert("Scanner connected! (OCR placeholder)");
-    } catch(e) { console.log(e); }
-};
-
-window.handleFileSelect = function(input) {
-    if (input.files && input.files[0]) {
-        document.getElementById('ocr-loading').classList.remove('hidden');
-        runOCR(input.files[0], 'mining').then(() => document.getElementById('ocr-loading').classList.add('hidden'));
-    }
-};
-async function runOCR(blob, mode) { /* Placeholder to prevent crash */ }
 
 // --- UI GENERATION ---
 function createArmConfigHtml(armIndex, ship) {
