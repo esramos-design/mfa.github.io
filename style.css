@@ -143,3 +143,88 @@ input, select {
     font-size: 0.8rem; padding-right: 1.2rem;
 }
 .ship-arm-card select option { font-size: 12px; background-color: #0f172a; }
+
+/* =========================================
+   === UI UPGRADE: GLOW & SCALING SYSTEM ===
+   ========================================= */
+
+/* 1. NEON GLOW ON HOVER (Columns) */
+/* Applies a sci-fi breathing neon effect when mouse moves over panels */
+.glass-panel {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 1px solid var(--border-main);
+}
+
+.glass-panel:hover {
+    border-color: rgba(56, 189, 248, 0.9); /* High-contrast Cyan */
+    box-shadow: 
+        0 0 15px rgba(56, 189, 248, 0.3), /* Bright inner halo */
+        0 0 40px rgba(56, 189, 248, 0.15), /* Wide outer bloom */
+        inset 0 0 30px rgba(56, 189, 248, 0.05); /* Glass depth effect */
+    transform: translateY(-3px) scale(1.01); /* Tactile lift effect */
+    z-index: 20; /* Ensure it pops over other elements */
+}
+
+/* 2. LARGE MONITOR SCALING (27" 1440p+ Optimization) */
+/* Forces larger text specifically for Target Analysis & Gadgets */
+@media (min-width: 1600px) {
+    /* Make the 'Target Analysis' Header much bigger */
+    .sticky-column-wrapper h2 {
+        font-size: 1.8rem !important;
+        letter-spacing: 0.15em !important;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Make 'Active Gadgetry' and other labels readable */
+    .sticky-column-wrapper label.text-xs,
+    .sticky-column-wrapper label.text-sm {
+        font-size: 1rem !important; /* Bump up from tiny text */
+        color: var(--text-strong) !important; /* Increase contrast */
+    }
+
+    /* Make the inputs/numbers larger and easier to read */
+    .sticky-column-wrapper input,
+    .sticky-column-wrapper select {
+        font-size: 1.2rem !important;
+        padding: 0.75rem !important;
+        font-family: var(--font-tech);
+    }
+
+    /* Increase the gadget list text size */
+    #gadget-list-container .text-sm {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* 3. MOBILE & TABLET AUTO-SCALING */
+/* Transforms the layout into a single flowing column for small screens */
+@media (max-width: 1024px) {
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0.5rem;
+    }
+
+    .glass-panel {
+        width: 100% !important;
+        margin-bottom: 1.5rem;
+        min-height: auto;
+    }
+
+    /* Disable the 'sticky' behavior on mobile so you can scroll naturally */
+    .sticky-column-wrapper, 
+    .sticky-scroll-content {
+        position: relative !important;
+        top: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Make buttons and inputs finger-friendly (touch targets) */
+    button, select, input {
+        min-height: 50px !important;
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+}

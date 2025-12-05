@@ -1,22 +1,66 @@
 /**
  * MODULE: OPTICAL SCANNER & OCR
- * Version: 5.15 (Fixes: 3x Duplicate Detection & Regex Noise)
- * Strategy: "Wildcard" matching to catch "Rieger.C3" or "Rieger_C3".
- * Strict UI matching to prevent dropdown errors.
+ * Version: 5.22 (GREEN CHANNEL ISOLATION)
+ * Fix: Targets the GREEN color channel to equalize brightness 
+ * between Cyan (Prospector), Orange (Mole), and White text.
  */
 
 let scannerStream = null;
 
+// --- VISUAL LOGGER SYSTEM ---
+window.createDebugWindow = function() {
+    let div = document.getElementById('ocr-debug-console');
+    if (div) { div.style.display = 'block'; return; }
+
+    div = document.createElement('div');
+    div.id = 'ocr-debug-console';
+    div.style.cssText = "position:fixed; bottom:10px; right:10px; width:450px; height:350px; background:rgba(0,0,0,0.95); color:#0f0; font-family:'Consolas', monospace; font-size:11px; padding:0; z-index:9999; border:2px solid #0f0; border-radius:4px; display:flex; flex-direction:column; resize:both; overflow:hidden;";
+
+    div.innerHTML = `
+        <div style="background:#003300; padding:5px; border-bottom:1px solid #0f0; display:flex; justify-content:space-between;">
+            <span style="font-weight:bold; color:#fff;">SCANNER LOG v5.22</span>
+            <div>
+                <button onclick="window.copyLog()" style="cursor:pointer; background:#0f0; border:none;">COPY</button>
+                <button onclick="window.clearLog()" style="cursor:pointer; background:#444; color:#fff; border:none;">CLEAR</button>
+                <button onclick="window.closeLog()" style="cursor:pointer; background:#f00; color:#fff; border:none;">X</button>
+            </div>
+        </div>
+        <div id="ocr-log-body" style="flex-grow:1; overflow-y:auto; padding:10px; user-select:text;"></div>
+    `;
+    document.body.appendChild(div);
+    log("/// GREEN CHANNEL SCANNER READY ///");
+}
+
+window.log = function(msg) {
+    if (!document.getElementById('ocr-debug-console')) window.createDebugWindow();
+    const box = document.getElementById('ocr-log-body');
+    if (box) {
+        const entry = document.createElement('div');
+        entry.style.borderBottom = "1px solid #004400";
+        entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        box.appendChild(entry);
+        box.scrollTop = box.scrollHeight;
+    }
+    console.log(msg); 
+}
+
+window.copyLog = function() {
+    navigator.clipboard.writeText(document.getElementById('ocr-log-body').innerText)
+        .then(() => alert("Log Copied!"))
+        .catch(e => alert("Copy Failed: " + e));
+}
+window.clearLog = function() { document.getElementById('ocr-log-body').innerHTML = ""; }
+window.closeLog = function() { document.getElementById('ocr-debug-console').style.display = 'none'; }
+
 // --- SCREEN CAPTURE ---
 window.toggleScan = async function(mode) {
+    window.createDebugWindow();
+    log(`>>> INIT SCAN: ${mode.toUpperCase()} <<<`);
+
     if (window.location.protocol === 'file:') {
         alert("Security Block: Scanner requires HTTPS or Localhost.");
         return;
     }
-
-    const btn = document.getElementById(`btn-scan-${mode}`);
-    const indicator = document.getElementById(`indicator-${mode}`);
-    const video = document.getElementById('stream-video');
 
     if (scannerStream) {
         stopScanner();
@@ -29,15 +73,14 @@ window.toggleScan = async function(mode) {
             audio: false
         });
 
+        const video = document.getElementById('stream-video');
         video.srcObject = scannerStream;
         await video.play(); 
         
-        if(indicator) indicator.classList.remove('hidden');
-        if(btn) btn.classList.add('border-blue-500', 'bg-blue-900/20');
-
         const checkReady = setInterval(async () => {
             if (video.videoWidth > 0 && video.videoHeight > 0) {
                 clearInterval(checkReady);
+                log(`Resolution: ${video.videoWidth} x ${video.videoHeight}`);
                 setTimeout(async () => {
                     await captureAndProcess(mode, 'stream');
                     stopScanner();
@@ -45,35 +88,28 @@ window.toggleScan = async function(mode) {
             }
         }, 100);
 
-        scannerStream.getVideoTracks()[0].onended = () => {
-            stopScanner();
-        };
+        scannerStream.getVideoTracks()[0].onended = () => stopScanner();
 
     } catch (err) {
-        console.error("Scanner Error:", err);
+        log("ERROR: " + err.message);
         stopScanner();
     }
 };
 
 function stopScanner() {
     const video = document.getElementById('stream-video');
-    const indicators = document.querySelectorAll('[id^="indicator-"]');
-    const btns = document.querySelectorAll('[id^="btn-scan-"]');
-
     if (scannerStream) {
         scannerStream.getTracks().forEach(track => track.stop());
         scannerStream = null;
     }
     if (video) video.srcObject = null;
-
-    indicators.forEach(el => el.classList.add('hidden'));
-    btns.forEach(el => el.classList.remove('border-blue-500', 'bg-blue-900/20'));
+    log("Scanner Stopped.");
 }
 
 async function captureAndProcess(mode, origin) {
     const video = document.getElementById('stream-video');
     const canvas = document.getElementById('stream-canvas');
-    if (!video || !canvas || video.videoWidth === 0) return;
+    if (!video || !canvas) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -84,6 +120,7 @@ async function captureAndProcess(mode, origin) {
 }
 
 window.handleFileSelect = function(input) {
+    window.createDebugWindow();
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -94,6 +131,7 @@ window.handleFileSelect = function(input) {
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
+                log(`File Loaded: ${img.width}x${img.height}`);
                 runOCR(canvas, 'auto', 'file');
             }
             img.src = event.target.result;
@@ -102,37 +140,55 @@ window.handleFileSelect = function(input) {
     }
 };
 
-// --- IMAGE PROCESSING (v5.11 Geometry) ---
+// --- IMAGE PROCESSING (GREEN ISOLATION) ---
 function preprocessImage(originalCanvas, mode) {
     const w = originalCanvas.width;
     const h = originalCanvas.height;
-
     let cropX = 0, cropY = 0, cropW = w, cropH = h;
 
     if (mode === 'mining') {
+        // Mining: Right 50%
         cropX = w * 0.50; cropW = w * 0.50; 
         cropY = h * 0.20; cropH = h * 0.60; 
+        log("Crop: Right 50%");
     } else if (mode === 'loadout') {
-        cropX = 0; cropW = w * 0.40; 
-        cropY = h * 0.15; cropH = h * 0.70;
+        // Loadout: Full Left Half (0-50%)
+        // Safety Catch: Captures Far-Left (Mole) and Center-Left (Prospector)
+        cropX = 0; 
+        cropW = w * 0.50; 
+        cropY = h * 0.15; 
+        cropH = h * 0.70;
+        log("Crop: Full Left Half (0-50%)");
     }
 
-    const scaleFactor = 2.0; 
+    const scaleFactor = 3.5; 
     const scaledCanvas = document.createElement('canvas');
     scaledCanvas.width = cropW * scaleFactor;
     scaledCanvas.height = cropH * scaleFactor;
     const ctx = scaledCanvas.getContext('2d');
+    
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     
     ctx.drawImage(originalCanvas, cropX, cropY, cropW, cropH, 0, 0, scaledCanvas.width, scaledCanvas.height);
 
     const imageData = ctx.getImageData(0, 0, scaledCanvas.width, scaledCanvas.height);
     const data = imageData.data;
 
+    log("Filter: Green Channel Isolation + Threshold 70");
+
     for (let i = 0; i < data.length; i += 4) {
-        const r = data[i]; const g = data[i + 1]; const b = data[i + 2];
-        const brightness = Math.max(r, g, b);
-        const val = brightness > 90 ? 0 : 255; 
-        data[i] = val; data[i + 1] = val; data[i + 2] = val;
+        // R=i, G=i+1, B=i+2
+        const green = data[i + 1]; // Only listen to Green Channel
+
+        // Threshold 70 on Green Channel
+        // If Green > 70 (Text is present), make Black (0)
+        // If Green < 70 (Background), make White (255)
+        const val = green > 70 ? 0 : 255; 
+
+        data[i] = val; 
+        data[i + 1] = val; 
+        data[i + 2] = val;
     }
 
     ctx.putImageData(imageData, 0, 0);
@@ -147,38 +203,37 @@ async function runOCR(sourceCanvas, mode, origin) {
     try {
         const processedImageIdx = preprocessImage(sourceCanvas, mode);
         
+        log("Loading Tesseract...");
         const worker = await Tesseract.createWorker('eng');
         await worker.setParameters({
-            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:%- '
+            // Optimized whitelist: Caps, numbers, dash, space, dot
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- '
         });
 
+        log("Reading...");
         const ret = await worker.recognize(processedImageIdx);
         const text = ret.data.text;
         
-        console.log("OCR RAW:", text);
         await worker.terminate();
+        log("OCR DONE. Length: " + text.length);
+        log("SAMPLE: " + text.substring(0, 100).replace(/[\n\r]+/g, ' '));
 
         if (mode === 'mining') parseMiningStats(text, origin);
         else if (mode === 'loadout') parseLoadoutStats(text, origin);
         else if (mode === 'auto') {
-            if (text.match(/Mass|Resistance|Instability/i)) parseMiningStats(text, origin);
-            else parseLoadoutStats(text, origin);
+            if (text.match(/Mass|Resistance|Instability/i)) {
+                log("Detected: Mining");
+                parseMiningStats(text, origin);
+            } else {
+                log("Detected: Loadout");
+                parseLoadoutStats(text, origin);
+            }
         }
 
     } catch (e) {
-        console.error("OCR Failed:", e);
-        alert("Scan Error: " + e.message);
+        log("EXCEPTION: " + e.message);
     } finally {
         if(loading) loading.classList.add('hidden');
-    }
-}
-
-function triggerFeedback(origin, mode, success) {
-    const btn = document.getElementById(mode === 'mining' ? 'btn-scan-mining' : 'btn-scan-loadout');
-    if(btn) {
-        const old = btn.innerHTML;
-        btn.innerHTML = success ? "<span class='text-green-400'>✔ OK</span>" : "<span class='text-red-400'>❌ FAIL</span>";
-        setTimeout(() => btn.innerHTML = old, 2000);
     }
 }
 
@@ -203,66 +258,65 @@ function parseMiningStats(text, origin) {
     const res = extract('Resistance|Res|Rest|Rcs');
     const inst = extract('Instability|Inst|Stab|1nst|In5t');
 
+    log(`Mining Data -> Mass:${mass} Res:${res} Inst:${inst}`);
+
     let updated = false;
     if (mass !== null && !isNaN(mass)) { document.getElementById('rockMass').value = mass; updated = true; }
     if (res !== null && !isNaN(res)) { document.getElementById('resistance').value = res; updated = true; }
     if (inst !== null && !isNaN(inst)) { document.getElementById('instability').value = inst; updated = true; }
 
     if(updated && window.calculate) window.calculate();
-    triggerFeedback(origin, 'mining', updated);
+    log(updated ? "SUCCESS" : "NO MATCHES");
 }
 
-// --- LOADOUT PARSER (WILDCARD REGEX & STRICT UI) ---
+// --- LOADOUT PARSER (GREEN FILTER ENABLED) ---
 function parseLoadoutStats(text, origin) {
     const foundItems = [];
-    let processingText = text; // Keep casing for now
+    let processingText = text; 
 
     let allItems = [];
     if (typeof allLaserHeads !== 'undefined') allItems = allItems.concat(allLaserHeads);
     if (typeof powerModules !== 'undefined') allItems = allItems.concat(powerModules);
     if (typeof gadgets !== 'undefined') allItems = allItems.concat(gadgets);
 
-    // Sort: Longest First ("Rieger-C3" before "Rieger")
     allItems.sort((a, b) => b.name.length - a.name.length);
+
+    log("DB Size: " + allItems.length);
 
     allItems.forEach(item => {
         if (item.name === "None") return;
         
-        // --- WILDCARD REGEX ---
-        // Converts "Rieger-C3" -> /Rieger.{0,4}C3/gi
-        // This matches: "Rieger C3", "Rieger.C3", "Rieger  C3", "Rieger_C3"
         let safeName = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        // Replace non-word chars (like dashes/spaces) with a greedy dot-match
-        // We match any separator character (dash, space, underscore) OR up to 3 garbage chars
-        let patternStr = safeName.replace(/[\s-]/g, '.{0,4}'); 
-        
+        // Loose Regex: spaces, dashes, dots allowed between parts
+        let patternStr = safeName.replace(/[\s-]/g, '[\\s\\.\\-]*'); 
         const regex = new RegExp(patternStr, 'gi');
 
-        // MATCH & COUNT
         const matches = processingText.match(regex);
         if (matches && matches.length > 0) {
-            // Push 1 item for EVERY match found (e.g. 3 times)
             matches.forEach(() => foundItems.push(item.name));
-            // Erase matches from text so they aren't counted again by shorter names
             processingText = processingText.replace(regex, (m) => '#'.repeat(m.length));
         }
     });
 
+    log(`Matches: ${foundItems.length} -> [${foundItems.join(', ')}]`);
+
     if (foundItems.length > 0) {
-        alert("Scanner Found (" + foundItems.length + "): " + foundItems.join(", "));
-        
         const container = document.getElementById('multiShipContainer');
         if(container) {
             let card = container.querySelector('.ship-arm-card');
+            
             if(!card && window.addShipLoadout) {
+                log("Auto-Deploying Ship...");
                 window.addShipLoadout();
                 card = container.querySelector('.ship-arm-card');
             }
+
             if(card) {
                 const laser = foundItems.find(n => allLaserHeads.some(lh => lh.name === n));
                 if (laser) {
                     const sel = card.querySelector('select[id$="-laser"]');
                     selectOptionByValue(sel, laser);
+                    log("Laser: " + laser);
                 }
                 
                 const mods = foundItems.filter(n => n !== laser);
@@ -270,9 +324,8 @@ function parseLoadoutStats(text, origin) {
                 
                 mods.forEach((m, i) => {
                     if (modSels[i]) {
-                        // Use STRICT Value matching
                         selectOptionByValue(modSels[i], m);
-                        
+                        log(`Mod ${i+1}: ${m}`);
                         if(window.togCheck) {
                              const parts = modSels[i].id.split('-');
                              window.togCheck(parts.slice(0,3).join('-'), parts[3].replace('mod',''));
@@ -282,17 +335,14 @@ function parseLoadoutStats(text, origin) {
                 if(window.calculate) window.calculate();
             }
         }
-        triggerFeedback(origin, 'loadout', true);
     } else {
-        triggerFeedback(origin, 'loadout', false);
+        log("No matches found.");
     }
 }
 
-// Helper: Select by VALUE (Exact Match) not TEXT (Partial)
 function selectOptionByValue(selectElement, val) {
     if(!selectElement) return;
     for(let i=0; i<selectElement.options.length; i++) {
-        // Strict ID check: "Rieger" will NOT match "Rieger-C3"
         if(selectElement.options[i].value === val) {
             selectElement.selectedIndex = i;
             break;
