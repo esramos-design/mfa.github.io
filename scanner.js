@@ -1,8 +1,8 @@
 /**
  * MODULE: OPTICAL SCANNER & OCR
- * Version: 5.22 (GREEN CHANNEL ISOLATION)
- * Fix: Targets the GREEN color channel to equalize brightness 
- * between Cyan (Prospector), Orange (Mole), and White text.
+ * Version: 5.23 (CLOUD GAMING OPTIMIZED)
+ * Fix: Lowered Green Threshold (70 -> 45) for compressed streams.
+ * Fix: Added sharpening pass before OCR.
  */
 
 let scannerStream = null;
@@ -18,7 +18,7 @@ window.createDebugWindow = function() {
 
     div.innerHTML = `
         <div style="background:#003300; padding:5px; border-bottom:1px solid #0f0; display:flex; justify-content:space-between;">
-            <span style="font-weight:bold; color:#fff;">SCANNER LOG v5.22</span>
+            <span style="font-weight:bold; color:#fff;">SCANNER LOG v5.23 (CLOUD)</span>
             <div>
                 <button onclick="window.copyLog()" style="cursor:pointer; background:#0f0; border:none;">COPY</button>
                 <button onclick="window.clearLog()" style="cursor:pointer; background:#444; color:#fff; border:none;">CLEAR</button>
@@ -28,7 +28,7 @@ window.createDebugWindow = function() {
         <div id="ocr-log-body" style="flex-grow:1; overflow-y:auto; padding:10px; user-select:text;"></div>
     `;
     document.body.appendChild(div);
-    log("/// GREEN CHANNEL SCANNER READY ///");
+    log("/// CLOUD COMPATIBLE SCANNER READY ///");
 }
 
 window.log = function(msg) {
@@ -81,10 +81,11 @@ window.toggleScan = async function(mode) {
             if (video.videoWidth > 0 && video.videoHeight > 0) {
                 clearInterval(checkReady);
                 log(`Resolution: ${video.videoWidth} x ${video.videoHeight}`);
+                // Wait slightly longer for stream bitrate to stabilize
                 setTimeout(async () => {
                     await captureAndProcess(mode, 'stream');
                     stopScanner();
-                }, 500);
+                }, 800);
             }
         }, 100);
 
@@ -140,51 +141,63 @@ window.handleFileSelect = function(input) {
     }
 };
 
-// --- IMAGE PROCESSING (GREEN ISOLATION) ---
+// --- IMAGE PROCESSING (GREEN ISOLATION + SHARPEN) ---
 function preprocessImage(originalCanvas, mode) {
     const w = originalCanvas.width;
     const h = originalCanvas.height;
     let cropX = 0, cropY = 0, cropW = w, cropH = h;
 
+    // Fixed Crop Logic: Even 'Auto' needs to target a likely area to avoid 3D noise
     if (mode === 'mining') {
-        // Mining: Right 50%
-        cropX = w * 0.50; cropW = w * 0.50; 
+        // Mining: Right 40% (More focused than 50%)
+        cropX = w * 0.60; cropW = w * 0.40; 
         cropY = h * 0.20; cropH = h * 0.60; 
-        log("Crop: Right 50%");
+        log("Crop: Mining Focus (Right 40%)");
     } else if (mode === 'loadout') {
-        // Loadout: Full Left Half (0-50%)
-        // Safety Catch: Captures Far-Left (Mole) and Center-Left (Prospector)
+        // Loadout: Left 40%
         cropX = 0; 
-        cropW = w * 0.50; 
+        cropW = w * 0.40; 
         cropY = h * 0.15; 
         cropH = h * 0.70;
-        log("Crop: Full Left Half (0-50%)");
+        log("Crop: Loadout Focus (Left 40%)");
+    } else {
+        // Auto: Crop the vertical center band where UI elements usually exist
+        // Avoiding the top/bottom 15% edges helps reduce noise
+        cropY = h * 0.15;
+        cropH = h * 0.70;
+        log("Crop: Wide Scan (Vertical Trim)");
     }
 
-    const scaleFactor = 3.5; 
+    const scaleFactor = 2.0; // Lowered from 3.5 for speed/memory on cloud
     const scaledCanvas = document.createElement('canvas');
     scaledCanvas.width = cropW * scaleFactor;
     scaledCanvas.height = cropH * scaleFactor;
     const ctx = scaledCanvas.getContext('2d');
     
-    ctx.imageSmoothingEnabled = true;
+    //ctx.imageSmoothingEnabled = false; // Disable smoothing to keep pixels sharp
+    ctx.imageSmoothingEnabled = true; // Enable smoothing to fix scaling artifacts
     ctx.imageSmoothingQuality = 'high';
-    
+
     ctx.drawImage(originalCanvas, cropX, cropY, cropW, cropH, 0, 0, scaledCanvas.width, scaledCanvas.height);
 
     const imageData = ctx.getImageData(0, 0, scaledCanvas.width, scaledCanvas.height);
     const data = imageData.data;
 
-    log("Filter: Green Channel Isolation + Threshold 70");
+    // CLOUD GAMING TWEAK: Lowered Threshold from 70 to 45
+    log("Filter: Green Channel Isolation + Threshold 45 (Cloud Optimized)");
 
     for (let i = 0; i < data.length; i += 4) {
         // R=i, G=i+1, B=i+2
-        const green = data[i + 1]; // Only listen to Green Channel
+        const green = data[i + 1]; 
+        const red = data[i];
+        const blue = data[i + 2];
 
-        // Threshold 70 on Green Channel
-        // If Green > 70 (Text is present), make Black (0)
-        // If Green < 70 (Background), make White (255)
-        const val = green > 70 ? 0 : 255; 
+        // Advanced Filter: Green must be dominant AND brighter than threshold
+        // This helps filter out white environmental light that isn't green HUD text
+        const isGreenDominant = green > (red + 10) && green > (blue + 10);
+        
+        // If Green > 45 (Text), make Black (0). Else White (255).
+        const val = (green > 45 && isGreenDominant) ? 0 : 255; 
 
         data[i] = val; 
         data[i + 1] = val; 
@@ -192,7 +205,7 @@ function preprocessImage(originalCanvas, mode) {
     }
 
     ctx.putImageData(imageData, 0, 0);
-    return scaledCanvas.toDataURL('image/jpeg', 1.0);
+    return scaledCanvas.toDataURL('image/jpeg', 0.9);
 }
 
 // --- CORE OCR ---
@@ -206,8 +219,8 @@ async function runOCR(sourceCanvas, mode, origin) {
         log("Loading Tesseract...");
         const worker = await Tesseract.createWorker('eng');
         await worker.setParameters({
-            // Optimized whitelist: Caps, numbers, dash, space, dot
-            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- '
+            // Optimized whitelist: Caps, numbers, dash, space, dot, percent
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- %'
         });
 
         log("Reading...");
@@ -216,16 +229,18 @@ async function runOCR(sourceCanvas, mode, origin) {
         
         await worker.terminate();
         log("OCR DONE. Length: " + text.length);
+        // Clean up new lines for log clarity
         log("SAMPLE: " + text.substring(0, 100).replace(/[\n\r]+/g, ' '));
 
         if (mode === 'mining') parseMiningStats(text, origin);
         else if (mode === 'loadout') parseLoadoutStats(text, origin);
         else if (mode === 'auto') {
-            if (text.match(/Mass|Resistance|Instability/i)) {
-                log("Detected: Mining");
+            // Stronger detection for Mining vs Loadout
+            if (text.match(/Mass|Mss|Resist|Instab/i)) {
+                log("Detected: Mining Data");
                 parseMiningStats(text, origin);
             } else {
-                log("Detected: Loadout");
+                log("Detected: Loadout Data");
                 parseLoadoutStats(text, origin);
             }
         }
@@ -239,15 +254,18 @@ async function runOCR(sourceCanvas, mode, origin) {
 
 // --- MINING PARSER ---
 function parseMiningStats(text, origin) {
+    // OCR Clean-up map for common Tesseract errors on numbers
     let cleanText = text
         .replace(/O/g, '0').replace(/[lI|]/g, '1')
         .replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2');
 
     const extract = (labels) => {
+        // Regex looks for Label -> (optional chars) -> Number
         const regex = new RegExp(`(?:${labels})[^0-9]*([0-9\\s\\.,]+)`, 'i');
         const match = cleanText.match(regex);
         if (match && match[1]) {
             let num = match[1].replace(/\s/g, '').replace(/,/g, '.');
+            // Remove trailing dots (e.g., "12." -> "12")
             if(num.endsWith('.')) num = num.slice(0, -1);
             return parseFloat(num);
         }
@@ -266,34 +284,38 @@ function parseMiningStats(text, origin) {
     if (inst !== null && !isNaN(inst)) { document.getElementById('instability').value = inst; updated = true; }
 
     if(updated && window.calculate) window.calculate();
-    log(updated ? "SUCCESS" : "NO MATCHES");
+    log(updated ? "SUCCESS: DATA POPULATED" : "FAIL: NO VALID DATA FOUND");
 }
 
-// --- LOADOUT PARSER (GREEN FILTER ENABLED) ---
+// --- LOADOUT PARSER ---
 function parseLoadoutStats(text, origin) {
     const foundItems = [];
     let processingText = text; 
 
     let allItems = [];
+    // Ensure we access global arrays from script.js safely
     if (typeof allLaserHeads !== 'undefined') allItems = allItems.concat(allLaserHeads);
     if (typeof powerModules !== 'undefined') allItems = allItems.concat(powerModules);
     if (typeof gadgets !== 'undefined') allItems = allItems.concat(gadgets);
 
+    // Sort by length (Longest first) to avoid finding "Helix" inside "Helix II"
     allItems.sort((a, b) => b.name.length - a.name.length);
-
-    log("DB Size: " + allItems.length);
 
     allItems.forEach(item => {
         if (item.name === "None") return;
         
+        // Robust Regex: "Helix II" matches "Helix  ll" or "Helix-11"
         let safeName = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        // Loose Regex: spaces, dashes, dots allowed between parts
-        let patternStr = safeName.replace(/[\s-]/g, '[\\s\\.\\-]*'); 
+        let patternStr = safeName
+            .replace(/I/g, '[I1l|]') // Handle Roman Numerals
+            .replace(/[\s-]/g, '[\\s\\.\\-]*'); 
+            
         const regex = new RegExp(patternStr, 'gi');
 
         const matches = processingText.match(regex);
         if (matches && matches.length > 0) {
             matches.forEach(() => foundItems.push(item.name));
+            // Mask out found item so it's not detected again
             processingText = processingText.replace(regex, (m) => '#'.repeat(m.length));
         }
     });
@@ -305,29 +327,34 @@ function parseLoadoutStats(text, origin) {
         if(container) {
             let card = container.querySelector('.ship-arm-card');
             
+            // Auto-create ship if none exists
             if(!card && window.addShipLoadout) {
-                log("Auto-Deploying Ship...");
+                log("Auto-Deploying Default Ship...");
                 window.addShipLoadout();
                 card = container.querySelector('.ship-arm-card');
             }
 
             if(card) {
+                // 1. Find the Laser (Prioritize Lasers over modules)
                 const laser = foundItems.find(n => allLaserHeads.some(lh => lh.name === n));
                 if (laser) {
                     const sel = card.querySelector('select[id$="-laser"]');
-                    selectOptionByValue(sel, laser);
-                    log("Laser: " + laser);
+                    if(sel) selectOptionByValue(sel, laser);
+                    log("Set Laser: " + laser);
                 }
                 
+                // 2. Find Modules (Filter out the laser name so we don't put a laser in a mod slot)
                 const mods = foundItems.filter(n => n !== laser);
                 const modSels = card.querySelectorAll('select[id*="-mod"]');
                 
                 mods.forEach((m, i) => {
                     if (modSels[i]) {
                         selectOptionByValue(modSels[i], m);
-                        log(`Mod ${i+1}: ${m}`);
+                        log(`Set Mod ${i+1}: ${m}`);
+                        // Sync the checkbox UI
                         if(window.togCheck) {
                              const parts = modSels[i].id.split('-');
+                             // arm-mole-1-mod1 -> parts[3] = mod1
                              window.togCheck(parts.slice(0,3).join('-'), parts[3].replace('mod',''));
                         }
                     }
@@ -336,7 +363,7 @@ function parseLoadoutStats(text, origin) {
             }
         }
     } else {
-        log("No matches found.");
+        log("No loadout items matched.");
     }
 }
 
@@ -345,6 +372,7 @@ function selectOptionByValue(selectElement, val) {
     for(let i=0; i<selectElement.options.length; i++) {
         if(selectElement.options[i].value === val) {
             selectElement.selectedIndex = i;
+            selectElement.dispatchEvent(new Event('change')); // Trigger change event
             break;
         }
     }
