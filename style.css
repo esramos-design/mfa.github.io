@@ -1,40 +1,59 @@
+/**
+ * UPDATED PALETTE: Logofolio 2025 (Vol. 2)
+ * 1. #F2F2F2 (Platinum) -> Main Text / Highlights
+ * 2. #A6A6A6 (Silver)   -> Muted Text / Borders
+ * 3. #737373 (Gray)     -> Secondary Elements
+ * 4. #404040 (Charcoal) -> Cards / Inputs
+ * 5. #0D0D0D (Obsidian) -> Main Background
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200..900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
-    --bg-main: #02040a;
-    --bg-gradient: radial-gradient(circle at 50% 0%, #111927 0%, #02040a 80%);
-    --bg-panel: rgba(13, 17, 23, 0.65);
-    --bg-card: rgba(30, 41, 59, 0.4);
-    --bg-input: rgba(15, 23, 42, 0.6);
-    --bg-input-focus: rgba(30, 41, 59, 0.8);
-    --border-main: rgba(255, 255, 255, 0.08);
-    --text-main: #e2e8f0;
-    --text-muted: #94a3b8;
-    --text-strong: #f8fafc;
+    /* --- NEW PALETTE MAPPING --- */
+    --bg-main: #0D0D0D; /* Logofolio-5 */
+    /* Radial gradient: Charcoal top-light fading into Obsidian */
+    --bg-gradient: radial-gradient(circle at 50% 0%, #404040 0%, #0D0D0D 85%);
+    
+    --bg-panel: rgba(13, 13, 13, 0.8);  /* #0D0D0D with high opacity */
+    --bg-card: rgba(64, 64, 64, 0.25);  /* #404040 transparent */
+    
+    --bg-input: rgba(13, 13, 13, 0.5);
+    --bg-input-focus: rgba(64, 64, 64, 0.6);
+    
+    --border-main: rgba(166, 166, 166, 0.2); /* #A6A6A6 transparent */
+    
+    --text-main: #F2F2F2;   /* Logofolio-1 */
+    --text-muted: #A6A6A6;  /* Logofolio-2 */
+    --text-strong: #FFFFFF; /* Pure White for contrast */
+    
     --font-ui: 'Inter', sans-serif;
     --font-tech: 'JetBrains Mono', monospace;
-    --chart-grid: rgba(148, 163, 184, 0.1);
-    --chart-text: #94a3b8;
-    --glow-blue: 0 0 20px rgba(56, 189, 248, 0.15);
-    --glow-purple: 0 0 20px rgba(168, 85, 247, 0.15);
-    --glow-yellow: 0 0 20px rgba(234, 179, 8, 0.15);
-    --glow-text: 0 0 10px rgba(56, 189, 248, 0.5);
+    
+    --chart-grid: rgba(115, 115, 115, 0.15); /* #737373 */
+    --chart-text: #A6A6A6;
+    
+    /* Monochrome Glows for the Noir feel */
+    --glow-blue: 0 0 25px rgba(242, 242, 242, 0.15); /* Silver Glow */
+    --glow-purple: 0 0 25px rgba(166, 166, 166, 0.15);
+    --glow-yellow: 0 0 25px rgba(255, 255, 255, 0.15);
+    --glow-text: 0 0 10px rgba(242, 242, 242, 0.3);
 }
 
 [data-theme="light"] {
-    --bg-main: #f0f4f8; 
-    --bg-gradient: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
-    --bg-panel: rgba(255, 255, 255, 0.85);      
+    --bg-main: #F2F2F2; /* Logofolio-1 */
+    --bg-gradient: linear-gradient(180deg, #F2F2F2 0%, #E5E5E5 100%);
+    --bg-panel: rgba(255, 255, 255, 0.9);      
     --bg-card: rgba(255, 255, 255, 0.6);       
-    --bg-input: #ffffff;
-    --bg-input-focus: #f8fafc;
-    --border-main: rgba(148, 163, 184, 0.4);   
-    --text-main: #1e293b;     
-    --text-muted: #64748b;    
-    --text-strong: #0f172a;   
-    --chart-grid: rgba(0,0,0,0.05);
-    --chart-text: #475569;
-    --glow-blue: 0 10px 30px -5px rgba(59, 130, 246, 0.2);
+    --bg-input: #FFFFFF;
+    --bg-input-focus: #F2F2F2;
+    --border-main: rgba(64, 64, 64, 0.2);   
+    --text-main: #0D0D0D;     
+    --text-muted: #737373;    
+    --text-strong: #000000;   
+    --chart-grid: rgba(0,0,0,0.1);
+    --chart-text: #404040;
+    --glow-blue: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
     --glow-text: none;
 }
 
@@ -56,19 +75,19 @@ input, select, button { font-size: 0.9rem !important; }
 
 /* --- ANIMATIONS --- */
 @keyframes statusPulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
-    50% { transform: scale(1.02); box-shadow: 0 0 20px 0 rgba(255, 255, 255, 0.1); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242, 242, 242, 0.2); }
+    50% { transform: scale(1.02); box-shadow: 0 0 20px 0 rgba(242, 242, 242, 0.1); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242, 242, 242, 0); }
 }
 .animate-status { animation: statusPulse 2s infinite ease-in-out; }
 
 /* Glass UI */
 .glass-panel {
     background-color: var(--bg-panel);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-main);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8); /* Deep shadow */
 }
 
 .glass-card {
@@ -84,19 +103,27 @@ input, select {
     background-color: var(--bg-input);
     border: 1px solid var(--border-main);
     color: var(--text-main);
+    font-family: var(--font-tech);
 }
 
-/* Holographic Section */
+input:focus, select:focus {
+    background-color: var(--bg-input-focus);
+    border-color: var(--text-main);
+    outline: none;
+    box-shadow: 0 0 15px rgba(242, 242, 242, 0.1);
+}
+
+/* Holographic Section - Now Silver/Gray style */
 .holo-container {
     position: relative;
-    background: rgba(15, 23, 42, 0.4);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.05);
+    background: rgba(13, 13, 13, 0.8);
+    border: 1px solid rgba(166, 166, 166, 0.3);
+    box-shadow: inset 0 0 30px rgba(166, 166, 166, 0.05);
     overflow: hidden;
 }
 .holo-scanline {
     position: absolute; top: 0; left: 0; right: 0; height: 100%;
-    background: linear-gradient(to bottom, transparent 50%, rgba(168, 85, 247, 0.02) 51%, transparent 51%);
+    background: linear-gradient(to bottom, transparent 50%, rgba(242, 242, 242, 0.03) 51%, transparent 51%);
     background-size: 100% 4px; pointer-events: none; z-index: 0;
 }
 
@@ -107,7 +134,8 @@ input, select {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #404040; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #A6A6A6; }
 
 /* Sticky Columns */
 @media (min-width: 1024px) {
@@ -125,15 +153,15 @@ input, select {
 /* Modal */
 .modal-backdrop {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+    background: rgba(13, 13, 13, 0.95); backdrop-filter: blur(10px);
     z-index: 100; display: none; justify-content: center; align-items: center;
     opacity: 0; transition: opacity 0.2s ease-in-out;
 }
 .modal-backdrop.show { display: flex; opacity: 1; }
 .modal-content {
-    background: rgba(13, 17, 23, 0.95); border: 1px solid rgba(56, 189, 248, 0.3);
+    background: #0D0D0D; border: 1px solid var(--text-muted);
     padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px;
-    box-shadow: 0 0 50px rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 60px rgba(242, 242, 242, 0.1);
 }
 
 /* Fix for Dropdown Widths */
@@ -142,48 +170,43 @@ input, select {
     width: 100%; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
     font-size: 0.8rem; padding-right: 1.2rem;
 }
-.ship-arm-card select option { font-size: 12px; background-color: #0f172a; }
+.ship-arm-card select option { font-size: 12px; background-color: #0D0D0D; }
 
 /* =========================================
    === UI UPGRADE: GLOW & SCALING SYSTEM ===
    ========================================= */
 
-/* 1. NEON GLOW ON HOVER (Columns) */
-/* Applies a sci-fi breathing neon effect when mouse moves over panels */
+/* 1. NEON GLOW ON HOVER (Columns) - Updated to Platinum/Silver */
 .glass-panel {
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border: 1px solid var(--border-main);
 }
 
 .glass-panel:hover {
-    border-color: rgba(56, 189, 248, 0.9); /* High-contrast Cyan */
+    border-color: rgba(242, 242, 242, 0.8); /* Logofolio-1 */
     box-shadow: 
-        0 0 15px rgba(56, 189, 248, 0.3), /* Bright inner halo */
-        0 0 40px rgba(56, 189, 248, 0.15), /* Wide outer bloom */
-        inset 0 0 30px rgba(56, 189, 248, 0.05); /* Glass depth effect */
-    transform: translateY(-3px) scale(1.01); /* Tactile lift effect */
-    z-index: 20; /* Ensure it pops over other elements */
+        0 0 20px rgba(242, 242, 242, 0.2), /* Bright inner halo */
+        0 0 50px rgba(242, 242, 242, 0.1), /* Wide outer bloom */
+        inset 0 0 30px rgba(242, 242, 242, 0.05); /* Glass depth effect */
+    transform: translateY(-3px) scale(1.01); 
+    z-index: 20; 
 }
 
 /* 2. LARGE MONITOR SCALING (27" 1440p+ Optimization) */
-/* Forces larger text specifically for Target Analysis & Gadgets */
 @media (min-width: 1600px) {
-    /* Make the 'Target Analysis' Header much bigger */
     .sticky-column-wrapper h2 {
         font-size: 1.8rem !important;
         letter-spacing: 0.15em !important;
-        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        text-shadow: 0 0 15px rgba(242, 242, 242, 0.5); /* Silver Shadow */
         margin-bottom: 1.5rem !important;
     }
 
-    /* Make 'Active Gadgetry' and other labels readable */
     .sticky-column-wrapper label.text-xs,
     .sticky-column-wrapper label.text-sm {
-        font-size: 1rem !important; /* Bump up from tiny text */
-        color: var(--text-strong) !important; /* Increase contrast */
+        font-size: 1rem !important;
+        color: var(--text-strong) !important; 
     }
 
-    /* Make the inputs/numbers larger and easier to read */
     .sticky-column-wrapper input,
     .sticky-column-wrapper select {
         font-size: 1.2rem !important;
@@ -191,14 +214,12 @@ input, select {
         font-family: var(--font-tech);
     }
 
-    /* Increase the gadget list text size */
     #gadget-list-container .text-sm {
         font-size: 1.1rem !important;
     }
 }
 
 /* 3. MOBILE & TABLET AUTO-SCALING */
-/* Transforms the layout into a single flowing column for small screens */
 @media (max-width: 1024px) {
     .main-container {
         display: flex;
@@ -213,7 +234,6 @@ input, select {
         min-height: auto;
     }
 
-    /* Disable the 'sticky' behavior on mobile so you can scroll naturally */
     .sticky-column-wrapper, 
     .sticky-scroll-content {
         position: relative !important;
@@ -222,9 +242,8 @@ input, select {
         overflow: visible !important;
     }
 
-    /* Make buttons and inputs finger-friendly (touch targets) */
     button, select, input {
         min-height: 50px !important;
-        font-size: 16px !important; /* Prevents iOS zoom on focus */
+        font-size: 16px !important;
     }
 }
