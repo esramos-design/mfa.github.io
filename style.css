@@ -10,22 +10,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200..900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
-    /* --- PALETTE VARIABLES --- */
+    /* --- NEW PALETTE MAPPING --- */
     --bg-main: #0D0D0D; /* Logofolio-5 */
     /* Radial gradient: Charcoal top-light fading into Obsidian */
     --bg-gradient: radial-gradient(circle at 50% 0%, #404040 0%, #0D0D0D 85%);
     
-    --bg-panel: rgba(13, 13, 13, 0.85);  /* High opacity for contrast */
-    --bg-card: rgba(64, 64, 64, 0.2);    /* Transparent Charcoal */
+    --bg-panel: rgba(13, 13, 13, 0.8);  /* #0D0D0D with high opacity */
+    --bg-card: rgba(64, 64, 64, 0.25);  /* #404040 transparent */
     
-    --bg-input: rgba(13, 13, 13, 0.6);
-    --bg-input-focus: rgba(64, 64, 64, 0.8);
+    --bg-input: rgba(13, 13, 13, 0.5);
+    --bg-input-focus: rgba(64, 64, 64, 0.6);
     
-    --border-main: rgba(166, 166, 166, 0.25); /* #A6A6A6 transparent */
+    --border-main: rgba(166, 166, 166, 0.2); /* #A6A6A6 transparent */
     
     --text-main: #F2F2F2;   /* Logofolio-1 */
     --text-muted: #A6A6A6;  /* Logofolio-2 */
-    --text-strong: #FFFFFF; /* Pure White */
+    --text-strong: #FFFFFF; /* Pure White for contrast */
     
     --font-ui: 'Inter', sans-serif;
     --font-tech: 'JetBrains Mono', monospace;
@@ -33,14 +33,15 @@
     --chart-grid: rgba(115, 115, 115, 0.15); /* #737373 */
     --chart-text: #A6A6A6;
     
-    /* Noir Glows */
-    --glow-blue: 0 0 25px rgba(242, 242, 242, 0.1); 
-    --glow-purple: 0 0 25px rgba(166, 166, 166, 0.1);
-    --glow-text: 0 0 8px rgba(242, 242, 242, 0.2);
+    /* Monochrome Glows for the Noir feel */
+    --glow-blue: 0 0 25px rgba(242, 242, 242, 0.15); /* Silver Glow */
+    --glow-purple: 0 0 25px rgba(166, 166, 166, 0.15);
+    --glow-yellow: 0 0 25px rgba(255, 255, 255, 0.15);
+    --glow-text: 0 0 10px rgba(242, 242, 242, 0.3);
 }
 
 [data-theme="light"] {
-    --bg-main: #F2F2F2; 
+    --bg-main: #F2F2F2; /* Logofolio-1 */
     --bg-gradient: linear-gradient(180deg, #F2F2F2 0%, #E5E5E5 100%);
     --bg-panel: rgba(255, 255, 255, 0.9);      
     --bg-card: rgba(255, 255, 255, 0.6);       
@@ -68,12 +69,6 @@ body {
     line-height: 1.6;
 }
 
-/* Selection Highlight */
-::selection {
-    background: var(--text-muted);
-    color: var(--bg-main);
-}
-
 input, select, button { font-size: 0.9rem !important; }
 .text-xs { font-size: 0.85rem !important; } 
 .text-sm { font-size: 1rem !important; }
@@ -92,18 +87,7 @@ input, select, button { font-size: 0.9rem !important; }
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-main);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.glass-panel:hover {
-    border-color: rgba(242, 242, 242, 0.6);
-    box-shadow: 
-        0 0 20px rgba(242, 242, 242, 0.15), 
-        0 0 40px rgba(242, 242, 242, 0.05),
-        inset 0 0 30px rgba(255, 255, 255, 0.02);
-    transform: translateY(-2px) scale(1.005); 
-    z-index: 20; 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8); /* Deep shadow */
 }
 
 .glass-card {
@@ -129,10 +113,10 @@ input:focus, select:focus {
     box-shadow: 0 0 15px rgba(242, 242, 242, 0.1);
 }
 
-/* Holographic Section */
+/* Holographic Section - Now Silver/Gray style */
 .holo-container {
     position: relative;
-    background: rgba(13, 13, 13, 0.9);
+    background: rgba(13, 13, 13, 0.8);
     border: 1px solid rgba(166, 166, 166, 0.3);
     box-shadow: inset 0 0 30px rgba(166, 166, 166, 0.05);
     overflow: hidden;
@@ -151,7 +135,7 @@ input:focus, select:focus {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #404040; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #F2F2F2; }
+::-webkit-scrollbar-thumb:hover { background: #A6A6A6; }
 
 /* Sticky Columns */
 @media (min-width: 1024px) {
@@ -180,7 +164,7 @@ input:focus, select:focus {
     box-shadow: 0 0 60px rgba(242, 242, 242, 0.1);
 }
 
-/* Dropdown Fixes */
+/* Fix for Dropdown Widths */
 #multiShipContainer { width: 100%; max-width: 100%; overflow-x: hidden; }
 .ship-arm-card select { 
     width: 100%; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
@@ -189,69 +173,77 @@ input:focus, select:focus {
 .ship-arm-card select option { font-size: 12px; background-color: #0D0D0D; }
 
 /* =========================================
-   === MONOCHROME OVERRIDES (Industrial Noir) ===
+   === UI UPGRADE: GLOW & SCALING SYSTEM ===
    ========================================= */
 
-/* Override standard colors to fit the Grayscale theme */
-
-/* Text Colors -> Map to Platinum/Silver */
-.text-blue-400, .text-blue-500, .text-blue-300,
-.text-purple-400, .text-purple-300,
-.text-green-400, .text-green-300,
-.text-yellow-500, .text-orange-400 {
-    color: var(--text-main) !important;
-    text-shadow: 0 0 5px rgba(242, 242, 242, 0.2);
+/* 1. NEON GLOW ON HOVER (Columns) - Updated to Platinum/Silver */
+.glass-panel {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 1px solid var(--border-main);
 }
 
-/* Errors/Failures should ideally be stark White or Dark Gray */
-.text-red-400, .text-red-500 {
-    color: #FFFFFF !important;
-    font-weight: bold;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+.glass-panel:hover {
+    border-color: rgba(242, 242, 242, 0.8); /* Logofolio-1 */
+    box-shadow: 
+        0 0 20px rgba(242, 242, 242, 0.2), /* Bright inner halo */
+        0 0 50px rgba(242, 242, 242, 0.1), /* Wide outer bloom */
+        inset 0 0 30px rgba(242, 242, 242, 0.05); /* Glass depth effect */
+    transform: translateY(-3px) scale(1.01); 
+    z-index: 20; 
 }
 
-/* Backgrounds (Buttons/Cards) -> Map to Charcoal/Obsidian */
-.bg-blue-600, .bg-blue-500, .bg-blue-900,
-.bg-green-600, .bg-green-700, .bg-green-900,
-.bg-purple-600, .bg-purple-900,
-.bg-red-800 {
-    background-color: var(--bg-card) !important;
-    border: 1px solid var(--text-muted) !important;
-    color: var(--text-main) !important;
-}
-
-/* Hover States -> Invert Colors */
-.bg-blue-600:hover, .bg-blue-500:hover,
-.bg-purple-600:hover {
-    background-color: var(--text-muted) !important;
-    color: var(--bg-main) !important;
-    border-color: var(--text-strong) !important;
-}
-
-/* Border Overrides */
-.border-blue-500, .border-green-500, .border-purple-500, .border-red-500, .border-indigo-500 {
-    border-color: var(--border-main) !important;
-}
-
-/* Media Query: Large Screens */
+/* 2. LARGE MONITOR SCALING (27" 1440p+ Optimization) */
 @media (min-width: 1600px) {
     .sticky-column-wrapper h2 {
         font-size: 1.8rem !important;
         letter-spacing: 0.15em !important;
-        text-shadow: 0 0 15px rgba(242, 242, 242, 0.5);
+        text-shadow: 0 0 15px rgba(242, 242, 242, 0.5); /* Silver Shadow */
         margin-bottom: 1.5rem !important;
     }
+
+    .sticky-column-wrapper label.text-xs,
+    .sticky-column-wrapper label.text-sm {
+        font-size: 1rem !important;
+        color: var(--text-strong) !important; 
+    }
+
     .sticky-column-wrapper input,
     .sticky-column-wrapper select {
         font-size: 1.2rem !important;
         padding: 0.75rem !important;
+        font-family: var(--font-tech);
+    }
+
+    #gadget-list-container .text-sm {
+        font-size: 1.1rem !important;
     }
 }
 
-/* Mobile Fixes */
+/* 3. MOBILE & TABLET AUTO-SCALING */
 @media (max-width: 1024px) {
-    .main-container { display: flex; flex-direction: column; width: 100%; padding: 0.5rem; }
-    .glass-panel { width: 100% !important; margin-bottom: 1.5rem; min-height: auto; }
-    .sticky-column-wrapper, .sticky-scroll-content { position: relative !important; top: 0 !important; max-height: none !important; overflow: visible !important; }
-    button, select, input { min-height: 50px !important; font-size: 16px !important; }
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0.5rem;
+    }
+
+    .glass-panel {
+        width: 100% !important;
+        margin-bottom: 1.5rem;
+        min-height: auto;
+    }
+
+    .sticky-column-wrapper, 
+    .sticky-scroll-content {
+        position: relative !important;
+        top: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    button, select, input {
+        min-height: 50px !important;
+        font-size: 16px !important;
+    }
 }
