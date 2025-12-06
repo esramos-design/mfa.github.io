@@ -1,125 +1,96 @@
 /**
- * MODULE: OPTICAL SCANNER & OCR
- * Version: 5.23 (CLOUD GAMING OPTIMIZED)
- * Fix: Lowered Green Threshold (70 -> 45) for compressed streams.
- * Fix: Added sharpening pass before OCR.
+ * MODULE: OPTICAL SCANNER & OCR (FINAL V19)
+ * Role: File Upload OCR + Draggable Log.
+ * STRICTLY NO HEADER INJECTION.
  */
 
-let scannerStream = null;
+// --- 1. DEPENDENCY CHECK ---
+(function loadTesseract() {
+    if (typeof Tesseract !== 'undefined') return;
+    const script = document.createElement('script');
+    script.src = "https://unpkg.com/tesseract.js@2.1.0/dist/tesseract.min.js";
+    document.head.appendChild(script);
+})();
 
-// --- VISUAL LOGGER SYSTEM ---
+// --- 2. DRAGGABLE LOGIC ---
+function makeDraggable(element, handle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    handle.onmousedown = dragMouseDown;
+    handle.style.cursor = 'move';
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        if (e.target.tagName === 'BUTTON') return;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// --- 3. DEBUG LOG WINDOW ---
 window.createDebugWindow = function() {
-    let div = document.getElementById('ocr-debug-console');
-    if (div) { div.style.display = 'block'; return; }
+    if (document.getElementById('ocr-debug-console')) {
+        document.getElementById('ocr-debug-console').style.display = 'flex';
+        return;
+    }
 
-    div = document.createElement('div');
-    div.id = 'ocr-debug-console';
-    div.style.cssText = "position:fixed; bottom:10px; right:10px; width:450px; height:350px; background:rgba(0,0,0,0.95); color:#0f0; font-family:'Consolas', monospace; font-size:11px; padding:0; z-index:9999; border:2px solid #0f0; border-radius:4px; display:flex; flex-direction:column; resize:both; overflow:hidden;";
-
-    div.innerHTML = `
-        <div style="background:#003300; padding:5px; border-bottom:1px solid #0f0; display:flex; justify-content:space-between;">
-            <span style="font-weight:bold; color:#fff;">SCANNER LOG v5.23 (CLOUD)</span>
-            <div>
-                <button onclick="window.copyLog()" style="cursor:pointer; background:#0f0; border:none;">COPY</button>
-                <button onclick="window.clearLog()" style="cursor:pointer; background:#444; color:#fff; border:none;">CLEAR</button>
-                <button onclick="window.closeLog()" style="cursor:pointer; background:#f00; color:#fff; border:none;">X</button>
+    const logWin = document.createElement('div');
+    logWin.id = 'ocr-debug-console';
+    logWin.style.cssText = "position:fixed; bottom:20px; right:20px; width:450px; height:450px; background:rgba(13, 13, 13, 0.98); color:#F2F2F2; font-family:'JetBrains Mono', monospace; font-size:11px; padding:0; z-index:99999; border:1px solid #404040; border-radius:8px; display:flex; flex-direction:column; box-shadow: 0 10px 40px rgba(0,0,0,0.5);";
+    
+    logWin.innerHTML = `
+        <div id="ocr-drag-header" style="background:linear-gradient(90deg, #404040, #0D0D0D); padding:10px; border-bottom:1px solid #404040; display:flex; justify-content:space-between; align-items:center; user-select:none; cursor:move; border-radius: 8px 8px 0 0;">
+            <span style="font-weight:bold; color:#fff; letter-spacing:1px;">OCR INTELLIGENCE</span>
+            <div style="display:flex; gap:5px;">
+                <button onclick="window.copyLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">COPY</button>
+                <button onclick="window.clearLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">CLR</button>
+                <button onclick="document.getElementById('ocr-debug-console').style.display='none'" style="cursor:pointer; background:#522; color:#fff; border:1px solid #a33; padding:2px 8px; border-radius:4px; font-size:10px;">X</button>
             </div>
         </div>
         <div id="ocr-log-body" style="flex-grow:1; overflow-y:auto; padding:10px; user-select:text;"></div>
+        <div id="ocr-preview-area" style="height:120px; border-top:1px solid #404040; background:#000; padding:5px; display:flex; justify-content:center; align-items:center;">
+            <span style="color:#737373;">[IMAGE PREVIEW]</span>
+        </div>
     `;
-    document.body.appendChild(div);
-    log("/// CLOUD COMPATIBLE SCANNER READY ///");
+
+    document.body.appendChild(logWin);
+    makeDraggable(logWin, document.getElementById('ocr-drag-header'));
 }
 
 window.log = function(msg) {
     if (!document.getElementById('ocr-debug-console')) window.createDebugWindow();
     const box = document.getElementById('ocr-log-body');
-    if (box) {
-        const entry = document.createElement('div');
-        entry.style.borderBottom = "1px solid #004400";
-        entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        box.appendChild(entry);
-        box.scrollTop = box.scrollHeight;
-    }
-    console.log(msg); 
-}
-
-window.copyLog = function() {
-    navigator.clipboard.writeText(document.getElementById('ocr-log-body').innerText)
-        .then(() => alert("Log Copied!"))
-        .catch(e => alert("Copy Failed: " + e));
+    const entry = document.createElement('div');
+    entry.style.borderBottom = "1px solid #262626";
+    entry.style.padding = "4px 0";
+    entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    box.appendChild(entry);
+    box.scrollTop = box.scrollHeight;
 }
 window.clearLog = function() { document.getElementById('ocr-log-body').innerHTML = ""; }
-window.closeLog = function() { document.getElementById('ocr-debug-console').style.display = 'none'; }
-
-// --- SCREEN CAPTURE ---
-window.toggleScan = async function(mode) {
-    window.createDebugWindow();
-    log(`>>> INIT SCAN: ${mode.toUpperCase()} <<<`);
-
-    if (window.location.protocol === 'file:') {
-        alert("Security Block: Scanner requires HTTPS or Localhost.");
-        return;
-    }
-
-    if (scannerStream) {
-        stopScanner();
-        return;
-    }
-
-    try {
-        scannerStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { cursor: "never" },
-            audio: false
-        });
-
-        const video = document.getElementById('stream-video');
-        video.srcObject = scannerStream;
-        await video.play(); 
-        
-        const checkReady = setInterval(async () => {
-            if (video.videoWidth > 0 && video.videoHeight > 0) {
-                clearInterval(checkReady);
-                log(`Resolution: ${video.videoWidth} x ${video.videoHeight}`);
-                // Wait slightly longer for stream bitrate to stabilize
-                setTimeout(async () => {
-                    await captureAndProcess(mode, 'stream');
-                    stopScanner();
-                }, 800);
-            }
-        }, 100);
-
-        scannerStream.getVideoTracks()[0].onended = () => stopScanner();
-
-    } catch (err) {
-        log("ERROR: " + err.message);
-        stopScanner();
-    }
-};
-
-function stopScanner() {
-    const video = document.getElementById('stream-video');
-    if (scannerStream) {
-        scannerStream.getTracks().forEach(track => track.stop());
-        scannerStream = null;
-    }
-    if (video) video.srcObject = null;
-    log("Scanner Stopped.");
+window.copyLog = function() {
+    navigator.clipboard.writeText(document.getElementById('ocr-log-body').innerText).then(()=>alert("Copied!"));
 }
 
-async function captureAndProcess(mode, origin) {
-    const video = document.getElementById('stream-video');
-    const canvas = document.getElementById('stream-canvas');
-    if (!video || !canvas) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    
-    ctx.drawImage(video, 0, 0);
-    runOCR(canvas, mode, origin);
-}
-
+// --- 4. FILE HANDLING ---
 window.handleFileSelect = function(input) {
     window.createDebugWindow();
     if (input.files && input.files[0]) {
@@ -127,13 +98,8 @@ window.handleFileSelect = function(input) {
         reader.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                const canvas = document.getElementById('stream-canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                log(`File Loaded: ${img.width}x${img.height}`);
-                runOCR(canvas, 'auto', 'file');
+                log(`Image Loaded: ${img.width}x${img.height}`);
+                runOCR(img);
             }
             img.src = event.target.result;
         }
@@ -141,239 +107,174 @@ window.handleFileSelect = function(input) {
     }
 };
 
-// --- IMAGE PROCESSING (GREEN ISOLATION + SHARPEN) ---
-function preprocessImage(originalCanvas, mode) {
-    const w = originalCanvas.width;
-    const h = originalCanvas.height;
-    let cropX = 0, cropY = 0, cropW = w, cropH = h;
-
-    // Fixed Crop Logic: Even 'Auto' needs to target a likely area to avoid 3D noise
-    if (mode === 'mining') {
-        // Mining: Right 40% (More focused than 50%)
-        cropX = w * 0.60; cropW = w * 0.40; 
-        cropY = h * 0.20; cropH = h * 0.60; 
-        log("Crop: Mining Focus (Right 40%)");
-    } else if (mode === 'loadout') {
-        // Loadout: Left 40%
-        cropX = 0; 
-        cropW = w * 0.40; 
-        cropY = h * 0.15; 
-        cropH = h * 0.70;
-        log("Crop: Loadout Focus (Left 40%)");
-    } else {
-        // Auto: Crop the vertical center band where UI elements usually exist
-        // Avoiding the top/bottom 15% edges helps reduce noise
-        cropY = h * 0.15;
-        cropH = h * 0.70;
-        log("Crop: Wide Scan (Vertical Trim)");
-    }
-
-    const scaleFactor = 2.0; // Lowered from 3.5 for speed/memory on cloud
-    const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = cropW * scaleFactor;
-    scaledCanvas.height = cropH * scaleFactor;
-    const ctx = scaledCanvas.getContext('2d');
+// --- 5. IMAGE PROCESSING (GREEN BINARIZATION) ---
+function preprocessImage(imgElement) {
+    const w = imgElement.width;
+    const h = imgElement.height;
+    const scale = 2.0; 
     
-    //ctx.imageSmoothingEnabled = false; // Disable smoothing to keep pixels sharp
-    ctx.imageSmoothingEnabled = true; // Enable smoothing to fix scaling artifacts
-    ctx.imageSmoothingQuality = 'high';
+    // Crop: Left 35% + Right 35%, skip top 20%
+    const panelW = w * 0.35; 
+    const panelH = h * 0.70; 
+    const topOffset = h * 0.20; 
 
-    ctx.drawImage(originalCanvas, cropX, cropY, cropW, cropH, 0, 0, scaledCanvas.width, scaledCanvas.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = (panelW * 2) * scale; 
+    canvas.height = panelH * scale;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false; // Sharp pixels for binary
+    
+    // Draw Left (Loadout)
+    ctx.drawImage(imgElement, 0, topOffset, panelW, panelH, 0, 0, panelW * scale, panelH * scale);
+    // Draw Right (Mining)
+    ctx.drawImage(imgElement, w - panelW, topOffset, panelW, panelH, panelW * scale, 0, panelW * scale, panelH * scale);
 
-    const imageData = ctx.getImageData(0, 0, scaledCanvas.width, scaledCanvas.height);
-    const data = imageData.data;
-
-    // CLOUD GAMING TWEAK: Lowered Threshold from 70 to 45
-    log("Filter: Green Channel Isolation + Threshold 45 (Cloud Optimized)");
-
-    for (let i = 0; i < data.length; i += 4) {
-        // R=i, G=i+1, B=i+2
-        const green = data[i + 1]; 
-        const red = data[i];
-        const blue = data[i + 2];
-
-        // Advanced Filter: Green must be dominant AND brighter than threshold
-        // This helps filter out white environmental light that isn't green HUD text
-        const isGreenDominant = green > (red + 10) && green > (blue + 10);
+    // Green Binarization Filter
+    const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = id.data;
+    
+    for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2];
+        const lum = 0.299*r + 0.587*g + 0.114*b;
         
-        // If Green > 45 (Text), make Black (0). Else White (255).
-        const val = (green > 45 && isGreenDominant) ? 0 : 255; 
-
-        data[i] = val; 
-        data[i + 1] = val; 
-        data[i + 2] = val;
+        let val = 255; // White BG
+        if (lum > 80) val = 0; // Black Text
+        
+        d[i] = val; d[i+1] = val; d[i+2] = val;
     }
+    ctx.putImageData(id, 0, 0);
 
-    ctx.putImageData(imageData, 0, 0);
-    return scaledCanvas.toDataURL('image/jpeg', 0.9);
+    // Update Preview
+    const pArea = document.getElementById('ocr-preview-area');
+    if(pArea) {
+        pArea.innerHTML = '';
+        const preview = document.createElement('img');
+        preview.src = canvas.toDataURL();
+        preview.style.height = '100%';
+        preview.style.border = '1px solid #404040';
+        pArea.appendChild(preview);
+    }
+    
+    return canvas.toDataURL('image/jpeg', 1.0);
 }
 
-// --- CORE OCR ---
-async function runOCR(sourceCanvas, mode, origin) {
-    const loading = document.getElementById('ocr-loading');
-    if(loading) loading.classList.remove('hidden');
+// --- 6. OCR EXECUTION ---
+async function runOCR(imgElement) {
+    const load = document.getElementById('ocr-loading');
+    if(load) load.classList.remove('hidden');
 
     try {
-        const processedImageIdx = preprocessImage(sourceCanvas, mode);
+        const processedUrl = preprocessImage(imgElement);
+        log("Initializing Tesseract...");
         
-        log("Loading Tesseract...");
         const worker = await Tesseract.createWorker('eng');
-        await worker.setParameters({
-            // Optimized whitelist: Caps, numbers, dash, space, dot, percent
-            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- %'
+        await worker.setParameters({ 
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- %:,|' 
         });
-
-        log("Reading...");
-        const ret = await worker.recognize(processedImageIdx);
-        const text = ret.data.text;
         
+        log("Reading Text...");
+        const ret = await worker.recognize(processedUrl);
+        const text = ret.data.text;
         await worker.terminate();
-        log("OCR DONE. Length: " + text.length);
-        // Clean up new lines for log clarity
-        log("SAMPLE: " + text.substring(0, 100).replace(/[\n\r]+/g, ' '));
 
-        if (mode === 'mining') parseMiningStats(text, origin);
-        else if (mode === 'loadout') parseLoadoutStats(text, origin);
-        else if (mode === 'auto') {
-            // Stronger detection for Mining vs Loadout
-            if (text.match(/Mass|Mss|Resist|Instab/i)) {
-                log("Detected: Mining Data");
-                parseMiningStats(text, origin);
-            } else {
-                log("Detected: Loadout Data");
-                parseLoadoutStats(text, origin);
-            }
+        log(`Scan Complete. (${text.length} chars)`);
+        log("--- RAW READ START ---");
+        log(text.substring(0, 150).replace(/[\n\r]+/g, ' | '));
+        log("--- RAW READ END ---");
+
+        if (text.match(/Mass|Mss|Resist|Instab|Shale|Obsidian/i)) { 
+            log("Context: MINING DATA"); 
+            parseMiningStats(text); 
+        } else { 
+            log("Context: LOADOUT DATA"); 
+            parseLoadoutStats(text); 
         }
 
-    } catch (e) {
-        log("EXCEPTION: " + e.message);
-    } finally {
-        if(loading) loading.classList.add('hidden');
+    } catch (e) { log("OCR Error: " + e.message); }
+    finally { if(load) load.classList.add('hidden'); }
+}
+
+// --- 7. PARSERS ---
+function parseMiningStats(text) {
+    let clean = text.replace(/O/g, '0').replace(/o/g, '0').replace(/[lI|]/g, '1').replace(/i/g, '1').replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2');
+    
+    const extract = (label) => {
+        const regex = new RegExp(`(?:${label})[\\s\\S]{0,50}?([0-9,]+(?:\\.[0-9]+)?)`, 'i');
+        const m = clean.match(regex);
+        if(!m) return null;
+        let numStr = m[1].replace(/\s/g, '').replace(/,/g, '.');
+        if(numStr.endsWith('.')) numStr = numStr.slice(0, -1);
+        return parseFloat(numStr);
+    };
+
+    const extractMass = () => {
+        const m = clean.match(/(?:Mass|Mss|Weight)[^0-9]{0,50}?([0-9,]+)/i);
+        if(m) return parseFloat(m[1].replace(/,/g, ''));
+        return null;
+    }
+
+    const mass = extractMass();
+    const res = extract('Resist|Res|Rest');
+    const inst = extract('Instab|Inst|Stab');
+
+    log(`> Mass: ${mass || 'N/A'}`);
+    log(`> Res: ${res || 'N/A'}%`);
+    log(`> Inst: ${inst || 'N/A'}%`);
+    
+    let updated = false;
+    if (mass) { document.getElementById('rockMass').value = mass; updated = true; }
+    if (res !== null) { document.getElementById('resistance').value = res; updated = true; }
+    if (inst !== null) { document.getElementById('instability').value = inst; updated = true; }
+    
+    if (updated && window.calculate) {
+        window.calculate();
+        log("Simulation Updated.");
+    } else {
+        log("No valid data found.");
     }
 }
 
-// --- MINING PARSER ---
-function parseMiningStats(text, origin) {
-    // OCR Clean-up map for common Tesseract errors on numbers
-    let cleanText = text
-        .replace(/O/g, '0').replace(/[lI|]/g, '1')
-        .replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2');
+function parseLoadoutStats(text) {
+    const found = [];
+    let all = [];
+    if (typeof allLaserHeads !== 'undefined') all = all.concat(allLaserHeads);
+    if (typeof powerModules !== 'undefined') all = all.concat(powerModules);
+    if (typeof gadgets !== 'undefined') all = all.concat(gadgets);
+    all.sort((a,b) => b.name.length - a.name.length);
 
-    const extract = (labels) => {
-        // Regex looks for Label -> (optional chars) -> Number
-        const regex = new RegExp(`(?:${labels})[^0-9]*([0-9\\s\\.,]+)`, 'i');
-        const match = cleanText.match(regex);
-        if (match && match[1]) {
-            let num = match[1].replace(/\s/g, '').replace(/,/g, '.');
-            // Remove trailing dots (e.g., "12." -> "12")
-            if(num.endsWith('.')) num = num.slice(0, -1);
-            return parseFloat(num);
-        }
-        return null;
-    };
-
-    const mass = extract('Mass|Mss|Weight|M4ss');
-    const res = extract('Resistance|Res|Rest|Rcs');
-    const inst = extract('Instability|Inst|Stab|1nst|In5t');
-
-    log(`Mining Data -> Mass:${mass} Res:${res} Inst:${inst}`);
-
-    let updated = false;
-    if (mass !== null && !isNaN(mass)) { document.getElementById('rockMass').value = mass; updated = true; }
-    if (res !== null && !isNaN(res)) { document.getElementById('resistance').value = res; updated = true; }
-    if (inst !== null && !isNaN(inst)) { document.getElementById('instability').value = inst; updated = true; }
-
-    if(updated && window.calculate) window.calculate();
-    log(updated ? "SUCCESS: DATA POPULATED" : "FAIL: NO VALID DATA FOUND");
-}
-
-// --- LOADOUT PARSER ---
-function parseLoadoutStats(text, origin) {
-    const foundItems = [];
-    let processingText = text; 
-
-    let allItems = [];
-    // Ensure we access global arrays from script.js safely
-    if (typeof allLaserHeads !== 'undefined') allItems = allItems.concat(allLaserHeads);
-    if (typeof powerModules !== 'undefined') allItems = allItems.concat(powerModules);
-    if (typeof gadgets !== 'undefined') allItems = allItems.concat(gadgets);
-
-    // Sort by length (Longest first) to avoid finding "Helix" inside "Helix II"
-    allItems.sort((a, b) => b.name.length - a.name.length);
-
-    allItems.forEach(item => {
-        if (item.name === "None") return;
-        
-        // Robust Regex: "Helix II" matches "Helix  ll" or "Helix-11"
-        let safeName = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        let patternStr = safeName
-            .replace(/I/g, '[I1l|]') // Handle Roman Numerals
-            .replace(/[\s-]/g, '[\\s\\.\\-]*'); 
-            
-        const regex = new RegExp(patternStr, 'gi');
-
-        const matches = processingText.match(regex);
-        if (matches && matches.length > 0) {
-            matches.forEach(() => foundItems.push(item.name));
-            // Mask out found item so it's not detected again
-            processingText = processingText.replace(regex, (m) => '#'.repeat(m.length));
+    let scanText = text;
+    all.forEach(item => {
+        if(item.name === "None") return;
+        let safe = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/I/g, '[I1l|]').replace(/[\s-]/g, '[\\s\\.\\-]*');
+        const reg = new RegExp(safe, 'gi');
+        if (scanText.match(reg)) {
+            found.push(item.name);
+            scanText = scanText.replace(reg, "###");
         }
     });
 
-    log(`Matches: ${foundItems.length} -> [${foundItems.join(', ')}]`);
+    log(`Items: ${found.join(', ') || 'None'}`);
 
-    if (foundItems.length > 0) {
-        const container = document.getElementById('multiShipContainer');
-        if(container) {
-            let card = container.querySelector('.ship-arm-card');
-            
-            // Auto-create ship if none exists
-            if(!card && window.addShipLoadout) {
-                log("Auto-Deploying Default Ship...");
-                window.addShipLoadout();
-                card = container.querySelector('.ship-arm-card');
+    if (found.length > 0 && window.addShipLoadout) {
+        const cont = document.getElementById('multiShipContainer');
+        let card = cont.querySelector('.ship-arm-card');
+        if(!card) { window.addShipLoadout(); card = cont.querySelector('.ship-arm-card'); }
+
+        if(card) {
+            const laser = found.find(n => allLaserHeads.some(lh => lh.name === n));
+            if (laser) {
+                const s = card.querySelector('select[id$="-laser"]');
+                for(let opt of s.options) { if(opt.text.includes(laser)) { s.value = opt.value; break; } }
+                s.dispatchEvent(new Event('change'));
             }
-
-            if(card) {
-                // 1. Find the Laser (Prioritize Lasers over modules)
-                const laser = foundItems.find(n => allLaserHeads.some(lh => lh.name === n));
-                if (laser) {
-                    const sel = card.querySelector('select[id$="-laser"]');
-                    if(sel) selectOptionByValue(sel, laser);
-                    log("Set Laser: " + laser);
-                }
-                
-                // 2. Find Modules (Filter out the laser name so we don't put a laser in a mod slot)
-                const mods = foundItems.filter(n => n !== laser);
-                const modSels = card.querySelectorAll('select[id*="-mod"]');
-                
-                mods.forEach((m, i) => {
-                    if (modSels[i]) {
-                        selectOptionByValue(modSels[i], m);
-                        log(`Set Mod ${i+1}: ${m}`);
-                        // Sync the checkbox UI
-                        if(window.togCheck) {
-                             const parts = modSels[i].id.split('-');
-                             // arm-mole-1-mod1 -> parts[3] = mod1
-                             window.togCheck(parts.slice(0,3).join('-'), parts[3].replace('mod',''));
-                        }
-                    }
-                });
-                if(window.calculate) window.calculate();
-            }
-        }
-    } else {
-        log("No loadout items matched.");
-    }
-}
-
-function selectOptionByValue(selectElement, val) {
-    if(!selectElement) return;
-    for(let i=0; i<selectElement.options.length; i++) {
-        if(selectElement.options[i].value === val) {
-            selectElement.selectedIndex = i;
-            selectElement.dispatchEvent(new Event('change')); // Trigger change event
-            break;
+            const mods = found.filter(n => n !== laser);
+            const mSels = card.querySelectorAll('select[id*="-mod"]');
+            mods.forEach((m, i) => {
+                if (mSels[i]) { mSels[i].value = m; mSels[i].dispatchEvent(new Event('change')); }
+            });
+            if(window.calculate) window.calculate();
+            log("Loadout Updated.");
         }
     }
 }
