@@ -240,7 +240,7 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
         // Fixed: Lancet MH1 has 1 slot (Focus III x1)
         prosL = `<span class="text-gray-300">Lancet MH1 + Focus III</span>`;
         // Fixed: Pitman has 2 slots
-        golemL = `<span class="text-gray-300">Pitman + Focus III + BoreMax</span>`;
+        golemL = `<span class="text-gray-300">Pitman + Focus III + Focus III</span>`;
     } else if (res > 40 || deficit > 0) {
         // RESISTANCE BREAKER
         strategyName = "Resistance Breaker (Res > 40%)";
