@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.16 (Laser Size Fix)
+ * Version: 5.17 (Gadget Logic Logic Fix)
  * Status: ALL SYSTEMS ONLINE
  */
 
@@ -190,13 +190,23 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
          crewHtml = `<div class="p-4 mb-6 rounded-lg bg-green-900/20 border border-green-500/30 text-center"><h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Status: Operational</h4><p class="text-xs text-green-200/80 mt-1">Fleet power sufficient.</p></div>`;
     }
 
-    // 2. Gadget Logic
+    // 2. Gadget Logic (V5.17 FIX)
     let gName = "None"; let gDesc = "Standard Rock";
-    if (res > 50) { gName="Sabir"; gDesc="Critical Resistance (>50%)"; }
-    else if (res > 30) { gName="OptiMax"; gDesc="High Resistance (>30%)"; }
-    else if (inst > 50) { gName="BoreMax"; gDesc="Critical Instability (>50%)"; }
-    else if (inst > 30) { gName="Stalwart"; gDesc="High Instability (>30%)"; }
-    else if (mass > 20000) { gName="Waveshift"; gDesc="Mass Stabilizer"; }
+    
+    // Order of Priority: SAFETY > DIFFICULTY > MASS > SPEED
+    if (inst > 50) { 
+        gName="BoreMax"; gDesc="Critical Instability (>50%)"; 
+    } else if (res > 50) { 
+        gName="Sabir"; gDesc="Critical Resistance (>50%)"; 
+    } else if (inst > 30) { 
+        gName="Stalwart"; gDesc="High Instability (>30%)"; 
+    } else if (res > 30) { 
+        gName="OptiMax"; gDesc="High Resistance (>30%)"; 
+    } else if (mass > 18000) { 
+        gName="Waveshift"; gDesc="Mass Stabilizer (>18k)"; 
+    } else if (mass < 8000) {
+        gName="Okunis"; gDesc="Speed Extraction (<8k)";
+    }
     
     const gadgHtml = `
         <div class="p-4 mb-6 rounded-lg bg-purple-900/20 border border-purple-500/30 shadow-lg">
@@ -580,7 +590,7 @@ function createArmConfigHtml(armIndex, ship) {
     const armId = `arm-${ship.id}-${armIdCounter}`;
     const heads = allLaserHeads.filter(h => {
         if (ship.id === 'golem') return h.name.includes('Pitman');
-        // Fix: Use STRICT EQUALITY (===) so Size 1 ships don't see Size 0 lasers
+        // Strict check for Size 1 (Prospector) vs Size 2 (MOLE)
         return !h.name.includes('Pitman') && h.size === ship.maxLaserSize;
     });
 
