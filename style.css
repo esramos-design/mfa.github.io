@@ -152,6 +152,12 @@ input:focus, select:focus {
         overflow-y: auto; max-height: calc(100vh - 3rem); position: sticky; top: 1.5rem;
         -ms-overflow-style: none; scrollbar-width: none; 
     }
+    
+    .vertical-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 }
 
 /* Modal */
@@ -176,53 +182,6 @@ input:focus, select:focus {
 }
 .ship-arm-card select option { font-size: 12px; background-color: #0D0D0D; }
 
-/* =========================================
-   === UI UPGRADE: GLOW & SCALING SYSTEM ===
-   ========================================= */
-
-/* 1. NEON GLOW ON HOVER (Columns) */
-.glass-panel {
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: 1px solid var(--border-main);
-}
-
-.glass-panel:hover {
-    border-color: rgba(242, 242, 242, 0.8);
-    box-shadow: 
-        0 0 20px rgba(242, 242, 242, 0.2),
-        0 0 50px rgba(242, 242, 242, 0.1),
-        inset 0 0 30px rgba(242, 242, 242, 0.05);
-    transform: translateY(-3px) scale(1.01); 
-    z-index: 20; 
-}
-
-/* 2. LARGE MONITOR SCALING (27" 1440p+ Optimization) */
-@media (min-width: 1600px) {
-    .sticky-column-wrapper h2 {
-        font-size: 1.8rem !important;
-        letter-spacing: 0.15em !important;
-        text-shadow: 0 0 15px rgba(242, 242, 242, 0.5);
-        margin-bottom: 1.5rem !important;
-    }
-
-    .sticky-column-wrapper label.text-xs,
-    .sticky-column-wrapper label.text-sm {
-        font-size: 1rem !important;
-        color: var(--text-strong) !important; 
-    }
-
-    .sticky-column-wrapper input,
-    .sticky-column-wrapper select {
-        font-size: 1.2rem !important;
-        padding: 0.75rem !important;
-        font-family: var(--font-tech);
-    }
-
-    #gadget-list-container .text-sm {
-        font-size: 1.1rem !important;
-    }
-}
-
 /* 3. MOBILE & TABLET AUTO-SCALING */
 @media (max-width: 1024px) {
     .glass-panel {
@@ -231,8 +190,7 @@ input:focus, select:focus {
         min-height: auto;
     }
 
-    .sticky-column-wrapper, 
-    .sticky-scroll-content {
+    .sticky-column-wrapper {
         position: relative !important;
         top: 0 !important;
         max-height: none !important;
