@@ -26,9 +26,8 @@
 
     <div class="main-container">
         
-        <div class="col-span-1 lg:col-span-4 w-full glass-panel rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between mb-4 gap-6" 
-             style="min-height: 100px;">
-             
+        <div class="col-span-1 lg:col-span-4 w-full rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between mb-4 gap-6" 
+             style="background: linear-gradient(90deg, #0b0e14, #11141a); border: 1px solid #1f252f; box-shadow: 0 4px 15px rgba(0,0,0,0.5); min-height: 100px;">
              <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
                  <div class="flex-shrink-0 w-20 h-20 relative group bg-gradient-to-br from-blue-900 to-orange-900 rounded-lg border border-gray-700 flex items-center justify-center overflow-hidden shadow-lg">
                     <img src="https://github.com/esramos-design/mfa.github.io/blob/main/mfa.jpg?raw=true" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition" onerror="this.style.display='none'">
@@ -37,12 +36,10 @@
                  <div>
                      <h1 class="text-2xl font-bold text-white mb-1 tracking-wider font-tech uppercase" style="text-shadow: 0 0 10px rgba(255,255,255,0.1);">Mining Fracture Analyser</h1>
                      <p class="text-xs text-gray-400 max-w-3xl leading-relaxed font-mono">
-                         The Mining Fracture Analyser (MFA) is a single-file, web-based tool designed to remove guesswork from high-stakes mining operations. 
-                         Calculates Total Combined Effective Laser Power (MW) in real-time.
+                         The Mining Fracture Analyser (MFA) is a single-file, web-based tool designed to remove guesswork from high-stakes mining operations.
                      </p>
                  </div>
              </div>
-
              <div class="flex flex-col gap-2 items-end">
                  <div class="flex gap-2">
                      <a href="https://robertsspaceindustries.com/citizens/CHIRONDRAGON" target="_blank" class="px-3 py-1.5 bg-[#181f29] border border-[#2d3642] text-xs font-bold text-white rounded hover:bg-[#252e3d] transition uppercase flex items-center gap-2">🚀 RSI Profile</a>
@@ -102,23 +99,15 @@
 
         <div class="w-full vertical-column">
             
-            <div class="glass-panel p-6 rounded-2xl mb-6 flex-grow">
+            <div class="glass-panel p-6 rounded-2xl flex-grow-0">
                 <h2 class="text-xl font-bold text-green-400 text-center uppercase tracking-widest font-tech">Optimized Loadouts</h2>
                 <section id="configs" class="pt-2"><p class="text-center text-[var(--text-muted)] font-mono text-xs opacity-60">/// AWAITING CALCULATION ///</p></section>
             </div>
 
-            <div class="glass-panel p-6 rounded-2xl flex-grow">
-                <h2 class="text-xl font-bold text-purple-400 text-center uppercase tracking-widest font-tech">Telemetry Data</h2>
-                <section id="results" class="pt-2"><p class="text-center text-[var(--text-muted)] font-mono text-xs opacity-60">/// WAITING FOR DATA ///</p></section>
-            </div>
-        </div>
-
-        <div class="w-full vertical-column">
-            
-            <div class="glass-panel p-6 rounded-2xl mb-6 flex-grow">
-                <div id="ai-section" class="holo-container p-6 rounded-xl">
+            <div class="glass-panel p-6 rounded-2xl flex-grow flex flex-col">
+                <div id="ai-section" class="holo-container p-6 rounded-xl flex-grow flex flex-col">
                     <div class="holo-scanline"></div>
-                    <div class="relative z-10">
+                    <div class="relative z-10 flex flex-col h-full">
                         <div class="flex items-center justify-between mb-4 border-b border-purple-500/30 pb-3">
                             <h3 class="text-xs font-bold text-purple-300 uppercase tracking-widest">Senior Foreman AI</h3>
                             <button onclick="openApiModal()" class="px-3 py-1 bg-purple-900/40 text-[10px] font-bold uppercase rounded border border-purple-500/40 hover:bg-purple-800/60 hover:text-white transition shadow-[0_0_10px_rgba(168,85,247,0.2)]">🔑 AUTH KEY</button>
@@ -133,12 +122,22 @@
                             <input type="text" id="ai-custom-input" placeholder="Query the mainframe..." class="w-full p-2 pr-8 rounded bg-[var(--bg-input)] border border-purple-500/30 text-xs text-[var(--text-main)] font-mono focus:border-purple-500 outline-none transition">
                             <button onclick="askAI('custom')" class="absolute right-2 top-2 text-purple-400 hover:text-white transition">➤</button>
                         </div>
-                        <div class="p-3 rounded bg-[#0a0e17]/80 min-h-[100px] border border-purple-500/20 font-mono text-xs overflow-hidden">
-                            <div id="ai-loading" class="hidden text-center py-4"><div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin inline-block"></div></div>
-                            <div id="ai-content" class="text-purple-100/90 whitespace-pre-wrap"><span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span></div>
+                        <div class="p-3 rounded bg-[#0a0e17]/80 border border-purple-500/20 font-mono text-xs overflow-hidden flex-grow relative">
+                             <div id="ai-content-wrapper" class="absolute inset-0 overflow-y-auto p-3 scrollbar-thin">
+                                <div id="ai-loading" class="hidden text-center py-4"><div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin inline-block"></div></div>
+                                <div id="ai-content" class="text-purple-100/90 whitespace-pre-wrap"><span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span></div>
+                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="w-full vertical-column">
+            
+            <div class="glass-panel p-6 rounded-2xl flex-grow-0">
+                <h2 class="text-xl font-bold text-purple-400 text-center uppercase tracking-widest font-tech">Telemetry Data</h2>
+                <section id="results" class="pt-2"><p class="text-center text-[var(--text-muted)] font-mono text-xs opacity-60">/// WAITING FOR DATA ///</p></section>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl flex-grow">
