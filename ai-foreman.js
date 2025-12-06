@@ -1,9 +1,19 @@
 /**
  * SENIOR FOREMAN AI MODULE
- * Version: 2.0 (Isolated)
- * Handles: Gemini API Communications, Key Management, and AI UI
- * Dependencies: Marked.js, script.js (reads currentSimState)
+ * Version: 2.2 (Model Auto-Switch)
+ * Fix: Automatically cycles models (2.5 -> 2.0 -> 1.5) to prevent 404 errors.
  */
+
+// --- MODEL CONFIGURATION ---
+// Priority list: Newest -> Oldest. The app will try them in order.
+const MODEL_PRIORITY_LIST = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash-002",
+    "gemini-1.5-flash"
+];
+
+let currentModelIndex = 0;
 
 // --- API KEY MANAGEMENT ---
 function openApiModal() {
@@ -12,14 +22,12 @@ function openApiModal() {
     const currentKey = localStorage.getItem('gemini_api_key');
     if(currentKey) input.value = currentKey;
     modal.style.display = 'flex';
-    // Small delay to allow display:flex to apply before opacity transition
     setTimeout(() => modal.classList.add('show'), 10);
 }
 
 function closeApiModal() {
     const m = document.getElementById('api-modal');
     m.classList.remove('show');
-    // Wait for animation to finish
     setTimeout(() => m.style.display = 'none', 200);
 }
 
@@ -28,7 +36,6 @@ function saveApiKey() {
     if(key) { 
         localStorage.setItem('gemini_api_key', key); 
         closeApiModal(); 
-        // Visual feedback in the AI console
         const aiContent = document.getElementById('ai-content');
         if(aiContent) aiContent.innerHTML = `<span class="text-green-400 font-bold">// KEY AUTHENTICATED. UPLINK ESTABLISHED.</span>`;
     } else {
@@ -40,7 +47,6 @@ function saveApiKey() {
 async function askAI(mode) {
     const apiKey = localStorage.getItem('gemini_api_key');
     
-    // Check if key exists
     if (!apiKey) { 
         openApiModal(); 
         return; 
@@ -52,13 +58,15 @@ async function askAI(mode) {
     
     // Check if simulation data exists (reads from global variable in script.js)
     if (typeof currentSimState === 'undefined' || currentSimState.power === 0) {
-        aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: No telemetry data found. Please run the simulation first.</span>`;
-        return;
+        if (mode !== 'custom') {
+            if(aiContent) aiContent.innerHTML = `<span class="text-yellow-500">// ERROR: No telemetry data. Run simulation first.</span>`;
+            return;
+        }
     }
 
     // UI Updates
-    aiLoading.classList.remove('hidden');
-    aiContent.innerHTML = ''; 
+    if(aiLoading) aiLoading.classList.remove('hidden');
+    if(aiContent) aiContent.innerHTML = ''; 
 
     // Prompt Construction
     let prompt = "";
@@ -66,36 +74,58 @@ async function askAI(mode) {
     const crewDetails = `Crew Power: ${currentSimState.power.toFixed(0)} MW from ${currentSimState.activeArms} active laser heads.`;
     const status = currentSimState.success ? "FRACTURE POSSIBLE" : "FRACTURE IMPOSSIBLE (Low Power)";
 
-    if (mode === 'strategy') prompt = `You are a Mining Foreman. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is it safe? 2. Modules?`;
+    if (mode === 'strategy') prompt = `You are a Mining Foreman in Star Citizen. Analyze: ${rockDetails} ${crewDetails} Status: ${status}. Keep it brief. 1. Is it safe? 2. Modules?`;
     else if (mode === 'briefing') prompt = `You are a Commander. Generate a short tactical order for crew chat. Scenario: ${rockDetails} ${crewDetails}`;
     else if (mode === 'risk') prompt = `Safety Officer. Analyze risk for: ${rockDetails}. Assess explosion probability. Keep it brief.`;
     else if (mode === 'optimize') prompt = `Loadout Engineer. ${rockDetails} Power: ${currentSimState.power.toFixed(0)} MW. Suggest optimal modules.`;
     else if (mode === 'custom') {
         const query = customInput.value;
         if (!query) { 
-            aiLoading.classList.add('hidden'); 
-            aiContent.innerHTML = `<span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span>`;
+            if(aiLoading) aiLoading.classList.add('hidden'); 
+            if(aiContent) aiContent.innerHTML = `<span class="text-purple-500/50 italic">// SYSTEM READY. AWAITING INPUT.</span>`;
             return; 
         }
         prompt = `Context: Mining. Rock: ${rockDetails} Crew: ${crewDetails} Question: "${query}"`;
     }
 
-    // API Call
+    // Recursive Call wrapper to handle Model Fallback
+    attemptGeneration(apiKey, prompt, aiContent, aiLoading);
+    
+    if(mode === 'custom') customInput.value = '';
+}
+
+async function attemptGeneration(key, prompt, displayElement, loadingElement) {
+    const modelName = MODEL_PRIORITY_LIST[currentModelIndex];
+    
     try {
-        const response = await callGemini(apiKey, prompt);
-        aiContent.innerHTML = marked.parse(response);
+        const text = await callGemini(key, prompt, modelName);
+        if(typeof marked !== 'undefined') displayElement.innerHTML = marked.parse(text);
+        else displayElement.innerText = text;
+        
+        if(loadingElement) loadingElement.classList.add('hidden');
+        
     } catch (error) {
-        console.error(error);
-        aiContent.innerHTML = `<span class="text-red-500 font-bold">// UPLINK FAILURE</span><br><span class="text-red-400 text-[10px]">${error.message}</span><br><br><button onclick="openApiModal()" class="text-blue-400 underline">Update API Key</button>`;
-    } finally {
-        aiLoading.classList.add('hidden');
-        if(mode === 'custom') customInput.value = '';
+        console.warn(`Model ${modelName} failed: ${error.message}`);
+        
+        // If 404 (Model not found) and we have more models to try:
+        if (error.message.includes("404") && currentModelIndex < MODEL_PRIORITY_LIST.length - 1) {
+            currentModelIndex++; // Switch to next older model
+            const nextModel = MODEL_PRIORITY_LIST[currentModelIndex];
+            if(displayElement) displayElement.innerHTML = `<span class="text-yellow-500 text-[10px]">// REROUTING UPLINK TO ${nextModel.toUpperCase()}...</span>`;
+            
+            // Retry immediately with new model
+            return attemptGeneration(key, prompt, displayElement, loadingElement);
+        }
+
+        // If all failed or other error:
+        if(loadingElement) loadingElement.classList.add('hidden');
+        if(displayElement) displayElement.innerHTML = `<span class="text-red-500 font-bold">// UPLINK FAILURE</span><br><span class="text-red-400 text-[10px]">${error.message}</span><br><br><button onclick="openApiModal()" class="text-blue-400 underline">Update API Key</button>`;
     }
 }
 
-async function callGemini(key, prompt) {
-    // Using gemini-1.5-flash as it is fast and cost-effective for this tool
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+async function callGemini(key, prompt, model) {
+    // Standard v1beta endpoint which supports modern models like 2.5
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
     
     const payload = { 
         contents: [{ parts: [{ text: prompt }] }] 
