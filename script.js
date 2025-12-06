@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.15 (Final Clean)
+ * Version: 5.16 (Laser Size Fix)
  * Status: ALL SYSTEMS ONLINE
  */
 
@@ -578,7 +578,11 @@ function populateGadgetList() {
 function createArmConfigHtml(armIndex, ship) {
     armIdCounter++; 
     const armId = `arm-${ship.id}-${armIdCounter}`;
-    const heads = allLaserHeads.filter(h => ship.id === 'golem' ? h.name.includes('Pitman') : !h.name.includes('Pitman') && h.size <= ship.maxLaserSize);
+    const heads = allLaserHeads.filter(h => {
+        if (ship.id === 'golem') return h.name.includes('Pitman');
+        // Fix: Use STRICT EQUALITY (===) so Size 1 ships don't see Size 0 lasers
+        return !h.name.includes('Pitman') && h.size === ship.maxLaserSize;
+    });
 
     const laserOpts = heads.map(h => {
         let sel = (ship.id==='mole'&&h.name.includes('Helix II')) || (ship.id==='prospector'&&h.name.includes('Helix I')) || (ship.id==='golem'&&h.name.includes('Pitman'));
