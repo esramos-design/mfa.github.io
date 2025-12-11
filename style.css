@@ -120,6 +120,7 @@ input:focus, select:focus {
     margin: 0 auto;
     /* Default for Mobile: 1 Column */
     grid-template-columns: 1fr; 
+    align-items: start;
 }
 
 /* Tablet (2 Columns) */
@@ -148,15 +149,12 @@ input:focus, select:focus {
         overflow-y: auto; padding-top: 0; -ms-overflow-style: none; scrollbar-width: none;
         border-radius: 1rem; 
     }
-    .sticky-scroll-content {
-        overflow-y: auto; max-height: calc(100vh - 3rem); position: sticky; top: 1.5rem;
-        -ms-overflow-style: none; scrollbar-width: none; 
-    }
     
     .vertical-column {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
+        height: 100%;
     }
 }
 
@@ -182,6 +180,28 @@ input:focus, select:focus {
 }
 .ship-arm-card select option { font-size: 12px; background-color: #0D0D0D; }
 
+/* AI Content Scrollbar */
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 2px; }
+
+/* Chrome Text Effect */
+.text-chrome {
+    background: linear-gradient(
+        to bottom,
+        #FFFFFF 20%,    /* Shiny Top */
+        #A0A0A0 45%,    /* Silver Middle */
+        #404040 50%,    /* Dark Horizon Line */
+        #E0E0E0 55%,    /* Reflective Bottom */
+        #FFFFFF 90%     /* Bottom Shine */
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 0px rgba(0,0,0,0.8)); /* Deep shadow for 3D pop */
+}
+
 /* 3. MOBILE & TABLET AUTO-SCALING */
 @media (max-width: 1024px) {
     .glass-panel {
@@ -201,28 +221,4 @@ input:focus, select:focus {
         min-height: 50px !important;
         font-size: 16px !important;
     }
-}
-/* ... (Keep existing CSS) ... */
-
-/* NEW: Scrollbar for AI Content */
-.scrollbar-thin::-webkit-scrollbar {
-    width: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.2);
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #a855f7; /* Purple to match AI theme */
-    border-radius: 2px;
-}
-
-/* Ensure columns stretch correctly */
-.main-container {
-    align-items: start; /* Prevent stretching if content is short */
-}
-.vertical-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    height: 100%; /* Fill available height */
 }
