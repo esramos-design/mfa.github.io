@@ -1,6 +1,9 @@
 /**
- * UPDATED PALETTE: Logofolio 2025 (Vol. 2)
+ * UPDATED PALETTE: Logofolio 2025 (Vol. 3 - High Contrast Light)
+ * Version: 5.18
  */
+
+ 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200..900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
@@ -221,4 +224,133 @@ input:focus, select:focus {
         min-height: 50px !important;
         font-size: 16px !important;
     }
+}
+/* --- LIGHT MODE SPECIFIC OVERRIDES --- */
+[data-theme="light"] #configs h4, 
+[data-theme="light"] #configs span,
+[data-theme="light"] #configs div {
+    color: #334155 !important; /* Dark Slate for Loadout Text */
+}
+
+/* Ensure the Strategy Tag is readable */
+[data-theme="light"] #configs .text-[10px].uppercase {
+    color: #0F172A !important; /* Almost Black */
+    background: rgba(0,0,0,0.05);
+    border-color: #CBD5E1;
+}
+
+/* Fix AI Section Buttons text color */
+[data-theme="light"] #ai-section button {
+    color: #1E293B !important; /* Dark text for buttons */
+    font-weight: 800;
+}
+
+/* Fix Fleet Config Dropdown and Input text */
+[data-theme="light"] #shipSelectToAdd, 
+[data-theme="light"] #multiShipContainer select,
+[data-theme="light"] #multiShipContainer p,
+[data-theme="light"] .ship-arm-card {
+    color: #0F172A !important;
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* Fix "Minimum Crew Requirement" numbers */
+[data-theme="light"] #configs .text-2xl.font-black {
+    color: #0F172A !important;
+}
+
+/* Fix Gadget Strategy Box */
+[data-theme="light"] #configs .bg-purple-900\/20 {
+    background-color: #F3E8FF !important; /* Light Purple for Light Mode */
+    border-color: #D8B4FE !important;
+}
+[data-theme="light"] #configs .bg-purple-900\/20 h4 {
+    color: #7E22CE !important; /* Dark Purple Text */
+}
+/* =========================================
+   LIGHT MODE: HIGH CONTRAST LOADOUT CARDS
+   ========================================= */
+
+/* 1. Turn the dark semi-transparent cards into solid white data cards */
+[data-theme="light"] #configs .bg-black\/40 {
+    background-color: #FFFFFF !important;
+    border: 1px solid #94A3B8 !important; /* Slate-400 Border */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 2. Darken the Ship Names (Header Text) */
+[data-theme="light"] #configs .text-indigo-400 { color: #3730a3 !important; } /* Dark Indigo */
+[data-theme="light"] #configs .text-green-400  { color: #166534 !important; } /* Dark Green */
+[data-theme="light"] #configs .text-orange-400 { color: #9a3412 !important; } /* Dark Orange */
+
+/* 3. Darken the Role Labels (Break / Stab / Extr) */
+[data-theme="light"] #configs .text-red-400    { color: #dc2626 !important; } /* Dark Red */
+[data-theme="light"] #configs .text-blue-400   { color: #2563eb !important; } /* Dark Blue */
+/* Note: Green labels use the rule in section 2 */
+
+/* 4. Fix the Loadout List Text (The most important part) */
+[data-theme="light"] #configs .text-gray-300,
+[data-theme="light"] #configs .text-xs,
+[data-theme="light"] #configs .font-mono {
+    color: #0F172A !important; /* Nearly Black (Slate-900) */
+    font-weight: 600 !important; /* Make text bolder */
+}
+
+/* 5. Fix the 'Solo' / '3 Heads' tags */
+[data-theme="light"] #configs span.rounded {
+    background-color: #F1F5F9 !important; /* Light Grey BG */
+    border: 1px solid #CBD5E1 !important;
+    color: #334155 !important;
+}
+
+/* 6. Fix Empty State Message in Fleet Config */
+[data-theme="light"] #empty-state-msg {
+    color: #64748B !important;
+    border-color: #94A3B8 !important;
+    background-color: #F8FAFC !important;
+    font-weight: bold;
+}
+/* =========================================
+   LIGHT MODE: AI FOREMAN BUTTONS (SOLID)
+   ========================================= */
+
+/* 1. Force White Text on AI Buttons */
+[data-theme="light"] #ai-section button {
+    color: #FFFFFF !important;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Subtle shadow for pop */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 2. Darken Backgrounds (Solid Colors) so White text is visible */
+/* Strategy (Purple) */
+[data-theme="light"] #ai-section button[onclick*="strategy"] { 
+    background-color: #7E22CE !important; 
+    border-color: #6B21A8 !important; 
+}
+
+/* Risk Report (Dark Yellow/Gold) */
+[data-theme="light"] #ai-section button[onclick*="risk"] { 
+    background-color: #CA8A04 !important; 
+    border-color: #A16207 !important; 
+}
+
+/* Loadout (Green) */
+[data-theme="light"] #ai-section button[onclick*="optimize"] { 
+    background-color: #15803D !important; 
+    border-color: #14532D !important; 
+}
+
+/* Orders (Blue) */
+[data-theme="light"] #ai-section button[onclick*="briefing"] { 
+    background-color: #1D4ED8 !important; 
+    border-color: #1E3A8A !important; 
+}
+
+/* Auth Key Button */
+[data-theme="light"] #ai-section button[onclick*="openApiModal"] {
+    background-color: #475569 !important; /* Slate Grey */
+    border-color: #334155 !important;
+    color: #FFFFFF !important;
 }

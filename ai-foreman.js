@@ -1,7 +1,6 @@
 /**
- * SENIOR FOREMAN AI MODULE
- * Version: 2.2 (Model Auto-Switch)
- * Fix: Automatically cycles models (2.5 -> 2.0 -> 1.5) to prevent 404 errors.
+ * MODULE: AI FOREMAN (GEMINI UPLINK)
+ * Version: 5.18
  */
 
 // --- MODEL CONFIGURATION ---

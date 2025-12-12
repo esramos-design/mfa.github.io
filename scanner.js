@@ -1,7 +1,6 @@
 /**
- * MODULE: OPTICAL SCANNER & OCR (V23 - SMART CROP)
- * Logic: Triple-Zone Scan to handle MOLE, Prospector, and Golem layouts simultaneously.
- * Filter: Inverted Grayscale (Best for bright backgrounds).
+ * MODULE: OPTICAL SCANNER & OCR (V28 - FINAL PARSING)
+ * Fixes: Aggressive cleanup of OCR noise (pipes, fragmented decimals) to finalize extraction.
  */
 
 // --- 1. DEPENDENCY CHECK ---
@@ -58,7 +57,7 @@ window.createDebugWindow = function() {
     
     logWin.innerHTML = `
         <div id="ocr-drag-header" style="background:linear-gradient(90deg, #404040, #0D0D0D); padding:10px; border-bottom:1px solid #404040; display:flex; justify-content:space-between; align-items:center; user-select:none; cursor:move; border-radius: 8px 8px 0 0;">
-            <span style="font-weight:bold; color:#fff; letter-spacing:1px;">OCR INTELLIGENCE V23</span>
+            <span style="font-weight:bold; color:#fff; letter-spacing:1px;">OCR INTELLIGENCE V28 (FINALIZED)</span>
             <div style="display:flex; gap:5px;">
                 <button onclick="window.copyLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">COPY</button>
                 <button onclick="window.clearLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">CLR</button>
@@ -107,58 +106,36 @@ window.handleFileSelect = function(input) {
     }
 };
 
-// --- 5. IMAGE PROCESSING (SMART CROP) ---
+// --- 5. IMAGE PROCESSING (BINARIZATION) ---
 function preprocessImage(imgElement) {
     const w = imgElement.width;
     const h = imgElement.height;
-    const scale = 2.5; 
     
-    // SMART CROP ZONES:
-    // Left Zone (Loadout): 0% to 35% Width
-    // Right Zone (Mining): 60% to 100% Width (Covers both MOLE and Prospector)
-    // Vertical: 20% to 80% (Skips header/footer)
+    const scale = 2.0; // Optimized scale
     
-    const leftW = w * 0.35;
-    const rightW = w * 0.40; // Wider right scan to catch floating text
-    const scanH = h * 0.60;
-    const topY = h * 0.20;
+    // Dual Zone Crop
+    const panelW = w * 0.35; 
+    const panelH = h * 0.70; 
+    const topOffset = h * 0.20; 
 
     const canvas = document.createElement('canvas');
-    canvas.width = (leftW + rightW) * scale; 
-    canvas.height = scanH * scale;
+    canvas.width = (panelW * 2) * scale; 
+    canvas.height = panelH * scale;
     
     const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false; 
     
-    // High Quality Scaling
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    
-    // 1. Draw Left Panel (Loadout)
-    ctx.drawImage(imgElement, 
-        0, topY, leftW, scanH, 
-        0, 0, leftW * scale, scanH * scale 
-    );
+    ctx.drawImage(imgElement, 0, topOffset, panelW, panelH, 0, 0, panelW * scale, panelH * scale);
+    ctx.drawImage(imgElement, w - panelW, topOffset, panelW, panelH, panelW * scale, 0, panelW * scale, panelH * scale);
 
-    // 2. Draw Right Panel (Mining)
-    // We start at 60% width to catch the start of the right MFD
-    ctx.drawImage(imgElement, 
-        w * 0.60, topY, rightW, scanH, 
-        leftW * scale, 0, rightW * scale, scanH * scale 
-    );
-
-    // --- FILTER: INVERTED GRAYSCALE ---
-    // proven best for bright backgrounds
+    // Binarization Filter (Luminance Threshold 80)
     const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d = id.data;
     
     for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        
-        // Luminance
-        const lum = 0.299*r + 0.587*g + 0.114*b;
-        
-        // Invert (Bright=Dark, Dark=Bright)
-        const val = 255 - lum;
+        const lum = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+        let val = 255; 
+        if (lum > 80) val = 0; 
         
         d[i] = val; d[i+1] = val; d[i+2] = val;
     }
@@ -185,7 +162,7 @@ async function runOCR(imgElement) {
 
     try {
         const processedUrl = preprocessImage(imgElement);
-        log("Initializing Tesseract...");
+        log("Running Tesseract...");
         
         const worker = await Tesseract.createWorker('eng');
         await worker.setParameters({ 
@@ -204,7 +181,7 @@ async function runOCR(imgElement) {
         log(text.substring(0, 150).replace(/[\n\r]+/g, ' | '));
         log("--- RAW READ END ---");
 
-        if (text.match(/Mass|Mss|Resist|Instab|Shale|Obsidian|Gold|Alum/i)) { 
+        if (text.match(/Mass|Mss|Resist|Instab|Shale|Obsidian/i)) { 
             log("Context: MINING DATA"); 
             parseMiningStats(text); 
         } else { 
@@ -218,14 +195,20 @@ async function runOCR(imgElement) {
 
 // --- 7. PARSERS ---
 function parseMiningStats(text) {
+    // 1. Cleanup OCR errors and Label Normalization (CRITICAL FIX)
     let clean = text
+        .replace(/HAgS/gi, 'MASS') // Fix garbled MASS from MOLE logs
+        .replace(/ETE/gi, 'MASS')  // Fix general garble near mass
+        .replace(/TARRE/gi, 'RESISTANCE') // Fix common resistance garble
         .replace(/O/g, '0').replace(/o/g, '0')
         .replace(/[lI|]/g, '1').replace(/i/g, '1')
         .replace(/S/g, '5').replace(/s/g, '5')
         .replace(/B/g, '8')
         .replace(/Z/g, '2');
     
+    // 2. Extractor (Allows wide spacing/junk and prioritizes numbers with decimals)
     const extract = (label) => {
+        // Look for Label -> skip up to 50 chars of junk (incl. newlines) -> Find Number/Decimal
         const regex = new RegExp(`(?:${label})[\\s\\S]{0,50}?([0-9,]+(?:\\.[0-9]+)?)`, 'i');
         const m = clean.match(regex);
         if(!m) return null;
@@ -235,13 +218,15 @@ function parseMiningStats(text) {
     };
 
     const extractMass = () => {
-        const m = clean.match(/(?:Mass|Mss|Weight)[^0-9]{0,50}?([0-9,]+)/i);
+        // Mass Extractor (Special: Handles commas and ensures full integer capture)
+        const m = clean.match(/(?:MASS|Mss|Weight)[^0-9]{0,50}?([0-9,]+)/i);
         if(m) return parseFloat(m[1].replace(/,/g, ''));
         return null;
     }
 
+    // Extraction Order (Must match label cleanup)
     const mass = extractMass();
-    const res = extract('Resist|Res|Rest');
+    const res = extract('RESISTANCE|Resist|Res|Rest');
     const inst = extract('Instab|Inst|Stab');
 
     log(`> Mass: ${mass || 'N/A'}`);
@@ -257,7 +242,7 @@ function parseMiningStats(text) {
         window.calculate();
         log("Simulation Updated.");
     } else {
-        log("No valid data found.");
+        log("FAIL: Data found, but numbers were missing or garbled.");
     }
 }
 
