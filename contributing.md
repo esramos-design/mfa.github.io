@@ -20,8 +20,9 @@ Stop Guessing. Start Fracturing.
 <a href="https://github.com/esramos-design/mfa.github.io/issues" target="_blank">✨ Request Feature</a>
 </p>
 </div>
-
+<br/>
 </div>
+
 
 
 
@@ -33,19 +34,18 @@ The Mining Fracture Analyser is a community tool built for Star Citizen players.
 
 ## **📂 Project Structure (v5.18)**
 
-The project has been refactored for stability and modularity:
+The project has been refactored for stability, modularity, and native compilation:
 
-* **index.html**: Main structure. Contains the **Locked Header** and the 4-Column Grid Layout.
-* **style.css**: Contains the **Logofolio Palette** variables (`--bg-main: #0D0D0D`) and responsive grid logic.
+* **index.html**: Main structure containing the **Chrome Header** and the 4-Column Grid.
+* **style.css**: Contains the **Logofolio Palette** variables (`--bg-main: #0D0D0D`) and the new **High-Contrast Light Mode** overrides.
 * **script.js**: **THE CORE ENGINE.** Contains:
   * Database (Ships, Lasers, Modules).
-  * Calculation Logic.
-  * **Strict Filtering:** Logic to ensure Prospectors only see S1 lasers, MOLEs only see S2.
+  * **Dynamic Logic:** The `generateAdvancedTelemetry` function now intelligently separates Gadgets from Ship Loadouts.
   * AI Integration (Gemini API).
-* **scanner.js**: **THE OPTICAL ENGINE.** Contains:
-  * **File Upload Logic** (No video streaming).
-  * **Image Pre-processing:** Uses Inverted Grayscale and Dual-Zone Cropping.
-  * Tesseract.js implementation with strict Regex parsing.
+* **scanner.js**: **THE OPTICAL ENGINE (V30).** Contains:
+  * **Nuclear Binarization** filter for high-contrast OCR.
+  * Aggressive Regex parsing to clean up OCR noise (e.g. `HAgS` -> `MASS`).
+* **run_app.py**: The Python wrapper script used to compile the standalone `.exe` using `pywebview`.
 
 ## **🚀 How Can I Contribute?**
 
@@ -65,12 +65,13 @@ The project has been refactored for stability and modularity:
 If CIG changes mining values, update the `allLaserHeads`, `powerModules`, or `gadgets` arrays in **script.js**.
 
 ### **2. Improving OCR (scanner.js)**
-We currently use a **2.5x scale factor** and **Inverted Grayscale** processing.
-* The logic uses a **Dual-Zone Crop** (Left 35% + Right 35%) to cut out the center crosshair noise.
-* If you improve the Regex, ensure it handles "floating" numbers typical of the Drake Golem HUD.
+We currently use **Inverted Grayscale** with high thresholds.
+* The logic uses a specific crop area. If the HUD changes in-game, this needs adjustment.
+* Focus on refining the Regex in `parseMiningStats` to handle percentage misreads.
 
-### **3. Reactive UI**
-The "Optimized Fleet Loadouts" in `script.js` uses conditional logic (`if (inst > 60)...`). If adding new logic, ensure you provide a fallback "Standard" case.
+### **3. Building the EXE**
+If you modify the source, you can rebuild the app using:
+`pyinstaller --noconsole --onefile --icon "icon.ico" --name "MFA_v5.18" --add-data "index.html;." --add-data "style.css;." --add-data "script.js;." --add-data "scanner.js;." --add-data "ai-foreman.js;." run_app.py`
 
 ## **⚖️ License**
 By contributing, you agree that your contributions will be licensed under its GNU General Public License (GPL).
