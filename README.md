@@ -27,24 +27,21 @@ Stop Guessing. Start Fracturing.
 
 The **Mining Fracture Analyser (MFA)** is a web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
 
-**Version 5.24** introduces **Dynamic Module Slot Locking**, ensuring your fleet configurations perfectly match in-game hardpoint limitations, alongside the new **Fleet Roster System** and **Drake Golem** support.
+**Version 5.24** introduces the **Fleet Roster System**, **Dynamic Module Slot Locking**, support for the **Drake Golem**, and a finalized **Optical Scanning Engine**.
 
 ---
 
 ## **🚀 Key Features (v5.24)**
 
-### **🛠️ Strict Fleet Configuration**
-* **Dynamic Slot Locking:** The module slots now automatically lock/unlock based on your chosen Laser Head.
-    * **Helix II:** Unlocks 3 Module Slots.
-    * **Lancet MH2:** Unlocks 2 Module Slots (Slot 3 is disabled).
-    * **Standard S1:** Unlocks 1 Module Slot (Slots 2 & 3 are disabled).
-* **Smart Filtering:** The ship selector strictly enforces hardpoint sizes (S1 for Prospector, S2 for MOLE).
-
-### **🚢 Fleet Roster System**
+### **🚢 Fleet Roster System (New!)**
 A dedicated dashboard for managing your organization's industrial assets.
 * **Live Manifest:** Tracks **Prospector**, **MOLE**, and **Drake Golem** fleets.
 * **Advanced Telemetry:** View detailed component breakdowns (Shields, Coolers, Power Plants) and emissions data.
 * **Command Dashboard:** Aggregates total cargo capacity, active mining heads, and fleet mass instantly.
+
+### **🛠️ Strict Fleet Configuration**
+* **Dynamic Slot Locking:** The module slots now automatically lock/unlock based on your chosen Laser Head.
+* **Smart Filtering:** The ship selector strictly enforces hardpoint sizes (S1 for Prospector, S2 for MOLE).
 
 ### **🧠 Reactive Dynamic Loadouts**
 The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resistance, or Instability:
@@ -53,12 +50,10 @@ The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resi
 
 ### **📷 Optical Scanner (OCR V28)**
 * **Upload & Analyze:** Replaced the unstable video scanner with a robust **File Upload / Drag-and-Drop** system.
-* **Smart Crop Technology:** Automatically detects **Left (Loadout)** and **Right (Mining)** data panels.
-* **Inverted Grayscale Engine:** Specifically tuned to read bright green text against bright backgrounds (Lyria/Wala).
+* **Smart Crop:** Automatically detects **Left (Loadout)** and **Right (Mining)** data panels.
 
 ### **🤖 AI Foreman 2.0**
 * **Gemini 2.5 Flash Uplink:** Powered by Google's latest model for fast, context-aware tactical reasoning.
-* **Pre-Deployment Strategy:** Query the AI before you undock.
 
 ---
 
@@ -71,13 +66,12 @@ The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resi
 
 ### **2. Input Data (Manual or Scan)**
 * **Manual:** Enter Mass, Resistance, and Instability in the **Target Analysis** panel.
-* **Optical Scan:** Click the **Camera Icon** to upload a screenshot of your mining HUD. The system will auto-fill the data.
+* **Optical Scan:** Click the **Camera Icon** to upload a screenshot of your mining HUD.
 * **Gadgets:** Toggle any active gadgets attached to the rock.
 
 ### **3. Deploy Fleet**
-* **Add Ships:** Use the **Fleet Config** panel to add ships to your operation.
+* **Add Ships:** Use the **Fleet Config** panel to add ships.
 * **Fit Loadouts:** Select Laser Heads and Modules.
-    * *Tip:* Toggle Active Modules (e.g., Surge) On/Off to simulate cooldowns.
 
 ### **4. Execute**
 * **Check Telemetry:** If the banner is **GREEN**, you have enough power.
@@ -92,22 +86,35 @@ The tool is a Progressive Web App (PWA) compatible with any modern browser.
 👉 [Launch MFA Dashboard](https://esramos-design.github.io/mfa.github.io/)
 
 ### **💻 Option 2: Standalone Windows App**
-Run MFA as a native desktop application to avoid browser clutter.
-
-1. **Install Python:** Download from [python.org](https://www.python.org/).
-2. **Clone/Download:** Get the repository files.
-3. **Install Dependency:** `pip install pywebview`
-4. **Launch:** Double-click `run_app.py`.
+**2. Desktop App:** Get the updated standalone Windows executable.  
+📥 [**DOWNLOAD MFA v5.24 EXE HERE**](https://github.com/esramos-design/Mining-Fracture-Analyser/releases/tag/v5.24-release)
 
 ---
 
-## **🤝 Credits & Data Sources**
+## **🤝 Contributing Guidelines**
+
+First off, thanks for taking the time to contribute! 🎉
+The Mining Fracture Analyser is a community tool built for Star Citizen players. We welcome contributions from developers of all skill levels.
+
+### **📂 Project Structure**
+* **index.html**: Main Analyser dashboard.
+* **fleet.html**: **NEW** Fleet Roster interface.
+* **script.js**: **THE CORE ENGINE.** Database and Calculation Logic.
+* **fleet.js**: **THE MANIFEST ENGINE.** Ship data and parser.
+* **scanner.js**: **THE OPTICAL ENGINE.** Tesseract.js implementation.
+
+### **🚀 How to Contribute**
+1. **Reporting Bugs:** Include browser version and screen resolution.
+2. **Pull Requests:** Fork the project, create a feature branch, and submit a PR.
+
+---
+
+## **⚖️ License & Credits**
 * **Lead Developer:** [Esramos Design](https://github.com/esramos-design)
 * **Mining Data:** Verified against [**Regolith.rocks**](https://regolith.rocks/) and [**UEXCorp**](https://uexcorp.space/).
 * **UI Design:** Logofolio "Obsidian" Dark Mode.
 * **AI Backend:** Powered by Google Gemini 2.5 Flash.
 
-## **⚠️ Disclaimer**
-This project is a fan-made tool and is not affiliated with Cloud Imperium Games (CIG) or Roberts Space Industries (RSI).
+**Disclaimer:** This project is a fan-made tool and is not affiliated with Cloud Imperium Games (CIG) or Roberts Space Industries (RSI).
 
 *Fly Safe. Crack Hard.*
