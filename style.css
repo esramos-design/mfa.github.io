@@ -1,6 +1,6 @@
 /**
  * UPDATED PALETTE: Logofolio 2025 (Vol. 3 - High Contrast Light)
- * Version: 5.18
+ * Version: 5.22
  */
 
  
@@ -354,3 +354,37 @@ input:focus, select:focus {
     border-color: #334155 !important;
     color: #FFFFFF !important;
 }
+
+/* --- FLEET ROSTER ADDITIONS (v5.22 Update) --- */
+
+/* Grid and Layout */
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Branding Colors */
+.text-orange-500 { color: #f97316; }
+.bg-orange-600 { background-color: #ea580c; }
+.border-orange-500\/50 { border-color: rgba(249, 115, 22, 0.5); }
+
+.text-yellow-500 { color: #eab308; }
+.bg-yellow-500 { background-color: #eab308; }
+.border-yellow-500\/50 { border-color: rgba(234, 179, 8, 0.5); }
+
+/* Manufacturer Identity Colors */
+.manu-ARGO { background-color: #f97316; box-shadow: 0 0 15px #f97316; } /* Orange */
+.manu-MISC { background-color: #cbd5e1; box-shadow: 0 0 15px #94a3b8; } /* Silver/Chrome */
+.manu-DRAK { background-color: #eab308; box-shadow: 0 0 15px #eab308; } /* Drake Yellow */
+
+/* Card Hover Effects */
+.glass-panel.group:hover, #fleet-container .glass-panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+    border-color: rgba(255,255,255,0.2);
+}
+
+/* Light Mode Overrides for Fleet Page */
+[data-theme="light"] .glass-panel h2 { color: #0F172A; }
+[data-theme="light"] .bg-black\/20 { background-color: rgba(0,0,0,0.05); border-color: #cbd5e1; }
+[data-theme="light"] .text-white { color: #1e293b; } /* Dark slate for stats */
+[data-theme="light"] .text-gray-400 { color: #475569; }
+[data-theme="light"] .border-white\/5 { border-color: #e2e8f0; }
+[data-theme="light"] .bg-\[var\(--bg-input\)\] { background-color: #f1f5f9; border-color: #cbd5e1; }

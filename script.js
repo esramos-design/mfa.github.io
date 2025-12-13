@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.18 (Dynamic Gadget & Loadout Logic)
+ * Version: 5.22 (Dynamic Gadget & Loadout Logic)
  * Status: ALL SYSTEMS ONLINE
  */
 
