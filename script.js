@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.24 (Dynamic Slot Locking & Strict Loadouts)
+ * Version: 5.35 (Dynamic Slot Locking & Strict Loadouts)
  * Status: ALL SYSTEMS ONLINE
  */
 

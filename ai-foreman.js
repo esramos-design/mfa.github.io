@@ -1,6 +1,6 @@
 /**
  * MODULE: AI FOREMAN (GEMINI UPLINK)
- * Version: 5.24
+ * Version: 5.35
  */
 
 // --- MODEL CONFIGURATION ---

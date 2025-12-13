@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">Mining Fracture Analyser (MFA) v5.24</h1>
+<h1 align="center">Mining Fracture Analyser (MFA) v5.35</h1>
 <p align="center">
 <strong>A real-time cooperative mining calculator & fleet manager for Star Citizen.</strong>
 <br />
@@ -27,13 +27,18 @@ Stop Guessing. Start Fracturing.
 
 The **Mining Fracture Analyser (MFA)** is a web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
 
-**Version 5.24** introduces the **Fleet Roster System**, **Dynamic Module Slot Locking**, support for the **Drake Golem**, and a finalized **Optical Scanning Engine**.
+**Version 5.35** introduces the **Fleet Roster System**, **Dynamic Module Slot Locking**, and the new **Dynamic Channel OCR Engine** for reading difficult scanners.
 
 ---
 
-## **🚀 Key Features (v5.24)**
+## **🚀 Key Features (v5.35)**
 
-### **🚢 Fleet Roster System (New!)**
+### **📷 Optical Scanner (OCR v5.35)**
+* **Dynamic Channel Isolation:** The new scanning engine (v5.35) automatically detects the strongest color channel (Red, Green, or White) to read UI text against any background.
+* **Contrast Crushing:** Aggressively filters out grey rock textures to ensure accurate readings on Lyria/Wala.
+* **Anchor Logic:** Uses the "%" symbol to intelligently locate Mass and Instability values, even if the labels are obscured.
+
+### **🚢 Fleet Roster System**
 A dedicated dashboard for managing your organization's industrial assets.
 * **Live Manifest:** Tracks **Prospector**, **MOLE**, and **Drake Golem** fleets.
 * **Advanced Telemetry:** View detailed component breakdowns (Shields, Coolers, Power Plants) and emissions data.
@@ -45,12 +50,8 @@ A dedicated dashboard for managing your organization's industrial assets.
 
 ### **🧠 Reactive Dynamic Loadouts**
 The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resistance, or Instability:
-* **Granular MOLE Configs:** Automatically assigns specific loadouts for **Head 1 (Break)**, **Head 2 (Stability)**, and **Head 3 (Extraction)** based on rock difficulty.
 * **Hazard Protocols:** Suggests "BoreMax" or "Lancet" builds if **Instability exceeds 60%**.
-
-### **📷 Optical Scanner (OCR V28)**
-* **Upload & Analyze:** Replaced the unstable video scanner with a robust **File Upload / Drag-and-Drop** system.
-* **Smart Crop:** Automatically detects **Left (Loadout)** and **Right (Mining)** data panels.
+* **Power Protocols:** Switches to "Surge" patterns if **Resistance exceeds 40%** or fleet power is insufficient.
 
 ### **🤖 AI Foreman 2.0**
 * **Gemini 2.5 Flash Uplink:** Powered by Google's latest model for fast, context-aware tactical reasoning.
@@ -66,7 +67,7 @@ The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resi
 
 ### **2. Input Data (Manual or Scan)**
 * **Manual:** Enter Mass, Resistance, and Instability in the **Target Analysis** panel.
-* **Optical Scan:** Click the **Camera Icon** to upload a screenshot of your mining HUD.
+* **Optical Scan:** Drag and drop a screenshot of your mining HUD into the window.
 * **Gadgets:** Toggle any active gadgets attached to the rock.
 
 ### **3. Deploy Fleet**
@@ -86,26 +87,8 @@ The tool is a Progressive Web App (PWA) compatible with any modern browser.
 👉 [Launch MFA Dashboard](https://esramos-design.github.io/mfa.github.io/)
 
 ### **💻 Option 2: Standalone Windows App**
-**2. Desktop App:** Get the updated standalone Windows executable.  
-📥 [**DOWNLOAD MFA v5.24 EXE HERE**](https://github.com/esramos-design/Mining-Fracture-Analyser/releases/tag/v5.24-release)
-
----
-
-## **🤝 Contributing Guidelines**
-
-First off, thanks for taking the time to contribute! 🎉
-The Mining Fracture Analyser is a community tool built for Star Citizen players. We welcome contributions from developers of all skill levels.
-
-### **📂 Project Structure**
-* **index.html**: Main Analyser dashboard.
-* **fleet.html**: **NEW** Fleet Roster interface.
-* **script.js**: **THE CORE ENGINE.** Database and Calculation Logic.
-* **fleet.js**: **THE MANIFEST ENGINE.** Ship data and parser.
-* **scanner.js**: **THE OPTICAL ENGINE.** Tesseract.js implementation.
-
-### **🚀 How to Contribute**
-1. **Reporting Bugs:** Include browser version and screen resolution.
-2. **Pull Requests:** Fork the project, create a feature branch, and submit a PR.
+**Desktop App:** Get the updated standalone Windows executable.  
+📥 [**DOWNLOAD MFA v5.35 EXE HERE**](https://github.com/esramos-design/Mining-Fracture-Analyser/releases/tag/v5.35-release)
 
 ---
 
