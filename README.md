@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">Mining Fracture Analyser (MFA) v5.22</h1>
+<h1 align="center">Mining Fracture Analyser (MFA) v5.24</h1>
 <p align="center">
 <strong>A real-time cooperative mining calculator & fleet manager for Star Citizen.</strong>
 <br />
@@ -27,40 +27,38 @@ Stop Guessing. Start Fracturing.
 
 The **Mining Fracture Analyser (MFA)** is a web-based tool designed to remove guesswork from high-stakes mining operations. It calculates **Total Combined Effective Laser Power (MW)** in real-time, accounting for ship hulls, laser heads, active/passive modules, gadgets, and rock resistance.
 
-**Version 5.22** introduces the **Fleet Roster System**, a rock-solid **Upload-Only OCR Scanner**, **Reactive Loadout Strategies**, and a strictly typed **Fleet Configuration** engine.
+**Version 5.24** introduces **Dynamic Module Slot Locking**, ensuring your fleet configurations perfectly match in-game hardpoint limitations, alongside the new **Fleet Roster System** and **Drake Golem** support.
 
 ---
 
-## **🚀 Key Features (v5.22)**
+## **🚀 Key Features (v5.24)**
 
-### **🚢 Fleet Roster System (New!)**
+### **🛠️ Strict Fleet Configuration**
+* **Dynamic Slot Locking:** The module slots now automatically lock/unlock based on your chosen Laser Head.
+    * **Helix II:** Unlocks 3 Module Slots.
+    * **Lancet MH2:** Unlocks 2 Module Slots (Slot 3 is disabled).
+    * **Standard S1:** Unlocks 1 Module Slot (Slots 2 & 3 are disabled).
+* **Smart Filtering:** The ship selector strictly enforces hardpoint sizes (S1 for Prospector, S2 for MOLE).
+
+### **🚢 Fleet Roster System**
 A dedicated dashboard for managing your organization's industrial assets.
 * **Live Manifest:** Tracks **Prospector**, **MOLE**, and **Drake Golem** fleets.
 * **Advanced Telemetry:** View detailed component breakdowns (Shields, Coolers, Power Plants) and emissions data.
 * **Command Dashboard:** Aggregates total cargo capacity, active mining heads, and fleet mass instantly.
-* **Visual Identity:** Cinematic headers and manufacturer-specific branding for every ship card.
 
 ### **🧠 Reactive Dynamic Loadouts**
 The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resistance, or Instability:
 * **Granular MOLE Configs:** Automatically assigns specific loadouts for **Head 1 (Break)**, **Head 2 (Stability)**, and **Head 3 (Extraction)** based on rock difficulty.
 * **Hazard Protocols:** Suggests "BoreMax" or "Lancet" builds if **Instability exceeds 60%**.
-* **Power Protocols:** Switches to "Surge" patterns if **Resistance exceeds 40%** or fleet power is insufficient.
 
 ### **📷 Optical Scanner (OCR V28)**
 * **Upload & Analyze:** Replaced the unstable video scanner with a robust **File Upload / Drag-and-Drop** system.
-* **Smart Crop Technology:** Automatically detects **Left (Loadout)** and **Right (Mining)** data panels, cutting out center screen noise (crosshairs/compass) for 99% accuracy.
+* **Smart Crop Technology:** Automatically detects **Left (Loadout)** and **Right (Mining)** data panels.
 * **Inverted Grayscale Engine:** Specifically tuned to read bright green text against bright backgrounds (Lyria/Wala).
-
-### **🛠️ Strict Fleet Configuration**
-* **Smart Filtering:** The ship selector strictly enforces hardpoint sizes:
-    * **Prospector:** Only displays **Size 1** lasers.
-    * **MOLE:** Only displays **Size 2** lasers.
-    * **Golem:** Locked to the integrated **Pitman** laser.
 
 ### **🤖 AI Foreman 2.0**
 * **Gemini 2.5 Flash Uplink:** Powered by Google's latest model for fast, context-aware tactical reasoning.
 * **Pre-Deployment Strategy:** Query the AI before you undock.
-* **Command Uplink:** Generates roleplay-ready tactical orders for in-game chat.
 
 ---
 
@@ -84,34 +82,6 @@ The **Optimized Fleet Loadouts** panel reacts instantly to changes in Mass, Resi
 ### **4. Execute**
 * **Check Telemetry:** If the banner is **GREEN**, you have enough power.
 * **Consult AI:** Click **"🧠 STRATEGY"** for a second opinion on safety.
-
----
-
-## **💻 Contributing Guidelines**
-
-First off, thanks for taking the time to contribute! 🎉
-The Mining Fracture Analyser is a community tool built for Star Citizen players. We welcome contributions from developers of all skill levels.
-
-### **📂 Project Structure**
-* **index.html**: Main Analyser dashboard with 4-Column Grid Layout.
-* **fleet.html**: **NEW** Fleet Roster interface.
-* **style.css**: Contains the **Logofolio Palette** variables (`--bg-main: #0D0D0D`) and responsive grid logic.
-* **script.js**: **THE CORE ENGINE.** Contains Database (Ships, Lasers), Calculation Logic, and Strict Filtering.
-* **fleet.js**: **THE MANIFEST ENGINE.** Contains deep JSON ship data and parser logic for the Roster page.
-* **scanner.js**: **THE OPTICAL ENGINE.** Tesseract.js implementation with strict Regex parsing.
-* **ai-foreman.js**: Handles Google Gemini API calls and context prompting.
-
-### **🚀 How to Contribute**
-1. **Fork the Project**
-2. **Create your Feature Branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit your Changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to the Branch** (`git push origin feature/AmazingFeature`)
-5. **Open a Pull Request**
-
-### **🛠️ Development Focus Areas**
-1.  **Updating Mining Data:** If CIG changes values, update arrays in `script.js`.
-2.  **Improving OCR:** Enhance `scanner.js` Regex to better handle "floating" numbers typical of the Drake Golem HUD.
-3.  **Fleet Expansion:** Add new industrial ships to `fleet.js` using the defined JSON schema.
 
 ---
 

@@ -1,6 +1,6 @@
 /**
  * MFA ADVANCED FLEET PARSER & MANIFEST
- * Version: 5.22 (Final: Reactive Dashboard, Images & Component Parsing)
+ * Version: 5.24 (Final: Reactive Dashboard, Images & Component Parsing)
  */
 
 // ==========================================

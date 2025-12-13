@@ -1,5 +1,6 @@
 /**
- * MODULE: OPTICAL SCANNER & OCR (MFA v5.22 Integration)
+ * MODULE: OPTICAL SCANNER & OCR (V28 - FINAL PARSING)
+ * Version: 5.24
  * Fixes: Aggressive cleanup of OCR noise (pipes, fragmented decimals) to finalize extraction.
  */
 
@@ -57,7 +58,7 @@ window.createDebugWindow = function() {
     
     logWin.innerHTML = `
         <div id="ocr-drag-header" style="background:linear-gradient(90deg, #404040, #0D0D0D); padding:10px; border-bottom:1px solid #404040; display:flex; justify-content:space-between; align-items:center; user-select:none; cursor:move; border-radius: 8px 8px 0 0;">
-            <span style="font-weight:bold; color:#fff; letter-spacing:1px;">OCR INTELLIGENCE V5.22</span>
+            <span style="font-weight:bold; color:#fff; letter-spacing:1px;">OCR INTELLIGENCE V28 (FINALIZED)</span>
             <div style="display:flex; gap:5px;">
                 <button onclick="window.copyLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">COPY</button>
                 <button onclick="window.clearLog()" style="cursor:pointer; background:#262626; color:#fff; border:1px solid #737373; padding:2px 8px; border-radius:4px; font-size:10px;">CLR</button>
