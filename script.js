@@ -1,6 +1,6 @@
 /**
  * MINING FRACTURE ANALYSER
- * Version: 5.35 (Dynamic Slot Locking & Strict Loadouts)
+ * Version: 5.35 (4.7 Reality Check Update)
  * Status: ALL SYSTEMS ONLINE
  */
 
@@ -89,6 +89,7 @@ const powerModules = [
     // --- DEFAULT Modules ---
     { name: "None", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Default', windowEffect: 0, miningLaserPower: 0 },
 ];
+
 function sortModules(modules) {
     return modules.sort((a, b) => {
         if (a.name === 'None') return -1; if (b.name === 'None') return 1;
@@ -140,11 +141,14 @@ function getFormattedStats(item, type) {
 }
 
 function assessDifficulty(instability, resistance) {
-    let score = resistance * 1.5 + instability;
-    if (score >= 100) return { text: "EXTREME: High instability/resistance.", color: "text-red-500" };
-    if (score >= 60) return { text: "HARD: Use stability modules.", color: "text-orange-400" };
-    if (score >= 30) return { text: "MODERATE: Standard difficulty.", color: "text-yellow-500" };
-    return { text: "EASY: Low difficulty.", color: "text-green-500" };
+    // 4.7 UPDATE: Reduced resistance multiplier and raised all thresholds.
+    // Rocks are more forgiving now, making "EASY" the standard baseline.
+    let score = (resistance * 1.2) + instability; 
+    
+    if (score >= 130) return { text: "EXTREME: High instability/resistance.", color: "text-red-500" };
+    if (score >= 85) return { text: "HARD: Specialized modules required.", color: "text-orange-400" };
+    if (score >= 45) return { text: "MODERATE: Pay attention to charge window.", color: "text-yellow-500" };
+    return { text: "EASY: Standard loadout sufficient.", color: "text-green-500" };
 }
 
 // --- DYNAMIC MODULE SLOT LOCKING (NEW FEATURE) ---
@@ -203,50 +207,50 @@ function generateAdvancedTelemetry(mass, res, inst, reqPwr, currentPwr) {
          crewHtml = `<div class="p-4 mb-6 rounded-lg bg-green-900/20 border border-green-500/30 text-center"><h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Status: Operational</h4><p class="text-xs text-green-200/80 mt-1">Fleet power sufficient.</p></div>`;
     }
 
-    let gName = "None"; let gDesc = "Standard Rock";
-    if (inst > 50) { gName="BoreMax"; gDesc="Critical Instability (>50%)"; } 
-    else if (res > 50) { gName="Sabir"; gDesc="Critical Resistance (>50%)"; } 
-    else if (inst > 30) { gName="Stalwart"; gDesc="High Instability (>30%)"; } 
-    else if (res > 30) { gName="OptiMax"; gDesc="High Resistance (>30%)"; } 
-    else if (mass > 18000) { gName="Waveshift"; gDesc="Mass Stabilizer (>18k)"; } 
-    else if (mass < 8000) { gName="Okunis"; gDesc="Speed Extraction (<8k)"; }
+    // --- 4.7 GADGET STRATEGY UPDATES ---
+    let gName = "None"; let gDesc = "Standard 4.7 Node";
+    if (inst > 70) { gName="BoreMax"; gDesc="Critical Instability (>70%)"; } 
+    else if (res > 75) { gName="Sabir"; gDesc="Critical Resistance (>75%)"; } 
+    else if (inst > 50) { gName="Stalwart"; gDesc="High Instability (>50%)"; } 
+    else if (res > 50) { gName="OptiMax"; gDesc="High Resistance (>50%)"; } 
+    else if (mass > 12000) { gName="Waveshift"; gDesc="High Mass Node (>12k)"; } // Lowered for 4.7
+    else if (mass < 4000) { gName="Okunis"; gDesc="Quick Extraction (<4k)"; }
     
     const gadgHtml = `<div class="p-4 mb-6 rounded-lg bg-purple-900/20 border border-purple-500/30 shadow-lg"><h4 class="text-sm font-bold text-purple-400 uppercase mb-2 tracking-wider border-b border-purple-500/20 pb-2">Gadget Strategy</h4><div class="flex justify-between items-center"><div><p class="text-lg font-black text-white">${gName}</p><p class="text-[10px] text-purple-200/70 font-mono">${gDesc}</p></div><div class="text-2xl">🧩</div></div></div>`;
 
+    // --- 4.7 FLEET STRATEGY UPDATES ---
     let strategyName = "Standard Extraction Protocol";
     let strategyColor = "text-green-400";
-    let moleL = "";
-    let prosL = "";
-    let golemL = "";
+    let moleL = ""; let prosL = ""; let golemL = "";
 
-    if (inst > 60) {
-        strategyName = "Hazard Protocol (Inst > 60%)";
+    if (inst > 70) { // Was 60
+        strategyName = "Hazard Protocol (Inst > 70%)";
         strategyColor = "text-red-500";
         moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Lancet MH2 + Focus III x2</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>`;
         prosL = `<span class="text-gray-300">Lancet MH1 + Focus III</span>`;
         golemL = `<span class="text-gray-300">Pitman + Focus III x2</span>`;
-    } else if (res > 40 || deficit > 0) {
-        strategyName = "Resistance Breaker (Res > 40%)";
+    } else if (res > 60 || deficit > 0) { // Was 40
+        strategyName = "Resistance Breaker (Res > 60%)";
         strategyColor = "text-red-400";
         moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Surge + Rieger-C3 x2</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Brandt + Focus III</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>`;
         prosL = `<span class="text-gray-300">Helix I + Surge + Rieger-C3</span>`;
         golemL = `<span class="text-gray-300">Pitman + Surge + Rieger-C3</span>`;
-    } else if (inst > 30) {
+    } else if (inst > 45) { // Was 30
         strategyName = "Stabilization Focus";
         strategyColor = "text-yellow-400";
         moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Focus III x3</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>`;
         prosL = `<span class="text-gray-300">Hofstede-S1 + Focus III</span>`;
         golemL = `<span class="text-gray-300">Pitman + Focus III + Rieger-C3</span>`;
-    } else if (mass > 25000) {
-        strategyName = "Cluster Extraction";
+    } else if (mass > 14000) { // Was 25000 (Very rare in 4.7)
+        strategyName = "Heavy Cluster Protocol";
         strategyColor = "text-blue-400";
         moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Impact II + Surge + Torrent III x2</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III x2 + FLTR-XL</div>`;
         prosL = `<span class="text-gray-300">Impact I + Torrent III + FLTR-XL</span>`;
         golemL = `<span class="text-gray-300">Pitman + Torrent III x2</span>`;
     } else {
-        strategyName = "Eco / Standard";
+        strategyName = "Standard 4.7 Eco";
         strategyColor = "text-gray-400";
-        moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Rieger-C3 x2</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Lancet MH2 + Focus III x2</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Impact II + Torrent III + FLTR-XL</div>`;
+        moleL = `<div class="mb-1"><span class="text-red-400 font-bold">Hd1 (Break):</span> Helix II + Rieger-C3 x2</div><div class="mb-1"><span class="text-blue-400 font-bold">Hd2 (Stab):</span> Arbor MH2 + Focus III x2</div><div><span class="text-green-400 font-bold">Hd3 (Extr):</span> Arbor MH2 + Torrent III + FLTR-XL</div>`;
         prosL = `<span class="text-gray-300">Arbor MH1 + FLTR-XL</span>`;
         golemL = `<span class="text-gray-300">Pitman + FLTR-XL</span>`;
     }
