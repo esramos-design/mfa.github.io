@@ -88,7 +88,7 @@ const powerModules = [
     { name: "FLTR", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Passive', windowEffect: 0, miningLaserPower: 0 },
     // --- DEFAULT Modules ---
     { name: "None", multiplier: 1.00, resistanceEffect: 0.0, instabilityEffect: 0.0, activation: 'Default', windowEffect: 0, miningLaserPower: 0 },
-]; 
+];
 function sortModules(modules) {
     return modules.sort((a, b) => {
         if (a.name === 'None') return -1; if (b.name === 'None') return 1;
